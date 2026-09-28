@@ -1,0 +1,2482 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Marinier Selectietrainer</title>
+<meta name="description" content="Gratis, onofficiële trainer voor capaciteitentests: cijferreeksen, analogieën, diagrammen, figuurreeksen, logisch en abstract redeneren. Elke training nieuwe vragen.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Stencil+One&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{
+  --bg:#EDF0EC;--card:#FAFBF8;--sunk:#E4E8E3;--ink:#15212B;--muted:#56626D;--line:#CCD3CF;
+  --acc:#1D4B6E;--acc-ink:#FFFFFF;--acc-soft:#DAE5EE;--olive:#56663A;--olive-soft:#E3E8D6;
+  --good:#2B7A4B;--good-soft:#DDEFE3;--bad:#B0382C;--bad-soft:#F6DFDB;--warn:#9A6210;--warn-soft:#F5E8D2;
+  --figbg:#FAFBF8;
+  --display:"Saira Stencil One",Impact,"Arial Narrow",sans-serif;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0D141A;--card:#151F27;--sunk:#101920;--ink:#E3E9E6;--muted:#93A0A9;--line:#2A3843;
+    --acc:#7DB2DA;--acc-ink:#0D141A;--acc-soft:#1B3244;--olive:#A6BA7C;--olive-soft:#232B1A;
+    --good:#5DC08A;--good-soft:#173325;--bad:#E8786A;--bad-soft:#3A1D1A;--warn:#E2A94E;--warn-soft:#352812;
+    --figbg:#151F27;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0D141A;--card:#151F27;--sunk:#101920;--ink:#E3E9E6;--muted:#93A0A9;--line:#2A3843;
+  --acc:#7DB2DA;--acc-ink:#0D141A;--acc-soft:#1B3244;--olive:#A6BA7C;--olive-soft:#232B1A;
+  --good:#5DC08A;--good-soft:#173325;--bad:#E8786A;--bad-soft:#3A1D1A;--warn:#E2A94E;--warn-soft:#352812;
+  --figbg:#151F27;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.55;margin:0;padding-inline:16px;padding-block:0 64px}
+.wrap{max-width:800px;margin:0 auto}
+header.top{padding-block:24px 4px;display:grid;gap:6px}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--olive);font-weight:600}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(32px,7vw,50px);line-height:1;margin:0;letter-spacing:.01em;text-wrap:balance}
+h2{font-family:var(--display);font-weight:400;font-size:clamp(24px,5vw,30px);line-height:1.1;margin:0 0 8px;text-wrap:balance}
+h3{font-size:17px;margin:0 0 6px;line-height:1.3}
+p{margin:0 0 12px}
+.lede{color:var(--muted);margin:2px 0 0;max-width:62ch}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+.num,.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+a{color:var(--acc)}
+button{font:inherit;color:inherit}
+button:focus-visible,a:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+
+nav.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:18px 0 22px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5}
+nav.tabs button{font-weight:600;font-size:15px;background:none;border:0;color:var(--muted);padding:12px 14px;border-bottom:3px solid transparent;margin-bottom:-1px;cursor:pointer}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--acc)}
+
+.btn{font-weight:600;border-radius:8px;padding:10px 18px;border:1px solid var(--acc);background:var(--acc);color:var(--acc-ink);cursor:pointer;line-height:1.3}
+.btn.ghost{background:transparent;color:var(--acc)}
+.btn.quiet{background:transparent;border-color:var(--line);color:var(--ink)}
+.btn:disabled{opacity:.4;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.spread{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+
+/* Menu */
+.modes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:600px){.modes{grid-template-columns:1fr}}
+.mode{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:start;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;cursor:pointer}
+.mode:hover{border-color:var(--acc)}
+.mode .no{font-family:var(--display);font-size:30px;line-height:1;color:var(--acc);grid-row:span 2;min-width:26px}
+.mode h3{margin:0}
+.mode ul{margin:0;padding-left:18px;font-size:14px;color:var(--muted)}
+.mode.star{border-color:var(--olive);background:var(--olive-soft)}
+.mode.star .no{color:var(--olive)}
+.sessionbar{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:14px}
+.sessionbar b{font-family:var(--mono);font-weight:500}
+
+/* Wizard */
+.steps-dots{display:flex;gap:6px;margin-bottom:14px}
+.steps-dots i{height:4px;flex:1;border-radius:2px;background:var(--line)}
+.steps-dots i.on{background:var(--acc)}
+.choices-list{display:grid;gap:8px;margin:14px 0 18px}
+.pick{display:grid;grid-template-columns:auto 1fr;gap:2px 14px;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer}
+.pick:hover{border-color:var(--acc)}
+.pick[aria-pressed="true"]{border-color:var(--acc);background:var(--acc-soft)}
+.pick .k{font-family:var(--mono);font-size:14px;color:var(--acc);grid-row:span 2;min-width:34px;padding-top:2px}
+.pick b{font-weight:600}
+.pick span.d{font-size:14px;color:var(--muted)}
+.pick .rec{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--olive);margin-left:6px}
+.note{font-size:14px;color:var(--muted);border:1px dashed var(--line);border-radius:8px;padding:10px 12px}
+.summary{display:grid;grid-template-columns:auto 1fr;gap:6px 18px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin:12px 0 16px;font-size:15px}
+.summary dt{color:var(--muted)}
+.summary dd{margin:0;font-weight:600}
+
+/* Training */
+.qbar{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;justify-content:space-between;margin-bottom:10px}
+.qbar .left{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:3px 10px;border-radius:99px;background:var(--acc-soft);color:var(--acc)}
+.chip.olive{background:var(--olive-soft);color:var(--olive)}
+.chip.warn{background:var(--warn-soft);color:var(--warn)}
+.counter{font-family:var(--mono);font-size:14px;color:var(--muted)}
+.timer{font-family:var(--mono);font-size:17px;padding:3px 10px;border-radius:6px;background:var(--card);border:1px solid var(--line);min-width:70px;text-align:center}
+.timer.low{color:var(--bad);border-color:var(--bad)}
+.tbar{height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:16px}
+.tbar i{display:block;height:100%;background:var(--acc);transition:width 1s linear}
+.tbar i.low{background:var(--bad)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px}
+@media (max-width:480px){.card{padding:16px}}
+.qtext{font-size:18px;font-weight:600;margin-bottom:14px;text-wrap:pretty}
+.answers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px}
+.answers.figopts{grid-template-columns:repeat(auto-fill,minmax(118px,1fr))}
+@media (max-width:480px){.answers{grid-template-columns:1fr}.answers.figopts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.ans{display:flex;align-items:center;gap:12px;text-align:left;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--bg);cursor:pointer;min-height:54px}
+.answers.figopts .ans{flex-direction:column;gap:6px;padding:10px}
+.ans:hover:not(:disabled){border-color:var(--acc)}
+.ans:disabled{cursor:default}
+.ans .k{font-family:var(--mono);font-size:13px;width:26px;height:26px;display:grid;place-items:center;border-radius:50%;border:1px solid var(--line);flex:none;background:var(--card)}
+.ans .v{font-size:17px;min-width:0;overflow-wrap:anywhere}
+.ans .v.mono{font-family:var(--mono);font-size:19px;letter-spacing:.04em}
+.ans svg{width:74px;height:74px}
+.ans.ok{border-color:var(--good);background:var(--good-soft)}
+.ans.ok .k{background:var(--good);border-color:var(--good);color:var(--card)}
+.ans.no{border-color:var(--bad);background:var(--bad-soft)}
+.ans.no .k{background:var(--bad);border-color:var(--bad);color:var(--card)}
+.ans .opbox{width:30px;height:30px}
+.cmds{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.cmd{font-family:var(--mono);font-size:12px;letter-spacing:.04em;padding:6px 10px;border-radius:6px;border:1px solid var(--line);background:var(--card);cursor:pointer;color:var(--ink)}
+.cmd:hover:not(:disabled){border-color:var(--acc);color:var(--acc)}
+.cmd:disabled{opacity:.4;cursor:default}
+.cmd.stop{color:var(--bad)}
+.hintbox{margin-top:14px;padding:10px 12px;border-radius:8px;background:var(--warn-soft);color:var(--ink);font-size:15px;border-left:3px solid var(--warn)}
+
+/* Stems */
+.seq{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px}
+.seq span{font-family:var(--mono);font-size:22px;min-width:52px;text-align:center;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+.seq span.q,.pairs .q{color:var(--acc);border-style:dashed;border-color:var(--acc)}
+.pairs{display:flex;flex-wrap:wrap;gap:10px}
+.pairs span{font-family:var(--mono);font-size:22px;padding:8px 14px;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+.pairs i{font-style:normal;color:var(--muted);margin:0 4px}
+.pairs b{font-weight:500;padding:0 6px;border:1px dashed var(--acc);border-radius:4px}
+.analogy{font-size:22px;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:baseline;margin-bottom:6px}
+.analogy.mono{font-family:var(--mono);letter-spacing:.06em}
+.analogy b{font-weight:600}
+.analogy .op{color:var(--muted);font-family:var(--mono)}
+.analogy .gap{color:var(--acc);border-bottom:2px dashed var(--acc);min-width:70px;display:inline-block;text-align:center}
+.legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:6px 16px;font-size:14px;padding:12px;border:1px solid var(--line);border-radius:8px;margin-bottom:14px;background:var(--bg)}
+.legend>div{display:flex;gap:10px;align-items:center}
+.legend .ex{display:block;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.opbox{font-size:17px;display:inline-grid;place-items:center;width:34px;height:34px;border:2px solid var(--ink);border-radius:4px;flex:none;background:var(--card)}
+.opbox.q{border-style:dashed;border-color:var(--acc);color:var(--acc);font-family:var(--mono)}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.flow .str{font-family:var(--mono);font-size:20px;letter-spacing:.12em;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:var(--card)}
+.flow .str.q{color:var(--acc);border-style:dashed;border-color:var(--acc)}
+.flow .arr{color:var(--muted)}
+.figs{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.figs .op{font-family:var(--mono);color:var(--muted);font-size:20px}
+.fig{width:84px;height:84px;border:1px solid var(--line);border-radius:6px;background:var(--figbg);display:grid;place-items:center}
+@media (max-width:420px){.fig{width:68px;height:68px}}
+.fig.q{border-style:dashed;border-color:var(--acc);color:var(--acc);font-family:var(--mono);font-size:26px}
+.fig svg{width:88%;height:88%}
+.matrix{display:grid;grid-template-columns:repeat(3,84px);gap:6px}
+@media (max-width:420px){.matrix{grid-template-columns:repeat(3,68px)}}
+.facts{margin:0;padding-left:20px;font-size:17px;display:grid;gap:4px}
+.s-ink{stroke:var(--ink)} .f-ink{fill:var(--ink)} .f-none{fill:none} .f-acc{fill:var(--acc)} .s-bg{stroke:var(--figbg)} .f-bg{fill:var(--figbg)}
+
+/* Feedback */
+.verdict{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:14px}
+.verdict div{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.verdict small{display:block;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.verdict b{font-size:18px}
+.verdict .good{color:var(--good)} .verdict .bad{color:var(--bad)}
+.fb h3{margin-top:18px;font-size:15px;text-transform:uppercase;letter-spacing:.06em;color:var(--olive)}
+.fb ol{margin:0;padding-left:22px;display:grid;gap:4px}
+.fb .lesson{font-weight:600;padding:10px 12px;border-radius:8px;background:var(--acc-soft)}
+.fb .miss{padding:10px 12px;border-radius:8px;background:var(--bad-soft)}
+.others{margin:0;padding-left:0;list-style:none;display:grid;gap:6px;font-size:15px}
+.others li{display:grid;grid-template-columns:28px 1fr;gap:8px}
+.others .k{font-family:var(--mono)}
+.progress{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:18px}
+.progress div{border-top:2px solid var(--line);padding-top:6px}
+.progress small{display:block;font-size:12px;color:var(--muted)}
+.progress b{font-family:var(--mono);font-weight:500;font-size:17px}
+.progress b.txt{font-family:var(--sans);font-weight:600;font-size:15px}
+.notes{display:grid;gap:6px;margin-top:12px}
+.notes div{font-size:14px;padding:8px 12px;border-radius:8px;background:var(--olive-soft)}
+
+/* Report */
+.report h3{margin-top:20px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:14px 0}
+.kpis div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.kpis small{display:block;font-size:12px;color:var(--muted)}
+.kpis b{font-family:var(--mono);font-size:26px;font-weight:500}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--card)}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+td.n{font-family:var(--mono);white-space:nowrap}
+.meter{height:8px;background:var(--sunk);border-radius:4px;overflow:hidden;min-width:80px}
+.meter i{display:block;height:100%;background:var(--good)}
+.meter i.mid{background:var(--warn)} .meter i.low{background:var(--bad)}
+ul.list{margin:0;padding-left:20px;display:grid;gap:4px}
+details.rev{border:1px solid var(--line);border-radius:8px;background:var(--card);margin-bottom:8px}
+details.rev summary{cursor:pointer;padding:10px 14px;display:flex;gap:10px;align-items:center;list-style:none;font-size:15px}
+details.rev summary::-webkit-details-marker{display:none}
+details.rev .body{padding:4px 14px 14px}
+.mark{font-family:var(--mono);font-size:13px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;flex:none}
+.mark.ok{background:var(--good);color:var(--card)} .mark.no{background:var(--bad);color:var(--card)}
+
+/* Overlay & toast */
+.overlay{position:fixed;inset:0;background:rgba(10,16,22,.45);display:grid;place-items:center;padding:16px;z-index:20}
+.panel{background:var(--card);color:var(--ink);border-radius:12px;padding:20px;max-width:520px;width:100%;max-height:85vh;overflow:auto;border:1px solid var(--line)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:14px;z-index:30;max-width:calc(100% - 32px)}
+
+/* Info */
+.info section{margin-bottom:28px}
+.stepsl{list-style:none;padding:0;margin:0}
+.stepsl li{display:grid;grid-template-columns:36px 1fr;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.stepsl li:last-child{border-bottom:1px solid var(--line)}
+.stepsl .n{font-family:var(--display);font-size:24px;color:var(--acc);line-height:1}
+.tag{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--warn);border:1px solid currentColor;border-radius:4px;padding:1px 5px;white-space:nowrap}
+.week{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.week div{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px;font-size:14px}
+.week b{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--olive);margin-bottom:4px}
+footer.foot{margin-top:40px;padding-top:14px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">Onofficiële oefenomgeving</div>
+    <h1>Marinier Selectietrainer</h1>
+    <p class="lede">Je persoonlijke trainer voor de cognitieve capaciteitentest. Elke training krijg je nieuwe vragen, uitleg per antwoord en een rapport met je zwakke punten.</p>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="train">Trainer</button>
+    <button role="tab" aria-selected="false" data-tab="info">Selectie &amp; voorbereiding</button>
+  </nav>
+
+  <main id="app" aria-live="polite"></main>
+
+  <main id="info" class="info" hidden>
+    <section>
+      <h2>Hoe de selectie loopt</h2>
+      <p class="muted">Het Korps Mariniers stelt zwaardere eisen dan de meeste andere functies bij Defensie. Naast de gewone selectiekeuring zijn er extra fysieke testen en selectiemomenten.</p>
+      <ol class="stepsl">
+        <li><span class="n">1</span><div><h3>Solliciteren</h3><p class="small">Via werkenbijdefensie.nl, bij een vacature voor marinier. Daar staan ook de actuele toelatingseisen.</p></div></li>
+        <li><span class="n">2</span><div><h3>Psychologisch onderzoek</h3><p class="small">Een capaciteitentest (de onderdelen die je in deze trainer oefent), vragenlijsten over je persoonlijkheid en een gesprek. Ze kijken naar karakter, kennis en instelling. Waarom wil je marinier worden, en kun je dat goed uitleggen?</p></div></li>
+        <li><span class="n">3</span><div><h3>Medische keuring en sporttest</h3><p class="small">Lichamelijk onderzoek met een oog- en gehoortest. De sporttest valt onder het medische onderdeel.</p></div></li>
+        <li><span class="n">4</span><div><h3>Veiligheidsonderzoek</h3><p class="small">Uitgevoerd door de MIVD, onder meer een controle op justitiële contacten.</p></div></li>
+        <li><span class="n">5</span><div><h3>Extra selectie voor mariniers</h3><p class="small">Aanvullende fysieke testen en selectiemomenten bovenop de gewone keuring.</p></div></li>
+        <li><span class="n">6</span><div><h3>Opleiding</h3><p class="small">Een lange en zware opleiding, beginnend met de eerste militaire vorming voor mariniers en daarna een vervolgopleiding. Ga uit van ongeveer een jaar in totaal. <span class="tag">indicatief</span></p></div></li>
+      </ol>
+    </section>
+    <section>
+      <h2>De sporttest</h2>
+      <p class="muted">De normen hangen af van het functiecluster. Mariniers zitten in het zwaarste cluster. De getallen hieronder komen van voorbereidingssites, niet van Defensie zelf. Controleer ze bij je werving.</p>
+      <div class="tbl"><table>
+        <thead><tr><th>Onderdeel</th><th>Wat je doet</th><th>Richting voor mariniers</th></tr></thead>
+        <tbody>
+          <tr><td>Hardlooptest</td><td>Maximaal 12 minuten om de afstand van je cluster te halen</td><td class="n">±2.700 m <span class="tag">indicatief</span></td></tr>
+          <tr><td>Marstest</td><td>Lopen met bepakking op 5 km/u; duur en gewicht lopen op</td><td>Zwaar gewicht, tot ±45 kg <span class="tag">indicatief</span></td></tr>
+          <tr><td>Til- en draagtest</td><td>Munitiekist 25 m verplaatsen, elke 25 seconden opnieuw</td><td>Tot ±40 kg <span class="tag">indicatief</span></td></tr>
+          <tr><td>Graaftest</td><td>Medicijnbal-rotaties tegen een muur, 30 s per kant</td><td>—</td></tr>
+          <tr><td>Binnenparcours</td><td>Klimmen, klauteren, hurken, schiethoudingen</td><td>—</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+    <section>
+      <h2>Voorbereiden</h2>
+      <h3>Capaciteitentest</h3>
+      <ul class="list">
+        <li>Start met de automatische niveaubepaling. Oefen daarna vooral je zwakste onderdeel.</li>
+        <li>Kom je niet uit een vraag, gok dan en ga door. Een lege vraag levert nooit punten op.</li>
+        <li>Bij figuurreeksen zitten vaak twee regels tegelijk, bijvoorbeeld draaien én kleur wisselen. Check elk kenmerk apart.</li>
+        <li>Oefenen maakt je niet slimmer, maar je raakt wel gewend aan de vraagtypes en de tijdsdruk.</li>
+        <li>Ook handig: <a href="https://www.oefenassessment.nl/oefenen/" target="_blank" rel="noopener">oefenassessment.nl</a>.</li>
+      </ul>
+      <h3 style="margin-top:18px">Fysiek</h3>
+      <p class="small">Alleen hardlopen is niet genoeg. Combineer conditie, kracht en marsen, en bouw het gewicht rustig op.</p>
+      <div class="week">
+        <div><b>Hardlopen</b>2–3× per week: één rustige duurloop, één intervaltraining. Loop elke 2–4 weken een 12-minutentest.</div>
+        <div><b>Kracht</b>2× per week: opdrukken, optrekken, squats, deadlifts, core.</div>
+        <div><b>Marsen</b>1× per week met een rugzak. Begin licht (±10 kg) en voer het gewicht en de afstand geleidelijk op.</div>
+        <div><b>Zwemmen</b>Mariniers werken op en rond het water. Zorg dat je alle zwemslagen goed beheerst.</div>
+      </div>
+      <p class="note" style="margin-top:14px">Eisen en procedures kunnen veranderen. De actuele info staat op <a href="https://werkenbijdefensie.nl/selectie-en-keuring/" target="_blank" rel="noopener">werkenbijdefensie.nl</a> en <a href="https://www.defensie.nl/onderwerpen/k/keuringen-en-opleidingen-bij-defensie/selectiekeuring-en-toelatingseisen" target="_blank" rel="noopener">defensie.nl</a>.</p>
+    </section>
+  </main>
+
+  <footer class="foot">
+    Onofficieel oefenproject. Niet verbonden aan Defensie of het Korps Mariniers. Alle vragen worden automatisch gegenereerd en zijn geen echte assessmentvragen. Je resultaten blijven alleen in je eigen browser.
+  </footer>
+</div>
+<script>
+/* Marinier Selectietrainer — gedeelde hulpfuncties
+ * Alle vragen worden willekeurig gegenereerd. Niets hiervan zijn officiële
+ * vragen van Defensie of het Korps Mariniers. */
+(function (G) {
+  'use strict';
+  const MT = (G.MT = G.MT || {});
+
+  const rand = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+  const pick = (a) => a[Math.floor(Math.random() * a.length)];
+  const chance = (p) => Math.random() < p;
+  const shuffle = (a) => {
+    a = a.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+  const esc = (s) =>
+    String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const fmtNum = (n) => (n < 0 ? '−' + Math.abs(n) : String(n));
+  const sgn = (d) => (d >= 0 ? '+ ' + d : '− ' + Math.abs(d));
+  const LETTERS = 'ABCDE';
+
+  /** Aantal antwoordopties per moeilijkheid. */
+  const optCount = (d) => (d >= 3 ? 5 : 4);
+
+  /**
+   * Maakt de antwoordopties.
+   * correct: {key, html, text}
+   * pool: [{key, html, text, why, tag}] in volgorde van voorkeur (meest verleidelijke eerst)
+   * Geeft null terug als er te weinig unieke afleiders zijn (generator probeert opnieuw).
+   */
+  function buildOptions(correct, pool, n) {
+    const seen = new Set([correct.key]);
+    const chosen = [];
+    for (const p of pool) {
+      if (p == null || p.key == null || seen.has(p.key)) continue;
+      seen.add(p.key);
+      chosen.push(p);
+      if (chosen.length === n - 1) break;
+    }
+    if (chosen.length < n - 1) return null;
+    const opts = shuffle([{ ...correct, why: null, tag: null, correct: true }, ...chosen]);
+    return { opts, ans: opts.findIndex((o) => o.correct) };
+  }
+
+  /** Probeer een generator meerdere keren tot hij een geldige vraag oplevert. */
+  function attempt(fn, tries = 400) {
+    for (let i = 0; i < tries; i++) {
+      const q = fn();
+      if (q) return q;
+    }
+    throw new Error('Kon geen geldige vraag maken');
+  }
+
+  const CATS = {
+    num: { id: 'num', letter: 'A', name: 'Cijferreeksen', short: 'Cijfers', icon: '🔢', base: 40 },
+    ana: { id: 'ana', letter: 'B', name: 'Analogieën', short: 'Analogieën', icon: '🔤', base: 30 },
+    dia: { id: 'dia', letter: 'C', name: 'Diagrammen', short: 'Diagrammen', icon: '◯', base: 50 },
+    fig: { id: 'fig', letter: 'D', name: 'Figuurreeksen', short: 'Figuren', icon: '🔷', base: 45 },
+    log: { id: 'log', letter: 'E', name: 'Logisch redeneren', short: 'Logisch', icon: '🧩', base: 70 },
+    abs: { id: 'abs', letter: 'F', name: 'Abstract redeneren', short: 'Abstract', icon: '🧠', base: 50 },
+  };
+  const CAT_IDS = Object.keys(CATS);
+
+  MT.util = { rand, pick, chance, shuffle, esc, clamp, fmtNum, sgn, LETTERS, optCount, buildOptions, attempt };
+  MT.CATS = CATS;
+  MT.CAT_IDS = CAT_IDS;
+  MT.gens = MT.gens || {};
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+/* Tekenen van figuren (SVG) — gedeeld door figuurreeksen en abstract redeneren */
+(function (G) {
+  'use strict';
+  const MT = G.MT;
+  let uid = 0;
+
+  const SHAPES = ['circle', 'square', 'triangle', 'diamond', 'pentagon', 'hexagon'];
+  const SHAPE_NL = { circle: 'cirkel', square: 'vierkant', triangle: 'driehoek', diamond: 'ruit', pentagon: 'vijfhoek', hexagon: 'zeshoek' };
+  const CORNERS = { circle: 0, square: 4, triangle: 3, diamond: 4, pentagon: 5, hexagon: 6 };
+  const FILL_NL = { empty: 'leeg', full: 'gevuld', half: 'half gevuld' };
+  const DIR_NL = { 0: 'omhoog', 45: 'rechtsboven', 90: 'rechts', 135: 'rechtsonder', 180: 'omlaag', 225: 'linksonder', 270: 'links', 315: 'linksboven' };
+  const norm = (a) => ((a % 360) + 360) % 360;
+
+  function poly(n, cx, cy, r, rot = -90) {
+    const pts = [];
+    for (let i = 0; i < n; i++) {
+      const a = ((rot + (360 / n) * i) * Math.PI) / 180;
+      pts.push(`${(cx + r * Math.cos(a)).toFixed(1)},${(cy + r * Math.sin(a)).toFixed(1)}`);
+    }
+    return pts.join(' ');
+  }
+  function shapeEl(shape, attrs) {
+    switch (shape) {
+      case 'circle': return { el: `<circle cx="35" cy="30" r="21" ${attrs}/>`, cy: 30 };
+      case 'square': return { el: `<rect x="15" y="10" width="40" height="40" ${attrs}/>`, cy: 30 };
+      case 'triangle': return { el: `<polygon points="35,5 60,50 10,50" ${attrs}/>`, cy: 35 };
+      case 'diamond': return { el: `<polygon points="35,5 60,30 35,55 10,30" ${attrs}/>`, cy: 30 };
+      case 'pentagon': return { el: `<polygon points="${poly(5, 35, 31, 23)}" ${attrs}/>`, cy: 32 };
+      case 'hexagon': return { el: `<polygon points="${poly(6, 35, 30, 23, 0)}" ${attrs}/>`, cy: 30 };
+    }
+  }
+
+  /** f = {shape, fill, rot, dots} */
+  function draw(f) {
+    const id = 'c' + ++uid;
+    const base = shapeEl(f.shape, '');
+    const cy = base.cy;
+    let s = '';
+    if (f.fill === 'half') {
+      s += `<clipPath id="${id}"><rect x="0" y="0" width="35" height="70"/></clipPath>`;
+      s += shapeEl(f.shape, 'class="f-ink" clip-path="url(#' + id + ')"').el;
+    }
+    s += shapeEl(f.shape, `class="s-ink ${f.fill === 'full' ? 'f-ink' : 'f-none'}" stroke-width="2.4" stroke-linejoin="round"`).el;
+    const a = `<g transform="rotate(${f.rot} 35 ${cy})"><line x1="35" y1="${cy + 10}" x2="35" y2="${cy - 5}" stroke-width="3.2" stroke-linecap="round"/><polygon points="35,${cy - 13} 29,${cy - 3} 41,${cy - 3}" stroke-width="0"/></g>`;
+    if (f.fill === 'full') s += `<g class="s-bg f-bg">${a}</g>`;
+    else if (f.fill === 'half') s += `<g class="s-bg f-bg" style="stroke-width:6">${a.replace(/stroke-width="[\d.]+"/g, '')}</g><g class="s-ink f-ink">${a}</g>`;
+    else s += `<g class="s-ink f-ink">${a}</g>`;
+    const n = f.dots || 0;
+    for (let i = 0; i < n; i++) s += `<circle cx="${35 - (n - 1) * 4 + i * 8}" cy="64" r="2.8" class="f-ink"/>`;
+    return `<svg viewBox="0 0 70 70" aria-hidden="true">${s}</svg>`;
+  }
+
+  /** Raster: n = 3 of 4; markers = [{pos, m:1|2}] ; pos = index in n×n */
+  function drawGrid(n, markers) {
+    const cell = n === 3 ? 19 : 14.5, gap = 2, tot = n * cell + (n - 1) * gap, off = (70 - tot) / 2;
+    let s = '';
+    for (let i = 0; i < n * n; i++) {
+      const x = off + (i % n) * (cell + gap), y = off + Math.floor(i / n) * (cell + gap);
+      const m = markers.find((k) => k.pos === i);
+      s += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${cell}" height="${cell}" rx="2" class="${m && m.m === 1 ? 'f-acc' : 'f-bg'} s-ink" stroke-width="1.2"/>`;
+      if (m && m.m === 2) s += `<circle cx="${(x + cell / 2).toFixed(1)}" cy="${(y + cell / 2).toFixed(1)}" r="${(cell * 0.3).toFixed(1)}" class="f-ink"/>`;
+    }
+    return `<svg viewBox="0 0 70 70" aria-hidden="true">${s}</svg>`;
+  }
+  const perimeter = (n) => {
+    const p = [];
+    for (let c = 0; c < n; c++) p.push(c);
+    for (let r = 1; r < n; r++) p.push(r * n + n - 1);
+    for (let c = n - 2; c >= 0; c--) p.push((n - 1) * n + c);
+    for (let r = n - 2; r >= 1; r--) p.push(r * n);
+    return p;
+  };
+
+  const key = (f) => `${f.shape}|${f.fill}|${norm(f.rot)}|${f.dots}`;
+  const describe = (f) => `${SHAPE_NL[f.shape]}, ${FILL_NL[f.fill]}, pijl ${DIR_NL[norm(f.rot)]}, ${f.dots} ${f.dots === 1 ? 'stip' : 'stippen'}`;
+
+  MT.fig = { draw, drawGrid, perimeter, key, describe, norm, SHAPES, SHAPE_NL, CORNERS, FILL_NL, DIR_NL };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+/* A. Cijferreeksen */
+(function (G) {
+  'use strict';
+  const MT = G.MT;
+  const { rand, pick, chance, shuffle, fmtNum, sgn, optCount, buildOptions, attempt } = MT.util;
+
+  const diffs = (a) => a.slice(1).map((v, i) => v - a[i]);
+  const fd = (d) => (d >= 0 ? '+' + d : '−' + Math.abs(d));
+  const P = [];
+  const def = (o) => P.push(o);
+
+  // Elk patroon: id, naam, niveaus [min,max], make(d) -> {seq, rule, derive(i), traps(i), midOk}
+  def({
+    id: 'arith', name: 'Vaste stap', lv: [1, 3],
+    hint: 'Kijk naar het verschil tussen twee opeenvolgende getallen.',
+    quick: 'Trek twee buren van elkaar af. Is dat verschil steeds gelijk, dan ben je klaar.',
+    lesson: 'Begin altijd met de verschillen tussen de getallen.',
+    make(d) {
+      const st = d === 1 ? rand(2, 6) : rand(3, 14) * (chance(0.4) ? -1 : 1);
+      let a = rand(1, d === 1 ? 20 : 70);
+      if (st < 0) a += Math.abs(st) * 7;
+      const seq = Array.from({ length: 6 }, (_, k) => a + k * st);
+      return {
+        seq, rule: `Elke stap is ${fd(st)}.`,
+        derive: (i) => `${fmtNum(seq[i - 1])} ${sgn(st)} = ${fmtNum(seq[i])}`,
+        traps: (i) => [{ v: seq[i - 1] + 2 * st, why: `Je deed de stap (${fd(st)}) twee keer.`, tag: 'Rekenfout' }],
+      };
+    },
+  });
+  def({
+    id: 'geo', name: 'Vermenigvuldigen / delen', lv: [1, 3],
+    hint: 'De getallen groeien (of krimpen) steeds sneller. Probeer delen in plaats van aftrekken.',
+    quick: 'Deel een getal door het vorige. Komt er steeds hetzelfde uit, dan is het ×.',
+    lesson: 'Groeien de verschillen snel? Denk aan vermenigvuldigen.',
+    make(d) {
+      const r = d === 1 ? 2 : pick([2, 3]);
+      const a = rand(1, d === 1 ? 4 : 5);
+      const down = d === 3 && chance(0.5);
+      const up = Array.from({ length: 6 }, (_, k) => a * r ** k);
+      const seq = down ? up.slice().reverse() : up;
+      return {
+        seq, rule: down ? `Elke stap wordt het getal gedeeld door ${r}.` : `Elke stap wordt het getal ×${r}.`,
+        derive: (i) => (down ? `${seq[i - 1]} ÷ ${r} = ${seq[i]}` : `${seq[i - 1]} × ${r} = ${seq[i]}`),
+        traps: (i) => [{
+          v: down ? seq[i - 1] - (seq[i - 2] - seq[i - 1]) : seq[i - 1] + (seq[i - 1] - seq[i - 2]),
+          why: 'Je herhaalde het laatste verschil. Hier wordt niet opgeteld maar vermenigvuldigd of gedeeld.', tag: 'Verkeerde regel',
+        }],
+      };
+    },
+  });
+  def({
+    id: 'plusmin', name: 'Afwisselend + en −', lv: [2, 3],
+    hint: 'Het verschil is niet steeds hetzelfde, maar wisselt om en om.',
+    quick: 'Schrijf de verschillen onder de reeks. Een zigzag (+ − + −) valt dan meteen op.',
+    lesson: 'Wisselen de verschillen van teken? Dan zijn er twee stappen die om en om gaan.',
+    make() {
+      const a = rand(3, 9), b = rand(1, a - 1), s0 = rand(1, 25);
+      const seq = [s0];
+      for (let k = 0; k < 6; k++) seq.push(seq[k] + (k % 2 === 0 ? a : -b));
+      return {
+        seq, rule: `De stappen wisselen om en om: +${a}, −${b}, +${a}, −${b}, …`,
+        derive: (i) => `${seq[i - 1]} ${(i - 1) % 2 === 0 ? '+ ' + a : '− ' + b} = ${seq[i]}`,
+        traps: (i) => [{
+          v: seq[i - 1] + ((i - 1) % 2 === 0 ? -b : a),
+          why: 'Je gebruikte de verkeerde stap. De stappen wisselen om en om, kijk welke nu aan de beurt is.', tag: 'Verkeerde regel',
+        }],
+      };
+    },
+  });
+  def({
+    id: 'incdiff', name: 'Oplopende verschillen', lv: [2, 4],
+    hint: 'Bekijk de verschillen. Is daar zelf een patroon in?',
+    quick: 'Schrijf de verschillen op een tweede regel. Die vormen vaak zelf een simpele reeks.',
+    lesson: 'Geen vaste stap? Zoek het patroon in de verschillen.',
+    make(d) {
+      const d0 = rand(1, 5), st = d >= 4 ? rand(2, 4) : rand(1, 3), a = rand(1, 25);
+      const seq = [a];
+      for (let k = 0; k < 6; k++) seq.push(seq[k] + d0 + k * st);
+      const df = diffs(seq);
+      return {
+        seq, rule: `De verschillen lopen steeds met ${st} op: ${df.map(fd).join(', ')}.`,
+        derive: (i) => `${seq[i - 1]} ${sgn(seq[i] - seq[i - 1])} = ${seq[i]}`,
+        traps: (i) => [
+          { v: seq[i - 1] + (seq[i - 1] - seq[i - 2]), why: 'Je herhaalde het vorige verschil, maar de verschillen lopen op.', tag: 'Verkeerde regel' },
+          { v: seq[i] + st, why: `De verschillen groeien met ${st}, niet met ${2 * st}.`, tag: 'Rekenfout' },
+        ],
+      };
+    },
+  });
+  def({
+    id: 'alt2', name: 'Twee reeksen door elkaar', lv: [2, 4],
+    hint: 'Kijk alleen naar de 1e, 3e, 5e… getallen, en daarna naar de 2e, 4e, 6e…',
+    quick: 'Springt de reeks op en neer? Lees om en om: dan zie je twee simpele reeksen.',
+    lesson: 'Rare sprongen? Probeer om-en-om te lezen.',
+    make(d) {
+      const a = rand(1, 20), d1 = rand(2, 7);
+      const geoB = d >= 4 && chance(0.6);
+      const b = geoB ? rand(1, 3) : rand(30, 70), d2 = rand(2, 6);
+      const seq = [];
+      for (let k = 0; k < 8; k++) {
+        const j = Math.floor(k / 2);
+        seq.push(k % 2 === 0 ? a + j * d1 : geoB ? b * 2 ** j : b - j * d2);
+      }
+      const opB = geoB ? '×2' : '−' + d2;
+      return {
+        seq, rule: `Twee reeksen om en om. De 1e, 3e, 5e… gaan steeds +${d1}. De 2e, 4e, 6e… gaan steeds ${opB}.`,
+        derive: (i) => {
+          const first = i % 2 === 0;
+          return `Plek ${i + 1} hoort bij de ${first ? 'eerste' : 'tweede'} reeks: ${seq[i - 2]} ${first ? '+ ' + d1 : geoB ? '× 2' : '− ' + d2} = ${seq[i]}`;
+        },
+        traps: (i) => {
+          const first = i % 2 === 0;
+          return [
+            { v: first ? seq[i - 1] + d1 : geoB ? seq[i - 1] * 2 : seq[i - 1] - d2, why: 'Je paste de juiste stap toe op het getal ervoor. Die hoort bij de andere reeks.', tag: 'Verkeerde regel' },
+            { v: first ? (geoB ? seq[i - 2] * 2 : seq[i - 2] - d2) : seq[i - 2] + d1, why: 'Je gebruikte de stap van de andere reeks.', tag: 'Verkeerde regel' },
+          ];
+        },
+      };
+    },
+  });
+  def({
+    id: 'altop', name: 'Afwisselende bewerkingen', lv: [3, 4],
+    hint: 'Er zijn twee verschillende bewerkingen die elkaar afwisselen.',
+    quick: 'Kijk naar paren stappen: één kleine (+ of −) en één grote (×).',
+    lesson: 'Groot, klein, groot, klein? Twee bewerkingen die afwisselen.',
+    make(d) {
+      const m = d >= 4 ? pick([2, 3]) : 2, x = rand(1, 5), neg = d >= 4 && m === 2 && chance(0.5);
+      const a = rand(neg ? 4 : 1, neg ? 8 : 6);
+      const seq = [a];
+      for (let k = 0; k < 6; k++) seq.push(k % 2 === 0 ? seq[k] + (neg ? -x : x) : seq[k] * m);
+      const op1 = neg ? '−' + x : '+' + x;
+      if (seq.some((v) => v <= 0)) return null;
+      return {
+        seq, rule: `De bewerkingen wisselen om en om: ${op1}, ×${m}, ${op1}, ×${m}, …`,
+        derive: (i) => ((i - 1) % 2 === 0 ? `${seq[i - 1]} ${neg ? '− ' + x : '+ ' + x} = ${seq[i]}` : `${seq[i - 1]} × ${m} = ${seq[i]}`),
+        traps: (i) => [{
+          v: (i - 1) % 2 === 0 ? seq[i - 1] * m : seq[i - 1] + (neg ? -x : x),
+          why: 'Je paste de verkeerde bewerking toe. Ze wisselen om en om; kijk welke nu aan de beurt is.', tag: 'Verkeerde regel',
+        }],
+      };
+    },
+  });
+  def({
+    id: 'fib', name: 'Som van de vorige twee', lv: [3, 4],
+    hint: 'Tel eens twee getallen naast elkaar bij elkaar op.',
+    quick: 'Klopt er geen vaste stap, probeer dan: getal 1 + getal 2 = getal 3?',
+    lesson: 'Groeien de verschillen mee met de reeks zelf? Denk aan optellen van vorige getallen.',
+    make() {
+      const seq = [rand(1, 6), rand(1, 9)];
+      for (let k = 2; k < 7; k++) seq.push(seq[k - 1] + seq[k - 2]);
+      return {
+        seq, rule: 'Elk getal is de som van de twee getallen ervoor.',
+        derive: (i) => `${seq[i - 2]} + ${seq[i - 1]} = ${seq[i]}`,
+        traps: (i) => [
+          { v: seq[i - 1] * 2, why: 'Je verdubbelde alleen het vorige getal. Je moet de twee vorige getallen optellen.', tag: 'Verkeerde regel' },
+          { v: seq[i - 1] + (seq[i - 1] - seq[i - 2]), why: 'Je herhaalde het vorige verschil.', tag: 'Verkeerde regel' },
+        ],
+      };
+    },
+  });
+  def({
+    id: 'pow', name: 'Kwadraten en machten', lv: [2, 5],
+    hint: 'Denk aan bekende getallen: 1, 4, 9, 16, 25… of 1, 8, 27, 64…',
+    quick: 'Ken de kwadraten tot 15 en de derde machten tot 6 uit je hoofd. Dan herken je ze direct.',
+    lesson: 'Verschillen van 3, 5, 7, 9…? Dat zijn kwadraten.',
+    make(d) {
+      const kind = d >= 5 ? pick(['rect', 'cube', 'sq']) : d === 4 ? pick(['cube', 'sq']) : 'sq';
+      const n0 = kind === 'cube' ? rand(1, 3) : rand(1, 6);
+      const c = d === 2 ? 0 : pick([0, 1, -1, 2, -2, 3]);
+      const f = (n) => (kind === 'sq' ? n * n : kind === 'cube' ? n ** 3 : n * (n + 1)) + c;
+      const fs = (n) => (kind === 'sq' ? `${n}×${n}` : kind === 'cube' ? `${n}×${n}×${n}` : `${n}×${n + 1}`) + (c ? (c > 0 ? ` + ${c}` : ` − ${-c}`) : '');
+      const seq = Array.from({ length: 6 }, (_, k) => f(n0 + k));
+      const nm = { sq: 'kwadraten (n × n)', cube: 'derde machten (n × n × n)', rect: 'n × (n + 1)' }[kind];
+      return {
+        seq, rule: `De reeks bestaat uit ${nm}${c ? `, steeds ${c > 0 ? 'plus ' + c : 'min ' + -c}` : ''}.`,
+        derive: (i) => `${fs(n0 + i)} = ${seq[i]}`,
+        traps: (i) => [
+          { v: f(n0 + i + 1), why: 'Je nam een grondtal te ver.', tag: 'Rekenfout' },
+          { v: seq[i - 1] + (seq[i - 1] - seq[i - 2]), why: 'Je herhaalde het vorige verschil, maar de verschillen lopen op.', tag: 'Verkeerde regel' },
+        ],
+      };
+    },
+  });
+  def({
+    id: 'mulminus', name: 'Twee bewerkingen per stap', lv: [3, 4],
+    hint: 'Elke stap bestaat uit twee bewerkingen: eerst vermenigvuldigen, dan iets erbij of eraf.',
+    quick: 'Is het volgende getal bijna het dubbele of driedubbele? Kijk dan hoeveel het ernaast zit.',
+    lesson: 'Bijna ×2? Dan zit er vaak nog een + of − achter.',
+    make(d) {
+      const m = d >= 4 ? pick([2, 3]) : 2, c = rand(1, 4) * (chance(0.6) ? -1 : 1), a = rand(2, 6);
+      const seq = [a];
+      for (let k = 0; k < 5; k++) seq.push(seq[k] * m + c);
+      if (seq.some((v) => v <= 0) || seq[5] > 2000) return null;
+      return {
+        seq, rule: `Elke stap: ×${m} en dan ${fd(c)}.`,
+        derive: (i) => `${seq[i - 1]} × ${m} ${sgn(c)} = ${seq[i]}`,
+        traps: (i) => [
+          { v: seq[i - 1] * m, why: `Je vergat de tweede bewerking (${fd(c)}).`, tag: 'Tweede regel gemist' },
+          { v: seq[i - 1] * m - c, why: `Je deed ${fd(-c)} in plaats van ${fd(c)}.`, tag: 'Verkeerde richting' },
+        ],
+      };
+    },
+  });
+  def({
+    id: 'diffmul', name: 'Verschillen vermenigvuldigen', lv: [4, 5],
+    hint: 'Schrijf de verschillen op. Hoe hangen die met elkaar samen?',
+    quick: 'Schrijf de verschillen op en deel ze door elkaar.',
+    lesson: 'Verschillen kunnen zelf ×2 of ×3 gaan.',
+    make(d) {
+      const r = d >= 5 && chance(0.5) ? 3 : 2, d0 = rand(1, 4), a = rand(1, 20);
+      const seq = [a];
+      for (let k = 0; k < 6; k++) seq.push(seq[k] + d0 * r ** k);
+      if (seq[6] > 3000) return null;
+      const df = diffs(seq);
+      return {
+        seq, rule: `De verschillen worden steeds ×${r}: ${df.map(fd).join(', ')}.`,
+        derive: (i) => `${seq[i - 1]} + ${seq[i] - seq[i - 1]} = ${seq[i]}`,
+        traps: (i) => {
+          const a1 = seq[i - 1] - seq[i - 2], a0 = seq[i - 2] - seq[i - 3];
+          return [
+            { v: seq[i - 1] + a1 + (a1 - a0), why: `Je liet de verschillen met een vast getal groeien. Ze worden ×${r}.`, tag: 'Verkeerde regel' },
+            { v: seq[i - 1] + a1, why: 'Je herhaalde het vorige verschil.', tag: 'Verkeerde regel' },
+          ];
+        },
+      };
+    },
+  });
+  def({
+    id: 'incmul', name: 'Oplopende vermenigvuldiger', lv: [4, 5],
+    hint: 'Deel elk getal door het vorige. Verandert de uitkomst?',
+    quick: 'Deel buren door elkaar: ×1, ×2, ×3… is een bekend patroon.',
+    lesson: 'Groeit de reeks steeds harder? Misschien loopt de vermenigvuldiger op.',
+    make() {
+      const m0 = rand(1, 2), a = rand(1, 3);
+      const seq = [a];
+      for (let k = 0; k < 5; k++) seq.push(seq[k] * (m0 + k));
+      return {
+        seq, rule: `Het getal wordt steeds met een oplopend getal vermenigvuldigd: ×${m0}, ×${m0 + 1}, ×${m0 + 2}, …`,
+        derive: (i) => `${seq[i - 1]} × ${m0 + i - 1} = ${seq[i]}`,
+        traps: (i) => [
+          { v: seq[i - 1] * (m0 + i - 2), why: 'Je gebruikte dezelfde vermenigvuldiger als bij de vorige stap. Die loopt op.', tag: 'Verkeerde regel' },
+          { v: seq[i - 1] * (m0 + i), why: 'Je nam de vermenigvuldiger één te hoog.', tag: 'Rekenfout' },
+        ],
+      };
+    },
+  });
+  def({
+    id: 'sqdiff', name: 'Verschillen zijn kwadraten', lv: [4, 5],
+    hint: 'Bekijk de verschillen. Herken je die getallen?',
+    quick: 'Verschillen 1, 4, 9, 16…? Die herken je alleen als je de kwadraten uit je hoofd kent.',
+    lesson: 'De verschillen kunnen zelf een bekende reeks zijn.',
+    make() {
+      const k0 = rand(1, 3), a = rand(1, 15);
+      const seq = [a];
+      for (let k = 0; k < 5; k++) seq.push(seq[k] + (k0 + k) ** 2);
+      const df = diffs(seq);
+      return {
+        seq, rule: `De verschillen zijn kwadraten: ${df.map(fd).join(', ')}.`,
+        derive: (i) => `${seq[i - 1]} + ${k0 + i - 1}×${k0 + i - 1} = ${seq[i]}`,
+        traps: (i) => {
+          const a1 = seq[i - 1] - seq[i - 2], a0 = seq[i - 2] - seq[i - 3];
+          return [{ v: seq[i - 1] + a1 + (a1 - a0), why: 'Je liet de verschillen met een vaste stap groeien. Het zijn kwadraten.', tag: 'Verkeerde regel' }];
+        },
+      };
+    },
+  });
+  def({
+    id: 'trib', name: 'Som van de vorige drie', lv: [5, 5],
+    hint: 'Twee getallen optellen werkt niet. Probeer er drie.',
+    quick: 'Test snel: getal 1 + 2 + 3 = getal 4?',
+    lesson: 'Werkt “som van twee” niet? Probeer de som van drie.',
+    make() {
+      const seq = [rand(1, 4), rand(1, 5), rand(1, 6)];
+      for (let k = 3; k < 8; k++) seq.push(seq[k - 1] + seq[k - 2] + seq[k - 3]);
+      return {
+        seq, rule: 'Elk getal is de som van de drie getallen ervoor.',
+        derive: (i) => `${seq[i - 3]} + ${seq[i - 2]} + ${seq[i - 1]} = ${seq[i]}`,
+        traps: (i) => [{ v: seq[i - 1] + seq[i - 2], why: 'Je telde maar twee vorige getallen op. Het zijn er drie.', tag: 'Verkeerde regel' }],
+      };
+    },
+  });
+  def({
+    id: 'altinc', name: 'Afwisselend met oplopende stap', lv: [5, 5],
+    hint: 'Er wisselen twee bewerkingen af, en één ervan verandert steeds een beetje.',
+    quick: 'Schrijf onder elke stap de bewerking. Kijk dan apart naar de oneven en de even stappen.',
+    lesson: 'Twee afwisselende bewerkingen kunnen elk hun eigen patroon hebben.',
+    make() {
+      const x0 = rand(1, 3), a = rand(1, 5);
+      const seq = [a];
+      for (let k = 0; k < 6; k++) seq.push(k % 2 === 0 ? seq[k] + x0 + k / 2 : seq[k] * 2);
+      return {
+        seq, rule: `Om en om: een optelling die steeds 1 groter wordt (+${x0}, +${x0 + 1}, +${x0 + 2}…) en ×2.`,
+        derive: (i) => ((i - 1) % 2 === 0 ? `${seq[i - 1]} + ${x0 + (i - 1) / 2} = ${seq[i]}` : `${seq[i - 1]} × 2 = ${seq[i]}`),
+        traps: (i) => [{
+          v: (i - 1) % 2 === 0 ? seq[i - 1] + x0 + (i - 1) / 2 - 1 : seq[i - 1] + x0 + (i - 2) / 2,
+          why: (i - 1) % 2 === 0 ? 'Je gebruikte dezelfde optelling als de vorige keer. Die wordt steeds 1 groter.' : 'Nu is ×2 aan de beurt, niet de optelling.',
+          tag: 'Verkeerde regel',
+        }],
+      };
+    },
+  });
+  def({
+    id: 'prime', name: 'Verschillen zijn priemgetallen', lv: [5, 5],
+    hint: 'De verschillen zijn getallen die alleen deelbaar zijn door 1 en zichzelf.',
+    quick: 'Ken de priemgetallen: 2, 3, 5, 7, 11, 13, 17, 19, 23.',
+    lesson: 'Onregelmatige maar stijgende verschillen? Denk aan priemgetallen.',
+    make() {
+      const PR = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29];
+      const p0 = rand(0, 2), a = rand(1, 20);
+      const seq = [a];
+      for (let k = 0; k < 6; k++) seq.push(seq[k] + PR[p0 + k]);
+      return {
+        seq, rule: `De verschillen zijn opeenvolgende priemgetallen: ${diffs(seq).map(fd).join(', ')}.`,
+        derive: (i) => `${seq[i - 1]} + ${seq[i] - seq[i - 1]} = ${seq[i]}`,
+        traps: (i) => [{ v: seq[i - 1] + (seq[i - 1] - seq[i - 2]) + 2, why: 'Je liet de verschillen steeds met 2 groeien. Het zijn priemgetallen.', tag: 'Verkeerde regel' }],
+      };
+    },
+  });
+
+  function generate(d, opt = {}) {
+    return attempt(() => {
+      let pool = P.filter((p) => d >= p.lv[0] && d <= p.lv[1]);
+      let p = pick(pool);
+      if (opt.kind) {
+        const k = P.find((x) => x.id === opt.kind);
+        if (k) p = k;
+      }
+      const r = p.make(d);
+      if (!r) return null;
+      const s = r.seq;
+      const last = s.length - 1;
+      const gi = d >= 3 && chance(0.3) ? rand(3, last - 1) : last;
+      const ans = s[gi];
+      const n = optCount(d);
+      const near = shuffle([
+        { v: ans + 1, why: 'Rekenfout: je zit er net naast. Reken de laatste stap nog eens na.', tag: 'Rekenfout' },
+        { v: ans - 1, why: 'Rekenfout: je zit er net naast. Reken de laatste stap nog eens na.', tag: 'Rekenfout' },
+        { v: ans + 2, why: 'Rekenfout: net niet goed. Controleer de stap.', tag: 'Rekenfout' },
+        { v: ans - 2, why: 'Rekenfout: net niet goed. Controleer de stap.', tag: 'Rekenfout' },
+        { v: ans + 10, why: 'Rekenfout met de tientallen.', tag: 'Rekenfout' },
+        { v: ans - 10, why: 'Rekenfout met de tientallen.', tag: 'Rekenfout' },
+      ]);
+      const pool2 = [...r.traps(gi), ...near].map((t) => ({ key: String(t.v), html: fmtNum(t.v), text: fmtNum(t.v), why: t.why, tag: t.tag }));
+      const built = buildOptions({ key: String(ans), html: fmtNum(ans), text: fmtNum(ans) }, pool2, n);
+      if (!built) return null;
+      const shown = s.map((v, i) => (i === gi ? '<span class="q">?</span>' : `<span>${fmtNum(v)}</span>`)).join('');
+      const steps = [r.rule, `Dus: ${r.derive(gi)}.`];
+      if (gi < last) steps.push(`Controle: het getal na het vraagteken klopt dan ook: ${r.derive(gi + 1)}.`);
+      return {
+        cat: 'num', diff: d, kindId: p.id, kind: p.name,
+        prompt: gi === last ? 'Welk getal komt hierna?' : 'Welk getal hoort op de plek van het vraagteken?',
+        stem: `<div class="seq">${shown}</div>`,
+        opts: built.opts, ans: built.ans, layout: 'mono',
+        steps, hint: p.hint, quick: p.quick, lesson: p.lesson,
+      };
+    });
+  }
+
+  MT.gens.num = { generate, kinds: P.map((p) => ({ id: p.id, name: p.name, lv: p.lv })) };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+/* B. Analogieën: woorden, getallen en letters */
+(function (G) {
+  'use strict';
+  const MT = G.MT;
+  const { rand, pick, chance, shuffle, esc, optCount, buildOptions, attempt } = MT.util;
+
+  // [a, b, c, antwoord, [afleiders], relatie, uitleg, niveau]
+  const WORDS = [
+    ['vis', 'water', 'vogel', 'lucht', ['nest', 'veer', 'vleugel', 'ei'], 'leefomgeving', 'Een vis beweegt zich in het water, een vogel in de lucht.', 1],
+    ['oog', 'zien', 'oor', 'horen', ['geluid', 'muziek', 'hoofd', 'praten'], 'functie', 'Met je oog zie je, met je oor hoor je.', 1],
+    ['dag', 'week', 'maand', 'jaar', ['uur', 'seizoen', 'kalender', 'datum'], 'deel en geheel', 'Een dag is een deel van een week, een maand een deel van een jaar.', 1],
+    ['warm', 'koud', 'hoog', 'laag', ['berg', 'lang', 'toren', 'boven'], 'tegenstelling', 'Warm is het tegenovergestelde van koud, hoog van laag.', 1],
+    ['kapitein', 'schip', 'piloot', 'vliegtuig', ['vliegveld', 'uniform', 'passagier', 'wolk'], 'wie bestuurt wat', 'Een kapitein bestuurt een schip, een piloot een vliegtuig.', 1],
+    ['bakker', 'brood', 'slager', 'vlees', ['mes', 'winkel', 'koe', 'schort'], 'maker en product', 'Een bakker verkoopt en maakt brood, een slager vlees.', 1],
+    ['hand', 'vinger', 'voet', 'teen', ['schoen', 'been', 'lopen', 'sok'], 'geheel en deel', 'Een vinger zit aan je hand, een teen aan je voet.', 1],
+    ['lamp', 'licht', 'kachel', 'warmte', ['hout', 'winter', 'vuur', 'kamer'], 'wat het geeft', 'Een lamp geeft licht, een kachel geeft warmte.', 1],
+    ['eik', 'boom', 'roos', 'bloem', ['doorn', 'tuin', 'rood', 'vaas'], 'soort en categorie', 'Een eik is een soort boom, een roos een soort bloem.', 1],
+    ['zaag', 'hout', 'schaar', 'papier', ['mes', 'knippen', 'lijm', 'potlood'], 'gereedschap en materiaal', 'Met een zaag snijd je hout, met een schaar papier.', 1],
+    ['rups', 'vlinder', 'kikkervisje', 'kikker', ['vijver', 'vis', 'ei', 'sloot'], 'jong stadium en volwassen dier', 'Een rups wordt een vlinder, een kikkervisje wordt een kikker.', 1],
+    ['klok', 'tijd', 'thermometer', 'temperatuur', ['koorts', 'graden', 'warmte', 'kwik'], 'instrument en wat het meet', 'Een klok meet tijd, een thermometer meet temperatuur.', 1],
+    ['pen', 'schrijven', 'schaar', 'knippen', ['papier', 'scherp', 'lijm', 'mes'], 'functie', 'Met een pen schrijf je, met een schaar knip je.', 1],
+    ['nat', 'droog', 'vol', 'leeg', ['glas', 'zwaar', 'half', 'water'], 'tegenstelling', 'Nat is het tegenovergestelde van droog, vol van leeg.', 1],
+    ['koe', 'kalf', 'paard', 'veulen', ['stal', 'zadel', 'hooi', 'ezel'], 'dier en jong', 'Het jong van een koe is een kalf, het jong van een paard een veulen.', 1],
+    ['boom', 'bos', 'huis', 'dorp', ['dak', 'deur', 'tuin', 'straat'], 'deel en groter geheel', 'Veel bomen samen vormen een bos, veel huizen samen een dorp.', 1],
+    ['zomer', 'warm', 'winter', 'koud', ['sneeuw', 'december', 'jas', 'ijs'], 'seizoen en temperatuur', 'In de zomer is het warm, in de winter is het koud.', 1],
+    ['auto', 'garage', 'vliegtuig', 'hangar', ['piloot', 'lucht', 'vleugel', 'motor'], 'waar het gestald wordt', 'Een auto staat in een garage, een vliegtuig in een hangar.', 1],
+    ['schoen', 'voet', 'handschoen', 'hand', ['wol', 'winter', 'vinger', 'sjaal'], 'kleding en lichaamsdeel', 'Een schoen draag je aan je voet, een handschoen aan je hand.', 1],
+    ['drie', 'driehoek', 'vier', 'vierkant', ['getal', 'hoek', 'lijn', 'cirkel'], 'aantal hoeken en vorm', 'Een driehoek heeft drie hoeken, een vierkant vier.', 1],
+    ['kok', 'keuken', 'monteur', 'werkplaats', ['auto', 'sleutel', 'olie', 'overall'], 'beroep en werkplek', 'Een kok werkt in een keuken, een monteur in een werkplaats.', 2],
+    ['ijs', 'smelten', 'water', 'koken', ['nat', 'vloeibaar', 'drinken', 'zee'], 'wat er bij verwarmen gebeurt', 'IJs smelt als het warm wordt, water kookt als het heet wordt.', 2],
+    ['woord', 'zin', 'noot', 'melodie', ['muziek', 'zingen', 'piano', 'klank'], 'bouwsteen en geheel', 'Woorden vormen samen een zin, noten samen een melodie.', 2],
+    ['helm', 'hoofd', 'scheenbeschermer', 'been', ['voetbal', 'sok', 'schop', 'knie'], 'bescherming en lichaamsdeel', 'Een helm beschermt je hoofd, een scheenbeschermer je been.', 2],
+    ['vliegtuig', 'piloot', 'trein', 'machinist', ['conducteur', 'spoor', 'reiziger', 'station'], 'voertuig en bestuurder', 'Een piloot bestuurt een vliegtuig, een machinist een trein.', 2],
+    ['bij', 'honing', 'koe', 'melk', ['weide', 'gras', 'boer', 'stier'], 'dier en wat het levert', 'Een bij levert honing, een koe levert melk.', 2],
+    ['gram', 'kilogram', 'meter', 'kilometer', ['centimeter', 'lengte', 'liniaal', 'afstand'], 'eenheid en 1000 keer zo groot', 'Een kilogram is 1000 gram, een kilometer is 1000 meter.', 2],
+    ['kompas', 'richting', 'weegschaal', 'gewicht', ['kilo', 'balans', 'markt', 'groente'], 'instrument en wat het bepaalt', 'Met een kompas bepaal je de richting, met een weegschaal het gewicht.', 2],
+    ['anker', 'schip', 'rem', 'auto', ['wiel', 'weg', 'motor', 'snelheid'], 'waarmee je iets stilzet', 'Een anker houdt een schip op zijn plek, een rem zet een auto stil.', 2],
+    ['uniform', 'soldaat', 'toga', 'rechter', ['rechtbank', 'wet', 'hamer', 'vonnis'], 'beroepskleding', 'Een soldaat draagt een uniform, een rechter een toga.', 2],
+    ['sergeant', 'peloton', 'kapitein', 'compagnie', ['soldaat', 'kazerne', 'rang', 'oefening'], 'commandant en eenheid', 'Een sergeant leidt een peloton, een kapitein een compagnie.', 2],
+    ['druppel', 'oceaan', 'zandkorrel', 'woestijn', ['steen', 'zon', 'kameel', 'zandloper'], 'kleinste deel en enorm geheel', 'Een druppel is een piepklein deel van een oceaan, een zandkorrel van een woestijn.', 2],
+    ['ei', 'kip', 'zaad', 'plant', ['grond', 'water', 'zak', 'tuin'], 'begin en wat eruit groeit', 'Uit een ei komt een kip, uit een zaad groeit een plant.', 2],
+    ['schip', 'haven', 'vliegtuig', 'luchthaven', ['wolk', 'piloot', 'vleugel', 'ticket'], 'waar het aankomt', 'Een schip meert aan in een haven, een vliegtuig landt op een luchthaven.', 2],
+    ['boek', 'bladzijde', 'trein', 'wagon', ['rails', 'station', 'conducteur', 'reis'], 'geheel en deel', 'Een boek bestaat uit bladzijden, een trein uit wagons.', 2],
+    ['brand', 'brandweer', 'ziekte', 'arts', ['ziekenhuis', 'medicijn', 'patiënt', 'koorts'], 'probleem en wie het bestrijdt', 'De brandweer bestrijdt brand, een arts bestrijdt ziekte.', 2],
+    ['leeuw', 'welp', 'hond', 'puppy', ['blaffen', 'hok', 'kat', 'riem'], 'dier en jong', 'Een jonge leeuw is een welp, een jonge hond een puppy.', 2],
+    ['regen', 'paraplu', 'zon', 'zonnebril', ['strand', 'warmte', 'zomer', 'hitte'], 'waar je je mee beschermt', 'Tegen regen gebruik je een paraplu, tegen de zon een zonnebril.', 2],
+    ['lauw', 'heet', 'koel', 'koud', ['warm', 'ijs', 'winter', 'sneeuw'], 'gradatie: mild en sterk', 'Heet is een sterkere vorm van lauw, koud een sterkere vorm van koel.', 3],
+    ['fluisteren', 'schreeuwen', 'wandelen', 'rennen', ['stilstaan', 'schoen', 'sport', 'pad'], 'gradatie: rustig en heftig', 'Schreeuwen is een heftige vorm van fluisteren, rennen een heftige vorm van wandelen.', 3],
+    ['dirigent', 'orkest', 'trainer', 'team', ['sport', 'veld', 'fluit', 'wedstrijd'], 'wie een groep leidt', 'Een dirigent leidt een orkest, een trainer leidt een team.', 3],
+    ['sleutel', 'slot', 'wachtwoord', 'account', ['computer', 'letters', 'internet', 'geheim'], 'wat iets opent', 'Een sleutel opent een slot, een wachtwoord opent een account.', 3],
+    ['kilometer', 'afstand', 'liter', 'inhoud', ['water', 'fles', 'melk', 'gewicht'], 'eenheid en grootheid', 'Kilometer is een eenheid van afstand, liter van inhoud.', 3],
+    ['vergrootglas', 'klein', 'verrekijker', 'ver', ['groot', 'oog', 'glas', 'vogel'], 'hulpmiddel en wat je ermee kunt zien', 'Met een vergrootglas zie je kleine dingen, met een verrekijker dingen die ver weg zijn.', 3],
+    ['alarm', 'gevaar', 'koorts', 'ziekte', ['thermometer', 'warm', 'bed', 'arts'], 'signaal en oorzaak', 'Een alarm wijst op gevaar, koorts wijst op ziekte.', 3],
+    ['recept', 'koken', 'kaart', 'navigeren', ['vouwen', 'papier', 'kompas', 'land'], 'leidraad en activiteit', 'Een recept gebruik je bij het koken, een kaart bij het navigeren.', 3],
+    ['voorwoord', 'boek', 'ouverture', 'opera', ['zanger', 'muziek', 'theater', 'applaus'], 'opening en geheel', 'Een voorwoord opent een boek, een ouverture opent een opera.', 3],
+    ['training', 'conditie', 'studie', 'kennis', ['school', 'boek', 'examen', 'docent'], 'activiteit en wat het oplevert', 'Door training krijg je conditie, door studie krijg je kennis.', 3],
+    ['droogte', 'oogst', 'blessure', 'prestatie', ['arts', 'pijn', 'sport', 'rust'], 'wat iets schaadt', 'Droogte schaadt de oogst, een blessure schaadt de prestatie.', 3],
+  ];
+
+  function wordQ(d) {
+    const lvl = d <= 1 ? [1] : d === 2 ? [1, 2] : [2, 3];
+    const it = pick(WORDS.filter((w) => lvl.includes(w[7])));
+    const [a, b, c, dd, wrong, rel, why] = it;
+    const n = optCount(d);
+    const pool = shuffle(wrong).map((w) => ({
+      key: w, html: esc(w), text: w, tag: 'Relatie niet gelijk',
+      why: `“${w}” heeft wel met “${c}” te maken, maar niet op dezelfde manier als “${b}” met “${a}” (${rel}).`,
+    }));
+    const built = buildOptions({ key: dd, html: esc(dd), text: dd }, pool, n);
+    return {
+      cat: 'ana', diff: d, kindId: 'word', kind: 'Woordanalogie',
+      prompt: 'Welk woord hoort op de open plek?',
+      stem: `<div class="analogy"><b>${esc(a)}</b><span class="op">:</span><b>${esc(b)}</b><span class="op">=</span><b>${esc(c)}</b><span class="op">:</span><span class="gap">?</span></div>`,
+      opts: built.opts, ans: built.ans, layout: 'text',
+      steps: [`Bepaal eerst de relatie tussen “${a}” en “${b}”: ${rel}.`, `Pas dezelfde relatie toe op “${c}”. ${why}`],
+      hint: `Maak een korte zin die “${a}” en “${b}” verbindt.`,
+      quick: 'Maak een zin van het eerste paar en zet het derde woord in dezelfde zin. Het woord dat precies past, wint.',
+      lesson: 'Zoek de relatie, niet het onderwerp. Een woord dat alleen “erbij hoort” is vaak een valkuil.',
+    };
+  }
+
+  /* ---- Getalanalogieën ---- */
+  function numFamily() {
+    const F = [];
+    for (let k = 1; k <= 40; k++) F.push({ n: `+${k}`, f: (x) => x + k }, { n: `−${k}`, f: (x) => x - k });
+    for (let k = 2; k <= 9; k++) F.push({ n: `×${k}`, f: (x) => x * k });
+    F.push({ n: 'x × x', f: (x) => x * x }, { n: 'x × x × x', f: (x) => x ** 3 }, { n: 'x × (x + 1)', f: (x) => x * (x + 1) }, { n: 'x × (x − 1)', f: (x) => x * (x - 1) }, { n: '2 × x × x', f: (x) => 2 * x * x });
+    for (let a = 2; a <= 5; a++) for (let b = -9; b <= 9; b++) if (b) F.push({ n: `×${a} ${b > 0 ? '+' : '−'} ${Math.abs(b)}`, f: (x) => a * x + b });
+    for (let k = -9; k <= 9; k++) if (k) F.push({ n: `x × x ${k > 0 ? '+' : '−'} ${Math.abs(k)}`, f: (x) => x * x + k }, { n: `x × x × x ${k > 0 ? '+' : '−'} ${Math.abs(k)}`, f: (x) => x ** 3 + k });
+    return F;
+  }
+  const NF = numFamily();
+  const NUM_RULES = {
+    2: () => pick([() => { const k = rand(3, 15); return { n: `+${k}`, f: (x) => x + k, say: `er komt steeds ${k} bij` }; }, () => { const k = rand(2, 6); return { n: `×${k}`, f: (x) => x * k, say: `het getal wordt ×${k}` }; }])(),
+    3: () => pick([() => ({ n: 'x × x', f: (x) => x * x, say: 'het getal wordt met zichzelf vermenigvuldigd' }), () => { const a = rand(2, 4), b = rand(1, 7) * (chance(0.5) ? 1 : -1); return { n: `×${a} ${b > 0 ? '+' : '−'} ${Math.abs(b)}`, f: (x) => a * x + b, say: `het getal wordt ×${a} en dan ${b > 0 ? '+' : '−'}${Math.abs(b)}` }; }])(),
+    4: () => pick([() => { const k = rand(1, 6) * (chance(0.5) ? 1 : -1); return { n: `x × x ${k > 0 ? '+' : '−'} ${Math.abs(k)}`, f: (x) => x * x + k, say: `het kwadraat van het getal, ${k > 0 ? 'plus' : 'min'} ${Math.abs(k)}` }; }, () => ({ n: 'x × x × x', f: (x) => x ** 3, say: 'het getal tot de derde macht' }), () => { const a = rand(3, 5), b = rand(2, 9) * (chance(0.5) ? 1 : -1); return { n: `×${a} ${b > 0 ? '+' : '−'} ${Math.abs(b)}`, f: (x) => a * x + b, say: `het getal wordt ×${a} en dan ${b > 0 ? '+' : '−'}${Math.abs(b)}` }; }])(),
+    5: () => pick([() => ({ n: 'x × (x + 1)', f: (x) => x * (x + 1), say: 'het getal keer het getal erna' }), () => ({ n: 'x × (x − 1)', f: (x) => x * (x - 1), say: 'het getal keer het getal ervoor' }), () => ({ n: '2 × x × x', f: (x) => 2 * x * x, say: 'twee keer het kwadraat' }), () => { const k = rand(1, 5) * (chance(0.5) ? 1 : -1); return { n: `x × x × x ${k > 0 ? '+' : '−'} ${Math.abs(k)}`, f: (x) => x ** 3 + k, say: `de derde macht, ${k > 0 ? 'plus' : 'min'} ${Math.abs(k)}` }; }])(),
+  };
+
+  function numQ(d) {
+    const R = NUM_RULES[Math.max(2, d)]();
+    const xs = shuffle([2, 3, 4, 5, 6, 7, 8, 9]).slice(0, 2).sort((a, b) => a - b);
+    const x3 = rand(2, 11);
+    if (xs.includes(x3)) return null;
+    const y = xs.map(R.f), ans = R.f(x3);
+    if (y.some((v) => v < 0) || ans < 0) return null;
+    const fits = NF.filter((g) => g.f(xs[0]) === y[0] && g.f(xs[1]) === y[1]);
+    if (fits.some((g) => g.f(x3) !== ans)) return null; // niet eenduidig
+    const pool = [];
+    for (const g of shuffle(NF)) {
+      const a1 = g.f(xs[0]) === y[0], a2 = g.f(xs[1]) === y[1];
+      if (a1 !== a2) {
+        const v = g.f(x3);
+        if (v >= 0) pool.push({ key: String(v), html: String(v), text: String(v), tag: 'Verkeerde regel', why: `Met de regel “${g.n}” klopt ${a1 ? `${xs[0]} → ${y[0]}` : `${xs[1]} → ${y[1]}`}, maar ${a1 ? `${xs[1]} → ${y[1]}` : `${xs[0]} → ${y[0]}`} niet. Controleer altijd beide voorbeelden.` });
+      }
+      if (pool.length > 8) break;
+    }
+    pool.push(...shuffle([ans + 1, ans - 1, ans + 2, ans + 10].map((v) => ({ key: String(v), html: String(v), text: String(v), tag: 'Rekenfout', why: 'Rekenfout: je zit er net naast.' }))));
+    const built = buildOptions({ key: String(ans), html: String(ans), text: String(ans) }, pool, optCount(d));
+    if (!built) return null;
+    return {
+      cat: 'ana', diff: d, kindId: 'num', kind: 'Getalanalogie',
+      prompt: `Welk getal hoort bij ${x3}, volgens dezelfde regel?`,
+      stem: `<div class="pairs"><span>${xs[0]} <i>→</i> ${y[0]}</span><span>${xs[1]} <i>→</i> ${y[1]}</span><span>${x3} <i>→</i> <b class="q">?</b></span></div>`,
+      opts: built.opts, ans: built.ans, layout: 'mono',
+      steps: [`Zoek één regel die bij beide voorbeelden past: ${R.say}.`, `Controle: ${xs[0]} → ${y[0]} en ${xs[1]} → ${y[1]} kloppen allebei.`, `Toepassen op ${x3}: ${ans}.`],
+      hint: 'Zoek een regel die bij BEIDE voorbeelden past, niet alleen bij het eerste.',
+      quick: 'Bedenk een regel bij het eerste paar en test hem meteen op het tweede. Klopt hij niet, gooi hem weg.',
+      lesson: 'Een regel is pas goed als hij bij alle voorbeelden klopt.',
+    };
+  }
+
+  /* ---- Letteranalogieën ---- */
+  const AL = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const toS = (a) => a.map((i) => AL[((i % 26) + 26) % 26]).join('');
+  const LF = [];
+  for (const k of [-3, -2, -1, 1, 2, 3]) LF.push({ id: 's' + k, n: `elke letter ${Math.abs(k)} ${Math.abs(k) === 1 ? 'plek' : 'plekken'} ${k > 0 ? 'verder' : 'terug'} in het alfabet`, f: (a) => a.map((x) => x + k) });
+  LF.push({ id: 'rev', n: 'de volgorde omdraaien', f: (a) => a.slice().reverse() });
+  for (const k of [-1, 1, 2]) LF.push({ id: 'rs' + k, n: `omdraaien én elke letter ${Math.abs(k)} ${k > 0 ? 'verder' : 'terug'}`, f: (a) => a.slice().reverse().map((x) => x + k) });
+  LF.push({ id: 'pos', n: 'de 1e letter +0, de 2e +1, de 3e +2, …', f: (a) => a.map((x, i) => x + i) });
+  LF.push({ id: 'pos1', n: 'de 1e letter +1, de 2e +2, de 3e +3, …', f: (a) => a.map((x, i) => x + i + 1) });
+  LF.push({ id: 'ends', n: 'eerste en laatste letter wisselen', f: (a) => [a[a.length - 1], ...a.slice(1, -1), a[0]] });
+  LF.push({ id: 'rotl', n: 'eerste letter naar achteren', f: (a) => [...a.slice(1), a[0]] });
+  LF.push({ id: 'rotr', n: 'laatste letter naar voren', f: (a) => [a[a.length - 1], ...a.slice(0, -1)] });
+  LF.push({ id: 'mir', n: 'spiegelen in het alfabet (A↔Z, B↔Y, …)', f: (a) => a.map((x) => 25 - x) });
+  const LET_BY = { 2: ['s1', 's2', 's-1'], 3: ['rev', 'rotl', 'rotr', 's2', 's-2', 's3'], 4: ['rs1', 'rs-1', 'pos', 'ends'], 5: ['mir', 'pos1', 'rs2', 'rs-1'] };
+
+  function letQ(d) {
+    const rid = pick(LET_BY[Math.max(2, d)]);
+    const R = LF.find((r) => r.id === rid);
+    const len = d >= 4 ? 4 : rand(3, 4);
+    const mk = () => shuffle([...Array(18).keys()].map((i) => i + 4)).slice(0, len);
+    const E = mk(), T = mk();
+    const eOut = toS(R.f(E)), ans = toS(R.f(T));
+    if (toS(E) === eOut || toS(T) === ans) return null;
+    const fits = LF.filter((g) => toS(g.f(E)) === eOut);
+    if (fits.some((g) => toS(g.f(T)) !== ans)) return null;
+    const pool = shuffle(LF.filter((g) => g !== R)).map((g) => {
+      const v = toS(g.f(T));
+      return { key: v, html: v, text: v, tag: 'Verkeerde regel', why: `Dit krijg je met de regel “${g.n}”. Maar dan zou ${toS(E)} veranderen in ${toS(g.f(E))}, niet in ${eOut}.` };
+    });
+    const built = buildOptions({ key: ans, html: ans, text: ans }, pool, optCount(d));
+    if (!built) return null;
+    return {
+      cat: 'ana', diff: d, kindId: 'let', kind: 'Letteranalogie',
+      prompt: 'Welke lettercombinatie hoort op de open plek?',
+      stem: `<div class="analogy mono"><b>${toS(E)}</b><span class="op">:</span><b>${eOut}</b><span class="op">=</span><b>${toS(T)}</b><span class="op">:</span><span class="gap">?</span></div>`,
+      opts: built.opts, ans: built.ans, layout: 'mono',
+      steps: [`Vergelijk ${toS(E)} met ${eOut}, letter voor letter.`, `De regel is: ${R.n}.`, `Toepassen op ${toS(T)} geeft ${ans}.`],
+      hint: 'Zijn het dezelfde letters in een andere volgorde, of zijn het andere letters?',
+      quick: 'Check eerst: zelfde letters (dan is de volgorde veranderd) of andere letters (dan zijn ze verschoven)? Dat halveert de opties.',
+      lesson: 'Zelfde letters = volgorde veranderd. Andere letters = verschoven in het alfabet.',
+    };
+  }
+
+  function generate(d, opt = {}) {
+    const pW = [0, 0.9, 0.65, 0.45, 0.3, 0.25][d];
+    let kind = opt.kind;
+    if (!kind) kind = chance(pW) ? 'word' : d >= 2 && chance(0.5) ? 'num' : d >= 2 ? 'let' : 'word';
+    if (kind === 'word') return wordQ(d);
+    return attempt(() => (kind === 'num' ? numQ(d) : letQ(d)));
+  }
+
+  MT.gens.ana = { generate, _words: WORDS };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+/* C. Diagrammen: bewerkingen op een rij letters */
+(function (G) {
+  'use strict';
+  const MT = G.MT;
+  const { rand, pick, chance, shuffle, optCount, buildOptions, attempt } = MT.util;
+
+  const AL = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const sh = (c, k) => AL[(AL.indexOf(c) + k + 26) % 26];
+  const OPS = {
+    rev: { n: 'Omkeren', f: (s) => s.slice().reverse(), inv: 'rev', lv: 1 },
+    sw12: { n: '1e en 2e wisselen', f: (s) => [s[1], s[0], ...s.slice(2)], inv: 'sw12', lv: 1 },
+    rotl: { n: 'Eerste naar achteren', f: (s) => [...s.slice(1), s[0]], inv: 'rotr', lv: 1 },
+    rotr: { n: 'Laatste naar voren', f: (s) => [s[s.length - 1], ...s.slice(0, -1)], inv: 'rotl', lv: 1 },
+    ends: { n: 'Eerste en laatste wisselen', f: (s) => [s[s.length - 1], ...s.slice(1, -1), s[0]], inv: 'ends', lv: 2 },
+    sw23: { n: '2e en 3e wisselen', f: (s) => [s[0], s[2], s[1], ...s.slice(3)], inv: 'sw23', lv: 2 },
+    up: { n: 'Elke letter 1 verder in het alfabet', f: (s) => s.map((c) => sh(c, 1)), inv: 'down', lv: 3 },
+    down: { n: 'Elke letter 1 terug in het alfabet', f: (s) => s.map((c) => sh(c, -1)), inv: 'up', lv: 4 },
+    up1: { n: 'Alleen de 1e letter 1 verder', f: (s) => [sh(s[0], 1), ...s.slice(1)], inv: null, lv: 4 },
+  };
+  const CONFUSE = { rotl: 'rotr', rotr: 'rotl', sw12: 'sw23', sw23: 'sw12', ends: 'rev', rev: 'ends', up: 'down', down: 'up', up1: 'up' };
+  const SYMS = ['◆', '●', '▲', '■', '★', '✚'];
+  const S = (a) => a.join('');
+  const run = (s, ch) => ch.reduce((x, k) => OPS[k].f(x), s);
+
+  function example(k, len) {
+    const base = 'ABCDEF'.slice(0, len).split('');
+    return `${S(base)}→${S(OPS[k].f(base))}`;
+  }
+
+  function one(d) {
+    const len = d >= 4 ? 5 : 4;
+    const chainLen = [0, 1, 2, rand(2, 3), 3, 4][d];
+    const avail = Object.keys(OPS).filter((k) => OPS[k].lv <= d);
+    const chain = [];
+    while (chain.length < chainLen) {
+      const k = pick(avail);
+      if (chain[chain.length - 1] === k) continue;
+      if (chain.length && OPS[chain[chain.length - 1]].inv === k) continue; // geen bewerking die de vorige opheft
+      chain.push(k);
+    }
+    const legendSize = Math.min(avail.length, [0, 3, 4, 5, 6, 6][d]);
+    const legendOps = shuffle([...new Set([...chain, ...shuffle(avail)])].slice(0, Math.max(legendSize, new Set(chain).size)));
+    const sym = {};
+    shuffle(SYMS).slice(0, legendOps.length).forEach((s, i) => (sym[legendOps[i]] = s));
+    const input = shuffle('BCDFGHKLMNPRSTVW'.split('')).slice(0, len);
+    const out = run(input, chain);
+    if (S(out) === S(input)) return null;
+
+    const types = ['out'];
+    if (d >= 3) types.push('op', 'op');
+    if (d >= 4 && chain.every((k) => OPS[k].inv)) types.push('in');
+    const mode = pick(types);
+    const n = optCount(d);
+    const trace = (inp) => {
+      const lines = [];
+      let cur = inp;
+      for (const k of chain) {
+        const nx = OPS[k].f(cur);
+        lines.push(`${S(cur)} → ${sym[k]} (${OPS[k].n.toLowerCase()}) → ${S(nx)}`);
+        cur = nx;
+      }
+      return lines;
+    };
+    const opLabel = (k) => `<span class="opbox">${sym[k]}</span>`;
+
+    let built, prompt, flowIn, flowOut, hole = -1, steps;
+    if (mode === 'out') {
+      const pool = [];
+      const rv = run(input, chain.slice().reverse());
+      pool.push({ v: rv, why: 'Je voerde de bewerkingen in de verkeerde volgorde uit. Werk altijd van links naar rechts.', tag: 'Volgorde van bewerkingen' });
+      chain.forEach((k, i) => {
+        const c = chain.slice(); c.splice(i, 1);
+        pool.push({ v: run(input, c), why: `Je sloeg bewerking ${sym[k]} (${OPS[k].n.toLowerCase()}) over.`, tag: 'Bewerking overgeslagen' });
+        if (CONFUSE[k]) {
+          const c2 = chain.slice(); c2[i] = CONFUSE[k];
+          pool.push({ v: run(input, c2), why: `Je verwarde ${sym[k]} (${OPS[k].n.toLowerCase()}) met “${OPS[CONFUSE[k]].n.toLowerCase()}”.`, tag: 'Bewerking verward' });
+        }
+      });
+      for (let i = 0; i < 6; i++) {
+        const c = shuffle(out.slice());
+        pool.push({ v: c, why: 'De letters staan niet in de volgorde die de bewerkingen opleveren.', tag: 'Volgorde van bewerkingen' });
+      }
+      const P = [...shuffle(pool.slice(0, pool.length - 6)), ...pool.slice(pool.length - 6)].map((p) => ({ key: S(p.v), html: S(p.v), text: S(p.v), why: p.why, tag: p.tag }));
+      built = buildOptions({ key: S(out), html: S(out), text: S(out) }, P, n);
+      prompt = 'Wat komt eruit?';
+      flowIn = S(input); flowOut = null;
+      steps = trace(input);
+    } else if (mode === 'op') {
+      hole = rand(0, chain.length - 1);
+      const good = legendOps.filter((k) => { const c = chain.slice(); c[hole] = k; return S(run(input, c)) === S(out); });
+      if (good.length !== 1 || legendOps.length < n) return null;
+      const P = shuffle(legendOps.filter((k) => k !== good[0])).map((k) => {
+        const c = chain.slice(); c[hole] = k;
+        return { key: k, html: `${opLabel(k)}<span class="small">${OPS[k].n}</span>`, text: `${sym[k]} ${OPS[k].n}`, tag: 'Bewerking verward', why: `Met ${sym[k]} (${OPS[k].n.toLowerCase()}) op die plek komt er ${S(run(input, c))} uit, niet ${S(out)}.` };
+      });
+      const g = good[0];
+      built = buildOptions({ key: g, html: `${opLabel(g)}<span class="small">${OPS[g].n}</span>`, text: `${sym[g]} ${OPS[g].n}` }, P, n);
+      prompt = 'Welke bewerking hoort op de plek van het vraagteken?';
+      flowIn = S(input); flowOut = S(out);
+      steps = [`Werk vanaf de invoer vooruit tot aan het vraagteken, en vanaf de uitkomst terug. Wat moet er op de lege plek gebeuren?`, ...trace(input)];
+    } else {
+      const invChain = chain.slice().reverse().map((k) => OPS[k].inv);
+      const back = run(out, invChain);
+      const P = [
+        { v: run(out, chain), why: 'Je voerde de bewerkingen vooruit uit op de uitkomst. Je moet terugrekenen: van rechts naar links, met de omgekeerde bewerkingen.', tag: 'Verkeerde richting' },
+        { v: run(out, chain.map((k) => OPS[k].inv)), why: 'Je gebruikte de omgekeerde bewerkingen, maar in de verkeerde volgorde. Begin bij de laatste.', tag: 'Volgorde van bewerkingen' },
+        { v: run(out, chain.slice().reverse()), why: 'Je werkte van rechts naar links, maar vergat de bewerkingen om te keren.', tag: 'Verkeerde richting' },
+        ...Array.from({ length: 6 }, () => ({ v: shuffle(back.slice()), why: 'Deze volgorde levert niet de gegeven uitkomst op.', tag: 'Rekenfout' })),
+      ].map((p) => ({ key: S(p.v), html: S(p.v), text: S(p.v), why: p.why, tag: p.tag }));
+      built = buildOptions({ key: S(back), html: S(back), text: S(back) }, P, n);
+      prompt = 'Wat ging erin?';
+      flowIn = null; flowOut = S(out);
+      steps = [`Reken terug vanaf ${S(out)}: begin bij de laatste bewerking en doe telkens het omgekeerde.`, `Controle vooruit:`, ...trace(back)];
+    }
+    if (!built) return null;
+
+    const legend = `<div class="legend">${legendOps.map((k) => `<div><span class="opbox">${sym[k]}</span><span>${OPS[k].n}<span class="ex">${example(k, len)}</span></span></div>`).join('')}</div>`;
+    const boxes = chain.map((k, i) => `<span class="arr">→</span><span class="opbox ${i === hole ? 'q' : ''}">${i === hole ? '?' : sym[k]}</span>`).join('');
+    const stem = `${legend}<div class="flow"><span class="str ${flowIn ? '' : 'q'}">${flowIn || '?'.repeat(len)}</span>${boxes}<span class="arr">→</span><span class="str ${flowOut ? '' : 'q'}">${flowOut || '?'.repeat(len)}</span></div>`;
+    return {
+      cat: 'dia', diff: d, kindId: 'dia-' + mode, kind: { out: 'Uitkomst bepalen', op: 'Ontbrekende bewerking', in: 'Terugrekenen' }[mode],
+      prompt, stem, opts: built.opts, ans: built.ans, layout: mode === 'op' ? 'op' : 'mono',
+      steps,
+      hint: mode === 'in' ? 'Begin bij de uitkomst en doe de laatste bewerking eerst omgekeerd.' : 'Volg één letter door alle bewerkingen heen.',
+      quick: 'Volg alleen de eerste letter van de uitkomst: waar komt die terecht? Daarmee streep je meestal al 2 of 3 opties weg.',
+      lesson: mode === 'in' ? 'Terugrekenen = omgekeerde bewerkingen, in omgekeerde volgorde.' : 'Werk strikt van links naar rechts en schrijf elke tussenstap op.',
+    };
+  }
+
+  function generate(d, opt = {}) {
+    return attempt(() => {
+      const q = one(d);
+      if (q && opt.kind && q.kindId !== opt.kind && chance(0.8)) return null;
+      return q;
+    });
+  }
+  MT.gens.dia = { generate, OPS };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+/* D. Figuurreeksen */
+(function (G) {
+  'use strict';
+  const MT = G.MT;
+  const { rand, pick, chance, shuffle, optCount, buildOptions, attempt } = MT.util;
+  const F = MT.fig;
+  const { norm, SHAPE_NL, FILL_NL, DIR_NL } = F;
+  const cw = (d) => (d > 0 ? 'met de klok mee' : 'tegen de klok in');
+
+  /* ---------- Reeks met eigenschappen (vorm, vulling, pijl, stippen) ---------- */
+  function makeRules(d, total) {
+    const nChange = [0, 1, 1, 2, rand(2, 3), 3][d];
+    const pool = d <= 2 ? ['rot', 'dots', ...(d === 2 ? ['fill'] : [])] : ['rot', 'fill', 'shape', 'dots'];
+    const attrs = shuffle(pool).slice(0, nChange);
+    const rules = {};
+    for (const a of attrs) {
+      if (a === 'rot') {
+        const st = d === 1 ? 90 : pick([45, 90, 135]), dir = pick([1, -1]), a0 = rand(0, 7) * 45;
+        if (d >= 5 && chance(0.5)) {
+          const s2 = pick([45, 90, 180].filter((x) => x !== st));
+          rules.rot = { v: (k) => norm(a0 + dir * (Math.ceil(k / 2) * st + Math.floor(k / 2) * s2)), txt: `De pijl draait om en om ${st}° en ${s2}° ${cw(dir)}.`, step: st, dir };
+        } else rules.rot = { v: (k) => norm(a0 + dir * st * k), txt: `De pijl draait elke stap ${st}° ${cw(dir)}.`, step: st, dir };
+      }
+      if (a === 'fill') {
+        const cyc = d >= 3 && chance(0.5) ? shuffle(['empty', 'half', 'full']) : shuffle(pick([['empty', 'full'], ['empty', 'half'], ['half', 'full']]));
+        rules.fill = { v: (k) => cyc[k % cyc.length], txt: `De vulling wisselt steeds in de volgorde ${cyc.map((c) => FILL_NL[c]).join(' → ')}${cyc.length === 3 ? ' en begint dan opnieuw' : ''}.`, cyc };
+      }
+      if (a === 'shape') {
+        const cyc = shuffle(F.SHAPES).slice(0, d >= 4 ? 3 : 2);
+        rules.shape = { v: (k) => cyc[k % cyc.length], txt: `De vorm wisselt steeds: ${cyc.map((c) => SHAPE_NL[c]).join(' → ')}${cyc.length === 3 ? ' en weer opnieuw' : ''}.`, cyc };
+      }
+      if (a === 'dots') {
+        const st = (d <= 2 ? 1 : pick([1, 2])) * (d >= 3 && chance(0.4) ? -1 : 1);
+        const span = Math.abs(st) * (total - 1);
+        if (span > 6) { const st1 = st > 0 ? 1 : -1; const s0 = st1 > 0 ? rand(0, 6 - (total - 1)) : rand(total - 1, 6); rules.dots = { v: (k) => s0 + st1 * k, txt: `Er komt steeds 1 stip ${st1 > 0 ? 'bij' : 'af'}.`, step: st1 }; }
+        else { const s0 = st > 0 ? rand(0, 6 - span) : rand(span, 6); rules.dots = { v: (k) => s0 + st * k, txt: `Er ${Math.abs(st) === 1 ? 'komt' : 'komen'} steeds ${Math.abs(st)} ${Math.abs(st) === 1 ? 'stip' : 'stippen'} ${st > 0 ? 'bij' : 'af'}.`, step: st }; }
+      }
+    }
+    return rules;
+  }
+
+  function attrQ(d) {
+    const shownN = d <= 2 ? 4 : 5;
+    const middle = d >= 4 && chance(0.25);
+    const total = middle ? shownN + 1 : shownN + 1; // frames 0..shownN (één daarvan is de vraag)
+    const rules = makeRules(d, total);
+    const cons = { shape: pick(F.SHAPES), fill: pick(['empty', 'full', 'half']), rot: rand(0, 7) * 45, dots: rand(0, 4) };
+    const frame = (k) => ({
+      shape: rules.shape ? rules.shape.v(k) : cons.shape,
+      fill: rules.fill ? rules.fill.v(k) : cons.fill,
+      rot: rules.rot ? rules.rot.v(k) : cons.rot,
+      dots: rules.dots ? rules.dots.v(k) : cons.dots,
+    });
+    const gi = middle ? rand(2, total - 2) : total - 1;
+    const frames = Array.from({ length: total }, (_, k) => frame(k));
+    const ans = frames[gi];
+    const pool = [];
+    const add = (f, why, tag) => pool.push({ f, why, tag });
+    const changing = Object.keys(rules);
+    for (const a of shuffle(changing)) {
+      if (a === 'rot') {
+        add({ ...ans, rot: frames[gi - 1].rot }, 'De pijl draait wel: je vergat de draaiing.', 'Regel gemist');
+        add({ ...ans, rot: norm(ans.rot + 180) }, 'De pijl wijst de verkeerde kant op. Tel de draaiing per stap na.', 'Verkeerde richting');
+        add({ ...ans, rot: norm(frames[gi - 1].rot - (ans.rot - frames[gi - 1].rot)) }, `Je draaide de pijl de verkeerde kant op. Hij draait ${cw(rules.rot.dir)}.`, 'Verkeerde richting');
+        add({ ...ans, rot: norm(ans.rot + 45) }, 'De pijl is 45° te ver of te weinig gedraaid.', 'Rekenfout');
+      }
+      if (a === 'fill') for (const v of ['empty', 'half', 'full']) if (v !== ans.fill) add({ ...ans, fill: v }, `De vulling klopt niet. ${rules.fill.txt}`, 'Regel gemist');
+      if (a === 'shape') for (const v of rules.shape.cyc) if (v !== ans.shape) add({ ...ans, shape: v }, `De vorm klopt niet. ${rules.shape.txt}`, 'Regel gemist');
+      if (a === 'dots') for (const v of [ans.dots + 1, ans.dots - 1]) if (v >= 0 && v <= 7) add({ ...ans, dots: v }, `Het aantal stippen klopt niet. ${rules.dots.txt}`, 'Rekenfout');
+    }
+    const first = shuffle(pool);
+    const extra = [];
+    if (!rules.shape) extra.push({ f: { ...ans, shape: pick(F.SHAPES.filter((s) => s !== ans.shape)) }, why: 'De vorm verandert niet in deze reeks.', tag: 'Verkeerde regel' });
+    if (!rules.fill) extra.push({ f: { ...ans, fill: pick(['empty', 'full', 'half'].filter((s) => s !== ans.fill)) }, why: 'De vulling verandert niet in deze reeks.', tag: 'Verkeerde regel' });
+    if (changing.length >= 2) {
+      const [x, y] = changing;
+      const px = first.find((p) => p.f[x] !== ans[x]), py = first.find((p) => p.f[y] !== ans[y]);
+      if (px && py) first.unshift({ f: { ...ans, [x]: px.f[x], [y]: py.f[y] }, why: 'Twee eigenschappen kloppen hier niet. Controleer elke eigenschap apart.', tag: 'Tweede regel gemist' });
+    }
+    // Bij meerdere regels: zet een optie met precies één fout vooraan (meest verleidelijk)
+    const P = [...first, ...shuffle(extra)].map((p) => ({ key: F.key(p.f), html: F.draw(p.f), text: F.describe(p.f), why: p.why, tag: changing.length > 1 && p.tag === 'Regel gemist' ? 'Tweede regel gemist' : p.tag }));
+    const built = buildOptions({ key: F.key(ans), html: F.draw(ans), text: F.describe(ans) }, P, optCount(d));
+    if (!built) return null;
+    const stem = `<div class="figs">${frames.map((f, k) => (k === gi ? '<div class="fig q">?</div>' : `<div class="fig">${F.draw(f)}</div>`)).join('')}</div>`;
+    const ruleTxt = changing.map((a) => rules[a].txt);
+    return {
+      cat: 'fig', diff: d, kindId: changing.length > 1 ? 'multi' : 'fig-' + changing[0], kind: changing.length > 1 ? `${changing.length} regels tegelijk` : { rot: 'Draaiing', fill: 'Vulling', shape: 'Vorm', dots: 'Aantal stippen' }[changing[0]],
+      prompt: gi === total - 1 ? 'Welke figuur komt hierna?' : 'Welke figuur hoort op de plek van het vraagteken?',
+      stem, opts: built.opts, ans: built.ans, layout: 'fig',
+      steps: [`Bekijk elke eigenschap apart: vorm, vulling, pijl en stippen.`, ...ruleTxt, `${changing.length < 4 ? 'De andere eigenschappen blijven gelijk. ' : ''}Het antwoord: ${F.describe(ans)}.`],
+      hint: changing.length > 1 ? `Er veranderen ${changing.length} dingen tegelijk. Kijk naar één eigenschap per keer.` : 'Er verandert maar één ding. Welk?',
+      quick: 'Streep per eigenschap af: eerst alle opties met de verkeerde pijlrichting, dan de verkeerde vulling, enzovoort.',
+      lesson: 'Eén eigenschap tegelijk: pijl, vulling, vorm, stippen.',
+    };
+  }
+
+  /* ---------- Rasterreeks ---------- */
+  function gridQ(d) {
+    const n = d >= 5 ? 4 : 3;
+    const per = F.perimeter(n), L = per.length;
+    const nm = d >= 3 ? 2 : 1;
+    const shownN = d <= 2 ? 4 : 5, total = shownN + 1;
+    const ms = [];
+    for (let m = 0; m < nm; m++) {
+      const st = d === 1 ? 1 : pick(d >= 4 ? [1, 2, 3] : [1, 2]), dir = pick([1, -1]);
+      ms.push({ m: m + 1, st, dir, p0: rand(0, L - 1) });
+    }
+    if (nm === 2 && ms[0].st === ms[1].st && ms[0].dir === ms[1].dir) return null;
+    const at = (mk, k) => per[(((mk.p0 + mk.dir * mk.st * k) % L) + L) % L];
+    const frame = (k) => ms.map((mk) => ({ pos: at(mk, k), m: mk.m }));
+    for (let k = 0; k < total; k++) { const f = frame(k); if (nm === 2 && f[0].pos === f[1].pos) return null; }
+    const ans = frame(total - 1);
+    const kf = (f) => f.map((x) => x.m + '@' + x.pos).sort().join(',');
+    const name = (m) => (m === 1 ? 'Het gekleurde vak' : 'De stip');
+    const pool = [];
+    ms.forEach((mk, i) => {
+      const mod = (pos) => ans.map((x, j) => (j === i ? { ...x, pos } : x));
+      const pi = per.indexOf(ans[i].pos);
+      pool.push({ f: mod(per[(pi - mk.dir * mk.st + L * 3) % L]), why: `${name(mk.m)} staat nog op de vorige plek. Hij moet nog ${mk.st} ${mk.st === 1 ? 'vak' : 'vakken'} verder.`, tag: 'Regel gemist' });
+      pool.push({ f: mod(per[(pi - 2 * mk.dir * mk.st + L * 3) % L]), why: `${name(mk.m)} loopt de verkeerde kant op. Hij gaat ${cw(mk.dir)}.`, tag: 'Verkeerde richting' });
+      pool.push({ f: mod(per[(pi + mk.dir + L) % L]), why: `${name(mk.m)} is één vak te ver.`, tag: 'Rekenfout' });
+      pool.push({ f: mod(per[(pi - mk.dir + L) % L]), why: `${name(mk.m)} is één vak te kort.`, tag: 'Rekenfout' });
+      pool.push({ f: mod(n === 3 ? 4 : 5), why: `${name(mk.m)} blijft altijd langs de rand lopen.`, tag: 'Verkeerde regel' });
+    });
+    if (nm === 2) pool.unshift({ f: [{ pos: ans[0].pos, m: 2 }, { pos: ans[1].pos, m: 1 }], why: 'De plekken kloppen, maar het gekleurde vak en de stip zijn verwisseld.', tag: 'Tweede regel gemist' });
+    const clean = pool.filter((p) => p.f.length < 2 || p.f[0].pos !== p.f[1].pos);
+    const P = shuffle(clean).map((p) => ({ key: kf(p.f), html: F.drawGrid(n, p.f), text: 'raster', why: p.why, tag: p.tag }));
+    const built = buildOptions({ key: kf(ans), html: F.drawGrid(n, ans), text: 'raster' }, P, optCount(d));
+    if (!built) return null;
+    const txt = ms.map((mk) => `${name(mk.m)} loopt langs de rand, steeds ${mk.st} ${mk.st === 1 ? 'vak' : 'vakken'} ${cw(mk.dir)}.`);
+    return {
+      cat: 'fig', diff: d, kindId: nm > 1 ? 'grid2' : 'grid', kind: nm > 1 ? 'Raster met twee bewegingen' : 'Raster',
+      prompt: 'Welk raster komt hierna?',
+      stem: `<div class="figs">${Array.from({ length: shownN }, (_, k) => `<div class="fig">${F.drawGrid(n, frame(k))}</div>`).join('')}<div class="fig q">?</div></div>`,
+      opts: built.opts, ans: built.ans, layout: 'fig',
+      steps: [nm > 1 ? 'Volg het gekleurde vak en de stip elk apart.' : 'Volg het gekleurde vak van plaatje naar plaatje.', ...txt],
+      hint: nm > 1 ? 'Het gekleurde vak en de stip bewegen elk volgens hun eigen regel.' : 'Tel hoeveel vakken het gekleurde vak per stap opschuift.',
+      quick: 'Tel alleen de sprong tussen de laatste twee plaatjes en zet die ene stap nog één keer.',
+      lesson: 'Twee bewegende dingen? Volg ze apart.',
+    };
+  }
+
+  function generate(d, opt = {}) {
+    return attempt(() => {
+      const wantGrid = opt.kind ? opt.kind.startsWith('grid') : chance(0.35);
+      const q = wantGrid ? gridQ(d) : attrQ(d);
+      if (q && opt.kind && !opt.kind.startsWith('grid') && q.kindId !== opt.kind && chance(0.7)) return null;
+      return q;
+    });
+  }
+  MT.gens.fig = { generate };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+/* F. Abstract redeneren: welke hoort er niet bij, figuuranalogieën en matrices */
+(function (G) {
+  'use strict';
+  const MT = G.MT;
+  const { rand, pick, chance, shuffle, optCount, buildOptions, attempt } = MT.util;
+  const F = MT.fig;
+  const { norm, SHAPE_NL, FILL_NL, DIR_NL, CORNERS } = F;
+  const FILLS = ['empty', 'full', 'half'];
+  const randFig = (d) => ({ shape: pick(F.SHAPES), fill: pick(FILLS), rot: rand(0, 7) * (d <= 2 ? 90 : 45) % 360, dots: rand(0, 5) });
+  const axis = (r) => (norm(r) % 180 === 0 ? 'v' : norm(r) % 180 === 90 ? 'h' : 'd');
+
+  /* ---------- Welke hoort er niet bij ---------- */
+  const ODD = [
+    { id: 'shape', lv: [1, 3], name: 'Zelfde vorm', rule: 'Alle andere figuren hebben dezelfde vorm.',
+      setup() { this.s = pick(F.SHAPES); }, sat(f) { return f.shape === this.s; },
+      make(ok) { const f = randFig(3); f.shape = ok ? this.s : pick(F.SHAPES.filter((x) => x !== this.s)); return f; },
+      ex(f) { return `Een ${SHAPE_NL[f.shape]}.`; } },
+    { id: 'fill', lv: [2, 3], name: 'Zelfde vulling', rule: 'Alle andere figuren hebben dezelfde vulling.',
+      setup() { this.v = pick(FILLS); }, sat(f) { return f.fill === this.v; },
+      make(ok) { const f = randFig(3); f.fill = ok ? this.v : pick(FILLS.filter((x) => x !== this.v)); return f; },
+      ex(f) { return `Deze is ${FILL_NL[f.fill]}.`; } },
+    { id: 'parity', lv: [2, 4], name: 'Even of oneven stippen', rule: '',
+      setup() { this.even = chance(0.5); this.rule = `Alle andere figuren hebben een ${this.even ? 'even' : 'oneven'} aantal stippen.`; },
+      sat(f) { return (f.dots % 2 === 0) === this.even; },
+      make(ok) { const f = randFig(3); const wantEven = ok ? this.even : !this.even; f.dots = pick([0, 1, 2, 3, 4, 5, 6].filter((x) => (x % 2 === 0) === wantEven && x > 0)); return f; },
+      ex(f) { return `${f.dots} stippen: ${f.dots % 2 === 0 ? 'even' : 'oneven'}.`; } },
+    { id: 'axis', lv: [3, 4], name: 'Richting van de pijl', rule: '',
+      setup() { this.ax = pick(['v', 'h']); this.rule = `Bij alle andere figuren wijst de pijl ${this.ax === 'v' ? 'recht omhoog of omlaag' : 'recht naar links of rechts'}.`; },
+      sat(f) { return axis(f.rot) === this.ax; },
+      make(ok) { const f = randFig(3); const v = this.ax === 'v' ? [0, 180] : [90, 270]; f.rot = ok ? pick(v) : pick([0, 45, 90, 135, 180, 225, 270, 315].filter((r) => !v.includes(r))); return f; },
+      ex(f) { return `Pijl wijst ${DIR_NL[norm(f.rot)]}.`; } },
+    { id: 'corners', lv: [3, 5], name: 'Stippen = hoeken', rule: 'Bij alle andere figuren is het aantal stippen gelijk aan het aantal hoeken van de vorm.',
+      setup() {}, sat(f) { return f.dots === CORNERS[f.shape]; },
+      make(ok) { const f = randFig(3); f.shape = pick(F.SHAPES.filter((s) => s !== 'circle')); f.dots = ok ? CORNERS[f.shape] : pick([2, 3, 4, 5, 6].filter((x) => x !== CORNERS[f.shape])); return f; },
+      ex(f) { return `${SHAPE_NL[f.shape]} met ${CORNERS[f.shape]} hoeken en ${f.dots} stippen.`; } },
+    { id: 'fillaxis', lv: [4, 5], name: 'Vulling hangt samen met de pijl', rule: '',
+      setup() { this.fullAx = pick(['v', 'h']); this.rule = `Bij alle andere figuren geldt: gevuld = pijl ${this.fullAx === 'v' ? 'verticaal' : 'horizontaal'}, leeg = pijl ${this.fullAx === 'v' ? 'horizontaal' : 'verticaal'}.`; },
+      sat(f) { return (f.fill === 'full' && axis(f.rot) === this.fullAx) || (f.fill === 'empty' && axis(f.rot) !== this.fullAx && axis(f.rot) !== 'd'); },
+      make(ok) { const f = randFig(3); f.fill = pick(['full', 'empty']); const other = this.fullAx === 'v' ? 'h' : 'v'; const want = (f.fill === 'full') === ok ? this.fullAx : other; f.rot = want === 'v' ? pick([0, 180]) : pick([90, 270]); return f; },
+      ex(f) { return `${FILL_NL[f.fill]}, pijl ${axis(f.rot) === 'v' ? 'verticaal' : 'horizontaal'}.`; } },
+    { id: 'filldots', lv: [5, 5], name: 'Vulling hangt samen met de stippen', rule: 'Bij alle andere figuren geldt: gevuld = even aantal stippen, leeg = oneven aantal stippen.',
+      setup() {}, sat(f) { return f.fill !== 'half' && (f.fill === 'full') === (f.dots % 2 === 0); },
+      make(ok) { const f = randFig(3); f.fill = pick(['full', 'empty']); const even = (f.fill === 'full') === ok; f.dots = pick([1, 2, 3, 4, 5, 6].filter((x) => (x % 2 === 0) === even)); return f; },
+      ex(f) { return `${FILL_NL[f.fill]} met ${f.dots} stippen (${f.dots % 2 === 0 ? 'even' : 'oneven'}).`; } },
+  ];
+  const FEATURES = [(f) => f.shape, (f) => f.fill, (f) => norm(f.rot), (f) => f.dots, (f) => f.dots % 2, (f) => axis(f.rot), (f) => CORNERS[f.shape] === f.dots, (f) => (f.fill === 'full') + axis(f.rot)];
+
+  function oddQ(d) {
+    const R = Object.create(pick(ODD.filter((r) => d >= r.lv[0] && d <= r.lv[1])));
+    R.setup();
+    const n = optCount(d);
+    const figs = Array.from({ length: n - 1 }, () => R.make(true));
+    const odd = R.make(false);
+    if (!figs.every((f) => R.sat(f)) || R.sat(odd)) return null;
+    const all = [...figs, odd];
+    if (new Set(all.map(F.key)).size !== all.length) return null;
+    // Geen andere eigenschap mag een figuur net zo duidelijk laten afwijken
+    for (const feat of FEATURES) {
+      const vals = all.map(feat);
+      const counts = {};
+      vals.forEach((v) => (counts[v] = (counts[v] || 0) + 1));
+      const keys = Object.keys(counts);
+      if (keys.length === 2) {
+        const loneKey = keys.find((k) => counts[k] === 1);
+        if (loneKey !== undefined && String(feat(odd)) !== loneKey) return null;
+      }
+      if (keys.length === 1 && feat !== FEATURES[0]) continue;
+    }
+    const pool = figs.map((f) => ({ key: F.key(f), html: F.draw(f), text: F.describe(f), tag: 'Regel niet gevonden', why: `Deze figuur volgt de regel wel. ${R.ex(f)}` }));
+    const built = buildOptions({ key: F.key(odd), html: F.draw(odd), text: F.describe(odd) }, pool, n);
+    return {
+      cat: 'abs', diff: d, kindId: 'odd', kind: 'Welke hoort er niet bij',
+      prompt: 'Welke figuur hoort er niet bij?',
+      stem: '<p class="muted small">Vier van de figuren volgen dezelfde regel. Eén niet.</p>'.replace('Vier', n === 4 ? 'Drie' : 'Vier'),
+      opts: built.opts, ans: built.ans, layout: 'fig',
+      steps: [R.rule, `De afwijkende figuur: ${R.ex(odd)}`],
+      hint: d >= 4 ? 'Kijk of twee eigenschappen met elkaar samenhangen, bijvoorbeeld vulling en pijl.' : 'Vergelijk één eigenschap tegelijk: vorm, vulling, pijl, stippen.',
+      quick: 'Loop de eigenschappen af (vorm, vulling, pijl, stippen). Zoek bij elke eigenschap of er precies één figuur anders is.',
+      lesson: 'Vind je geen enkele afwijker? Zoek dan naar een verband tussen twee eigenschappen.',
+    };
+  }
+
+  /* ---------- Figuuranalogie A : B = C : ? ---------- */
+  const TX = {
+    rotcw: { n: 'de pijl draait 90° met de klok mee', f: (x) => ({ ...x, rot: norm(x.rot + 90) }), g: 'rot' },
+    rotccw: { n: 'de pijl draait 90° tegen de klok in', f: (x) => ({ ...x, rot: norm(x.rot - 90) }), g: 'rot' },
+    rot180: { n: 'de pijl draait 180°', f: (x) => ({ ...x, rot: norm(x.rot + 180) }), g: 'rot' },
+    fill: { n: 'leeg wordt gevuld en gevuld wordt leeg', f: (x) => ({ ...x, fill: x.fill === 'full' ? 'empty' : 'full' }), g: 'fill' },
+    dup: { n: 'er komt 1 stip bij', f: (x) => ({ ...x, dots: x.dots + 1 }), g: 'dots' },
+    ddown: { n: 'er gaat 1 stip af', f: (x) => ({ ...x, dots: x.dots - 1 }), g: 'dots' },
+    dbl: { n: 'het aantal stippen verdubbelt', f: (x) => ({ ...x, dots: x.dots * 2 }), g: 'dots' },
+  };
+  function anaQ(d) {
+    const nT = d <= 2 ? 1 : d <= 4 ? 2 : 3;
+    const groups = shuffle(['rot', 'fill', 'dots']).slice(0, nT);
+    const tx = groups.map((g) => pick(Object.keys(TX).filter((k) => TX[k].g === g && (k !== 'dbl' || d >= 4))));
+    const mk = () => { const f = randFig(d); f.fill = pick(['empty', 'full']); f.dots = rand(1, 3); return f; };
+    const A = mk(), C = mk();
+    if (A.shape === C.shape) return null;
+    const T = (x, list = tx) => list.reduce((y, k) => TX[k].f(y), x);
+    const B = T(A), ans = T(C);
+    if (F.key(B) === F.key(A)) return null;
+    const pool = [];
+    tx.forEach((k, i) => {
+      const rest = tx.filter((_, j) => j !== i);
+      pool.push({ f: T(C, rest), why: `Je vergat één verandering: ${TX[k].n}.`, tag: nT > 1 ? 'Tweede regel gemist' : 'Regel gemist' });
+      const alt = Object.keys(TX).filter((z) => TX[z].g === TX[k].g && z !== k);
+      for (const z of alt) pool.push({ f: T(C, [...rest, z]), why: `Bijna: maar niet “${TX[z].n}”. Het is: ${TX[k].n}.`, tag: 'Verkeerde richting' });
+    });
+    pool.push({ f: C, why: 'Er verandert wel iets: kijk wat er van A naar B gebeurt.', tag: 'Regel gemist' });
+    pool.push({ f: { ...ans, shape: A.shape }, why: 'De vorm blijft gelijk aan die van C; alleen de veranderingen van A naar B worden overgenomen.', tag: 'Verkeerde regel' });
+    const valid = (f) => f.dots >= 0 && f.dots <= 7;
+    if (!valid(B) || !valid(ans)) return null;
+    const P = shuffle(pool.filter((p) => valid(p.f))).map((p) => ({ key: F.key(p.f), html: F.draw(p.f), text: F.describe(p.f), why: p.why, tag: p.tag }));
+    const built = buildOptions({ key: F.key(ans), html: F.draw(ans), text: F.describe(ans) }, P, optCount(d));
+    if (!built) return null;
+    return {
+      cat: 'abs', diff: d, kindId: 'figana', kind: 'Figuuranalogie',
+      prompt: 'Welke figuur hoort op de open plek?',
+      stem: `<div class="figs ana"><div class="fig">${F.draw(A)}</div><span class="op">:</span><div class="fig">${F.draw(B)}</div><span class="op">=</span><div class="fig">${F.draw(C)}</div><span class="op">:</span><div class="fig q">?</div></div>`,
+      opts: built.opts, ans: built.ans, layout: 'fig',
+      steps: [`Wat verandert er van de eerste naar de tweede figuur? ${tx.map((k) => TX[k].n).join('; ')}.`, `Doe precies hetzelfde met de derde figuur: ${F.describe(ans)}.`],
+      hint: nT > 1 ? `Er veranderen ${nT} dingen tussen de eerste en de tweede figuur.` : 'Er verandert één ding tussen de eerste en de tweede figuur.',
+      quick: 'Maak een lijstje van alle veranderingen van A naar B. Streep opties weg die er één missen.',
+      lesson: 'Neem alle veranderingen over, niet alleen de eerste die je ziet.',
+    };
+  }
+
+  /* ---------- Matrix 3×3 ---------- */
+  function matrixQ(d) {
+    const shapes = shuffle(F.SHAPES).slice(0, 3);
+    const fills = shuffle(FILLS);
+    const r0 = rand(0, 3) * 90, dotBase = rand(0, 2);
+    let cell, txt;
+    if (d <= 3) {
+      cell = (r, c) => ({ shape: shapes[r], fill: fills[c], rot: r0, dots: dotBase + 1 });
+      txt = ['In elke rij is de vorm steeds hetzelfde.', 'In elke kolom is de vulling steeds hetzelfde.'];
+    } else if (d === 4) {
+      cell = (r, c) => ({ shape: shapes[(r + c) % 3], fill: fills[r], rot: r0, dots: dotBase + c + 1 });
+      txt = ['Elke vorm komt in elke rij en kolom precies één keer voor.', 'In elke rij is de vulling gelijk.', 'Van links naar rechts komt er steeds 1 stip bij.'];
+    } else {
+      cell = (r, c) => ({ shape: shapes[(r + c) % 3], fill: fills[(r + 2 * c) % 3], rot: norm(r0 + 90 * c), dots: dotBase + r + 1 });
+      txt = ['Elke vorm komt in elke rij en kolom precies één keer voor.', 'Ook elke vulling komt in elke rij en kolom één keer voor.', 'Van links naar rechts draait de pijl steeds 90° met de klok mee.', 'Van boven naar beneden komt er steeds 1 stip bij.'];
+    }
+    const ans = cell(2, 2);
+    const pool = [];
+    for (const s of shapes) if (s !== ans.shape) pool.push({ f: { ...ans, shape: s }, why: 'De vorm klopt niet met de regel voor vormen.', tag: 'Regel gemist' });
+    for (const v of FILLS) if (v !== ans.fill) pool.push({ f: { ...ans, fill: v }, why: 'De vulling klopt niet met de regel voor vullingen.', tag: 'Regel gemist' });
+    for (const v of [ans.dots - 1, ans.dots + 1]) if (v >= 0) pool.push({ f: { ...ans, dots: v }, why: 'Het aantal stippen klopt niet.', tag: 'Rekenfout' });
+    pool.push({ f: { ...ans, rot: norm(ans.rot + 90) }, why: 'De pijlrichting klopt niet.', tag: 'Verkeerde richting' });
+    pool.push({ f: { ...ans, rot: norm(ans.rot + 180) }, why: 'De pijlrichting klopt niet.', tag: 'Verkeerde richting' });
+    pool.push({ f: cell(2, 1), why: 'Dit is een kopie van het vakje ernaast. Het ontbrekende vak volgt de regels voor zijn eigen rij en kolom.', tag: 'Verkeerde regel' });
+    const P = shuffle(pool).map((p) => ({ key: F.key(p.f), html: F.draw(p.f), text: F.describe(p.f), why: p.why, tag: d >= 4 && p.tag === 'Regel gemist' ? 'Tweede regel gemist' : p.tag }));
+    const built = buildOptions({ key: F.key(ans), html: F.draw(ans), text: F.describe(ans) }, P, optCount(d));
+    if (!built) return null;
+    let grid = '';
+    for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) grid += r === 2 && c === 2 ? '<div class="fig q">?</div>' : `<div class="fig">${F.draw(cell(r, c))}</div>`;
+    return {
+      cat: 'abs', diff: d, kindId: 'matrix', kind: 'Matrix',
+      prompt: 'Welke figuur hoort in het lege vak?',
+      stem: `<div class="matrix">${grid}</div>`,
+      opts: built.opts, ans: built.ans, layout: 'fig',
+      steps: ['Zoek de regels per rij (horizontaal) en per kolom (verticaal).', ...txt, `Het lege vak wordt dus: ${F.describe(ans)}.`],
+      hint: 'Kijk eerst per rij en daarna per kolom. Wat blijft gelijk en wat verandert?',
+      quick: 'Bepaal per eigenschap wat er in de onderste rij en rechterkolom nog ontbreekt.',
+      lesson: 'Matrix: elke eigenschap heeft een eigen regel, per rij of per kolom.',
+    };
+  }
+
+  function generate(d, opt = {}) {
+    const kinds = d <= 1 ? ['odd'] : d === 2 ? ['odd', 'figana'] : ['odd', 'figana', 'matrix'];
+    const k = opt.kind && kinds.includes(opt.kind) ? opt.kind : pick(kinds);
+    return attempt(() => (k === 'odd' ? oddQ(d) : k === 'figana' ? anaQ(d) : matrixQ(d)));
+  }
+  MT.gens.abs = { generate };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+/* E. Logisch redeneren: volgorde, syllogismen, codes en redeneersommen */
+(function (G) {
+  'use strict';
+  const MT = G.MT;
+  const { rand, pick, chance, shuffle, esc, optCount, buildOptions, attempt } = MT.util;
+
+  const NAMES = ['Anouk', 'Bram', 'Chris', 'Daan', 'Emma', 'Fleur', 'Gijs', 'Hamza', 'Iris', 'Jesse', 'Kim', 'Lars', 'Mila', 'Noah', 'Omar', 'Pim', 'Rik', 'Sara', 'Tess', 'Yara'];
+  const DIMS = [
+    { more: 'ouder', less: 'jonger', top: 'oudste', bot: 'jongste' },
+    { more: 'langer', less: 'korter', top: 'langste', bot: 'kortste' },
+    { more: 'sneller', less: 'langzamer', top: 'snelste', bot: 'langzaamste' },
+    { more: 'zwaarder', less: 'lichter', top: 'zwaarste', bot: 'lichtste' },
+    { more: 'sterker', less: 'zwakker', top: 'sterkste', bot: 'zwakste' },
+  ];
+  function perms(a) {
+    if (a.length <= 1) return [a];
+    const out = [];
+    a.forEach((x, i) => perms([...a.slice(0, i), ...a.slice(i + 1)]).forEach((p) => out.push([x, ...p])));
+    return out;
+  }
+
+  /* ---------- Volgorde ---------- */
+  function orderQ(d) {
+    const n = [0, 3, 4, 4, 5, 5][d];
+    const names = shuffle(NAMES).slice(0, n);
+    const truth = shuffle(names); // truth[0] = meest (oudste)
+    const D = pick(DIMS);
+    const rank = (p, x) => p.indexOf(x);
+    // vraag
+    const qs = [
+      { t: `Wie is de ${D.top}?`, pos: 0 },
+      { t: `Wie is de ${D.bot}?`, pos: n - 1 },
+    ];
+    if (n >= 4) qs.push({ t: `Wie is de op één na ${D.top}?`, pos: 1 }, { t: `Wie is de op één na ${D.bot}?`, pos: n - 2 });
+    if (n === 5) qs.push({ t: `Wie staat precies in het midden?`, pos: 2 });
+    const Q = d <= 1 ? qs[rand(0, 1)] : pick(qs);
+    const all = perms(names);
+    const facts = [];
+    let cands = all;
+    const allPairs = [];
+    for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) allPairs.push([truth[i], truth[j], j - i]);
+    let pairPool = d <= 2 ? allPairs.filter((p) => p[2] === 1) : shuffle(allPairs).sort((a, b) => (d >= 4 ? 0 : a[2] - b[2]));
+    if (d >= 4) pairPool = shuffle(allPairs);
+    for (const [hi, lo] of pairPool) {
+      const answers = new Set(cands.map((p) => p[Q.pos]));
+      if (answers.size === 1 && facts.length >= n - 1) break;
+      const next = cands.filter((p) => rank(p, hi) < rank(p, lo));
+      if (next.length === cands.length) continue; // voegt niets toe
+      facts.push([hi, lo]);
+      cands = next;
+    }
+    const answers = new Set(cands.map((p) => p[Q.pos]));
+    if (answers.size !== 1) return null;
+    const ans = [...answers][0];
+    const sentences = shuffle(facts).map(([hi, lo]) => (d >= 2 && chance(0.5) ? `${lo} is ${D.less} dan ${hi}.` : `${hi} is ${D.more} dan ${lo}.`));
+    const fullKnown = cands.length === 1;
+    const orderTxt = fullKnown ? truth.join(' > ') : null;
+    const pool = shuffle(names.filter((x) => x !== ans)).map((x) => ({
+      key: x, html: esc(x), text: x, tag: 'Volgorde verkeerd',
+      why: fullKnown ? `${x} staat op plek ${truth.indexOf(x) + 1} van ${n} (van ${D.top} naar ${D.bot}).` : `${x} kan niet op die plek staan als je alle zinnen combineert.`,
+    }));
+    pool.push({ key: '?', html: 'Dat is niet te bepalen', text: 'Niet te bepalen', tag: 'Volgorde verkeerd', why: `Het is wel te bepalen: ${ans} is de enige die op die plek past.` });
+    const built = buildOptions({ key: ans, html: esc(ans), text: ans }, pool, optCount(d));
+    if (!built) return null;
+    return {
+      cat: 'log', diff: d, kindId: 'order', kind: 'Volgorde bepalen',
+      prompt: Q.t,
+      stem: `<ul class="facts">${sentences.map((s) => `<li>${esc(s)}</li>`).join('')}</ul>`,
+      opts: built.opts, ans: built.ans, layout: 'text',
+      steps: [
+        `Zet iedereen op één lijn, van ${D.top} naar ${D.bot}. Schrijf “${D.less} dan” om naar “${D.more} dan”, zodat alle zinnen dezelfde kant op wijzen.`,
+        fullKnown ? `De volgorde is: ${orderTxt}.` : `Niet de hele volgorde ligt vast, maar wel wie er op de gevraagde plek staat.`,
+        `Antwoord: ${ans}.`,
+      ],
+      hint: `Schrijf alle zinnen om naar “${D.more} dan” en teken een lijn.`,
+      quick: 'Teken een verticale lijn en zet de namen erop terwijl je leest. Omschrijven naar één richting voorkomt denkfouten.',
+      lesson: `Draai elke zin om naar dezelfde richting (“${D.more} dan”) voordat je gaat ordenen.`,
+    };
+  }
+
+  /* ---------- Syllogismen (met controle via alle mogelijke situaties) ---------- */
+  const WORDS = ['blimpers', 'kroters', 'spanels', 'dolvers', 'grimsels', 'plofters', 'zwakels', 'murvels', 'tringels', 'flonters', 'snaters', 'pluimers'];
+  // uitspraak: {t:'A'|'E'|'I'|'O', x, y}
+  const say = (s, W) => ({
+    A: `Alle ${W[s.x]} zijn ${W[s.y]}.`,
+    E: `Geen enkele ${W[s.x].replace(/s$/, '')} is een ${W[s.y].replace(/s$/, '')}.`,
+    I: `Sommige ${W[s.x]} zijn ${W[s.y]}.`,
+    O: `Sommige ${W[s.x]} zijn geen ${W[s.y]}.`,
+  }[s.t]);
+  function holds(s, regions) {
+    const hasX = (r) => (r >> s.x) & 1, hasY = (r) => (r >> s.y) & 1;
+    switch (s.t) {
+      case 'A': return !regions.some((r) => hasX(r) && !hasY(r));
+      case 'E': return !regions.some((r) => hasX(r) && hasY(r));
+      case 'I': return regions.some((r) => hasX(r) && hasY(r));
+      case 'O': return regions.some((r) => hasX(r) && !hasY(r));
+    }
+  }
+  function models(nSets, premises) {
+    const regs = [];
+    for (let r = 1; r < 1 << nSets; r++) regs.push(r);
+    const out = [];
+    for (let m = 1; m < 1 << regs.length; m++) {
+      const occ = regs.filter((_, i) => (m >> i) & 1);
+      let ok = true;
+      for (let s = 0; s < nSets && ok; s++) if (!occ.some((r) => (r >> s) & 1)) ok = false; // alle groepen bestaan
+      if (ok && premises.every((p) => holds(p, occ))) out.push(occ);
+    }
+    return out;
+  }
+  // Sjablonen: premissen + geldige conclusie. Termen 0,1,2(,3)
+  const SYL = [
+    { lv: 2, n: 3, p: [['A', 0, 1], ['A', 1, 2]], c: ['A', 0, 2], ex: 'Alle 1 zijn 2, en alle 2 zijn 3. Dus zijn alle 1 ook 3.' },
+    { lv: 2, n: 3, p: [['A', 0, 1], ['E', 1, 2]], c: ['E', 0, 2], ex: 'Alle 1 zijn 2, en 2 en 3 hebben niets gemeen. Dus hebben 1 en 3 ook niets gemeen.' },
+    { lv: 3, n: 3, p: [['I', 0, 1], ['A', 1, 2]], c: ['I', 0, 2], ex: 'Sommige 1 zijn 2, en alle 2 zijn 3. Die “sommige” zijn dus ook 3.' },
+    { lv: 3, n: 3, p: [['I', 0, 1], ['E', 1, 2]], c: ['O', 0, 2], ex: 'Sommige 1 zijn 2, en 2 en 3 hebben niets gemeen. Die “sommige” 1 zijn dus geen 3.' },
+    { lv: 4, n: 3, p: [['A', 0, 1], ['O', 2, 1]], c: ['O', 2, 0], ex: 'Alle 1 zijn 2. Sommige 3 zijn geen 2, dus kunnen die ook geen 1 zijn.' },
+    { lv: 4, n: 3, p: [['A', 1, 0], ['A', 1, 2]], c: ['I', 0, 2], ex: 'Alle 2 zijn zowel 1 als 3. Omdat er 2 bestaan, zijn er dus 1 die ook 3 zijn.' },
+    { lv: 5, n: 4, p: [['A', 0, 1], ['A', 1, 2], ['E', 2, 3]], c: ['E', 0, 3], ex: 'Alle 1 zijn 2, alle 2 zijn 3, en 3 en 4 hebben niets gemeen. Dus hebben 1 en 4 ook niets gemeen.' },
+    { lv: 5, n: 4, p: [['I', 0, 1], ['A', 1, 2], ['E', 2, 3]], c: ['O', 0, 3], ex: 'Sommige 1 zijn 2, alle 2 zijn 3, en 3 en 4 hebben niets gemeen. Die “sommige” 1 zijn dus geen 4.' },
+  ];
+  const cache = new Map();
+  function sylQ(d) {
+    const T = pick(SYL.filter((s) => s.lv <= d && s.lv >= d - 2));
+    const W = shuffle(WORDS).slice(0, T.n);
+    const prem = T.p.map(([t, x, y]) => ({ t, x, y }));
+    const ck = JSON.stringify(T.p);
+    if (!cache.has(ck)) cache.set(ck, models(T.n, prem));
+    const M = cache.get(ck);
+    const valid = (s) => M.every((occ) => holds(s, occ));
+    const possible = (s) => M.some((occ) => holds(s, occ));
+    const concl = { t: T.c[0], x: T.c[1], y: T.c[2] };
+    if (!valid(concl)) throw new Error('Sjabloon ongeldig');
+    const cands = [];
+    for (const t of ['A', 'E', 'I', 'O']) for (let x = 0; x < T.n; x++) for (let y = 0; y < T.n; y++) if (x !== y) cands.push({ t, x, y });
+    const isPrem = (s) => prem.some((p) => p.t === s.t && p.x === s.x && p.y === s.y);
+    const bad = cands.filter((s) => !valid(s) && !isPrem(s));
+    // meest verleidelijk: zelfde termen als de conclusie
+    const same = (s) => (s.x === concl.x && s.y === concl.y) || (s.x === concl.y && s.y === concl.x);
+    const ordered = [...shuffle(bad.filter(same)), ...shuffle(bad.filter((s) => !same(s)))];
+    const pool = ordered.map((s) => ({
+      key: s.t + s.x + s.y, html: esc(say(s, W)), text: say(s, W),
+      tag: possible(s) ? 'Mogelijk maar niet zeker' : 'In strijd met de gegevens',
+      why: possible(s) ? 'Dit kán waar zijn, maar het volgt niet zeker uit de gegevens.' : 'Dit is in strijd met de gegevens: het kan dus niet waar zijn.',
+    }));
+    const built = buildOptions({ key: concl.t + concl.x + concl.y, html: esc(say(concl, W)), text: say(concl, W) }, pool, optCount(d));
+    if (!built) return null;
+    let ex = T.ex;
+    for (let i = T.n; i >= 1; i--) ex = ex.split(String(i)).join(W[i - 1]);
+    return {
+      cat: 'log', diff: d, kindId: 'syl', kind: 'Syllogisme (wat volgt zeker?)',
+      prompt: 'Welke conclusie volgt zeker uit de gegevens?',
+      stem: `<ul class="facts">${shuffle(prem).map((p) => `<li>${esc(say(p, W))}</li>`).join('')}</ul><p class="muted small">Ga ervan uit dat alle genoemde groepen bestaan. Gebruik alleen deze gegevens.</p>`,
+      opts: built.opts, ans: built.ans, layout: 'text',
+      steps: ['Teken elke groep als een cirkel en zet de cirkels zo neer als de zinnen zeggen.', ex, 'Een conclusie volgt alleen “zeker” als ze in elke tekening die bij de gegevens past waar is.'],
+      hint: 'Teken de groepen als cirkels. Zoek een tekening waarin een optie niet klopt: dan valt die af.',
+      quick: 'Probeer bij elke optie een tegenvoorbeeld te bedenken. Lukt dat, dan volgt die optie niet zeker.',
+      lesson: '“Kan waar zijn” is niet hetzelfde als “volgt zeker”.',
+    };
+  }
+
+  /* ---------- Geheimschrift ---------- */
+  const AL = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const CW = ['KAMP', 'BOOT', 'DUIK', 'TANK', 'MARS', 'SCHIP', 'HAVEN', 'LAARS', 'ANKER', 'RADAR', 'KUST', 'STORM', 'GOLF', 'DEK', 'WACHT', 'VLOOT', 'TOUW', 'KOERS', 'ROER', 'MAST', 'PIER', 'BRUG', 'DOEL', 'RUGZAK', 'HELM'];
+  const enc = (w, f) => f(w.split('').map((c) => AL.indexOf(c))).map((i) => AL[((i % 26) + 26) % 26]).join('');
+  const CODES = [
+    { id: 'p1', lv: 1, n: 'elke letter 1 plek verder in het alfabet', f: (a) => a.map((x) => x + 1) },
+    { id: 'm1', lv: 1, n: 'elke letter 1 plek terug in het alfabet', f: (a) => a.map((x) => x - 1) },
+    { id: 'p2', lv: 2, n: 'elke letter 2 plekken verder', f: (a) => a.map((x) => x + 2) },
+    { id: 'rev', lv: 2, n: 'het woord achterstevoren', f: (a) => a.slice().reverse() },
+    { id: 'revp1', lv: 3, n: 'achterstevoren én elke letter 1 verder', f: (a) => a.slice().reverse().map((x) => x + 1) },
+    { id: 'alt', lv: 3, n: 'om en om 1 verder en 1 terug', f: (a) => a.map((x, i) => x + (i % 2 ? -1 : 1)) },
+    { id: 'pos', lv: 4, n: 'de 1e letter +1, de 2e +2, de 3e +3, …', f: (a) => a.map((x, i) => x + i + 1) },
+    { id: 'm2', lv: 2, n: 'elke letter 2 plekken terug', f: (a) => a.map((x) => x - 2) },
+  ];
+  function codeQ(d) {
+    const R = pick(CODES.filter((c) => c.lv <= d && c.lv >= d - 2));
+    const [w1, w2] = shuffle(CW);
+    const noWrap = (w) => w.split('').every((c) => { const i = AL.indexOf(c); return i >= 3 && i <= 21; });
+    if (d <= 2 && (!noWrap(w1) || !noWrap(w2))) return null;
+    if (w1.length === w2.length && d <= 1) return null;
+    const e1 = enc(w1, R.f), ans = enc(w2, R.f);
+    const fits = CODES.filter((c) => enc(w1, c.f) === e1);
+    if (fits.some((c) => enc(w2, c.f) !== ans)) return null;
+    const pool = shuffle(CODES.filter((c) => c !== R)).map((c) => {
+      const v = enc(w2, c.f);
+      return { key: v, html: v, text: v, tag: 'Verkeerde regel', why: `Dit is de code “${c.n}”. Dan zou ${w1} als ${enc(w1, c.f)} geschreven worden, niet als ${e1}.` };
+    });
+    // één letter fout
+    for (let i = 0; i < 3; i++) {
+      const arr = ans.split('');
+      const j = rand(0, arr.length - 1);
+      arr[j] = AL[(AL.indexOf(arr[j]) + pick([1, -1]) + 26) % 26];
+      pool.push({ key: arr.join(''), html: arr.join(''), text: arr.join(''), tag: 'Rekenfout', why: 'Eén letter is verkeerd omgezet. Controleer letter voor letter.' });
+    }
+    const built = buildOptions({ key: ans, html: ans, text: ans }, pool, optCount(d));
+    if (!built) return null;
+    return {
+      cat: 'log', diff: d, kindId: 'code', kind: 'Geheimschrift',
+      prompt: `In een geheimtaal wordt ${w1} geschreven als ${e1}. Hoe schrijf je ${w2}?`,
+      stem: `<div class="analogy mono"><b>${w1}</b><span class="op">→</span><b>${e1}</b></div><div class="analogy mono"><b>${w2}</b><span class="op">→</span><span class="gap">?</span></div>`,
+      opts: built.opts, ans: built.ans, layout: 'mono',
+      steps: [`Vergelijk ${w1} en ${e1} letter voor letter.`, `De code is: ${R.n}.`, `${w2} wordt dan ${ans}.`],
+      hint: 'Zet het alfabet op papier en tel hoeveel plekken elke letter verschuift.',
+      quick: 'Check alleen de eerste en laatste letter van de opties. Daarmee valt de rest vaak al af.',
+      lesson: 'Schrijf bij twijfel het alfabet uit; tellen in je hoofd geeft snel fouten.',
+    };
+  }
+
+  /* ---------- Redeneersommen ---------- */
+  const hm = (min) => { const h = Math.floor(min / 60), m = min % 60; return m ? `${h} uur en ${m} min` : `${h} uur`; };
+  const clock = (min) => { min = ((min % 1440) + 1440) % 1440; return `${String(Math.floor(min / 60)).padStart(2, '0')}:${String(min % 60).padStart(2, '0')}`; };
+  const SUMS = [
+    { lv: [1, 3], make() {
+      const v = pick([4, 5, 6]), mins = pick([30, 45, 60, 75, 90, 120, 150, 180, 210]), km = (v * mins) / 60;
+      if (km % 0.5) return null;
+      const kmT = String(km).replace('.', ',');
+      const hrs = km / v, h = Math.floor(hrs), fr = Math.round((hrs - h) * 100);
+      const wrong = [{ m: mins + 30, why: 'Reken na: tijd = afstand ÷ snelheid.' }, { m: mins - 15, why: 'Reken na: tijd = afstand ÷ snelheid.' }, { m: mins + 15, why: 'Reken na: tijd = afstand ÷ snelheid.' }];
+      if (fr) wrong.unshift({ m: h * 60 + fr, why: `Je las ${String(hrs).replace('.', ',')} uur als ${h} uur en ${fr} minuten. Maar een uur heeft 60 minuten, geen 100.` });
+      return { q: `Een groep marcheert met een snelheid van ${v} km per uur. Hoe lang doet de groep over ${kmT} km?`, a: hm(mins), vals: wrong.filter((x) => x.m > 0 && x.m !== mins).map((x) => ({ v: hm(x.m), why: x.why })),
+        steps: [`Tijd = afstand ÷ snelheid = ${kmT} ÷ ${v} = ${String(km / v).replace('.', ',')} uur.`, `${String(km / v).replace('.', ',')} uur = ${hm(mins)}.`], kind: 'Snelheid, afstand, tijd', lesson: 'Tijd = afstand ÷ snelheid. Een half uur is 30 minuten, niet 50.' };
+    } },
+    { lv: [1, 3], make() {
+      const start = rand(18, 23) * 60 + pick([0, 15, 30, 45]), dur = rand(5, 9) * 60 + pick([10, 20, 35, 40, 50]);
+      const end = start + dur;
+      return { q: `Een wacht begint om ${clock(start)} en duurt ${hm(dur)}. Hoe laat is de wacht voorbij?`, a: clock(end), vals: [{ v: clock(end + 60), why: 'Je telde een uur te veel.' }, { v: clock(end - 60), why: 'Je telde een uur te weinig.' }, { v: clock(end - (dur % 60)), why: 'Je vergat de minuten op te tellen.' }, { v: clock(end + 10), why: 'De minuten kloppen niet.' }],
+        steps: [`${clock(start)} + ${Math.floor(dur / 60)} uur = ${clock(start + Math.floor(dur / 60) * 60)}.`, `Daarna nog ${dur % 60} minuten erbij: ${clock(end)}. Let op middernacht.`], kind: 'Kloktijden', lesson: 'Tel eerst de hele uren op en daarna pas de minuten.' };
+    } },
+    { lv: [2, 4], make() {
+      const a = pick([2, 3, 4, 6]), t = pick([6, 8, 12, 9]), b = pick([3, 4, 6, 8, 2].filter((x) => x !== a)), tot = a * t;
+      if (tot % b) return null;
+      const r = tot / b;
+      return { q: `${a} mariniers graven samen een stelling in ${t} uur. Hoe lang doen ${b} mariniers erover, als iedereen even hard werkt?`, a: `${r} uur`, vals: [{ v: `${(t * b) / a} uur`, why: 'Je rekende alsof meer mensen er langer over doen. Meer mensen = minder tijd.' }, { v: `${r + 1} uur`, why: 'Rekenfout.' }, { v: `${Math.max(1, r - 1)} uur`, why: 'Rekenfout.' }, { v: `${t + (a - b)} uur`, why: 'Je rekende met optellen en aftrekken. Dit is een omgekeerd evenredige som.' }].filter((x) => x.v !== `${r} uur`),
+        steps: [`Totaal werk = ${a} mariniers × ${t} uur = ${tot} “manuren”.`, `Met ${b} mariniers: ${tot} ÷ ${b} = ${r} uur.`], kind: 'Omgekeerd evenredig', lesson: 'Meer mensen, minder tijd: reken eerst het totaal aantal manuren uit.' };
+    } },
+    { lv: [3, 5], make() {
+      const n = pick([200, 240, 300, 360, 400, 480, 600]), p = pick([10, 20, 25, 30, 40]), fr = pick([[1, 4], [1, 3], [1, 2], [2, 3]]);
+      const after1 = n - (n * p) / 100;
+      if (after1 % 1 || (after1 * fr[0]) % fr[1]) return null;
+      const out = (after1 * fr[0]) / fr[1];
+      const r = after1 - out;
+      const wrong1 = n - (n * p) / 100 - (n * fr[0]) / fr[1];
+      return { q: `Van ${n} kandidaten valt ${p}% af bij de sporttest. Van de rest valt daarna nog ${fr[0]}/${fr[1]} deel af bij het gesprek. Hoeveel kandidaten blijven er over?`, a: String(r), vals: [{ v: String(wrong1), why: `Je nam ${fr[0]}/${fr[1]} van alle ${n} kandidaten. Het gaat om ${fr[0]}/${fr[1]} van de rest.` }, { v: String(out), why: 'Dat is het aantal dat afvalt bij het gesprek, niet het aantal dat overblijft.' }, { v: String(after1), why: 'Je vergat de tweede ronde.' }, { v: String(r + 10), why: 'Rekenfout.' }].filter((x) => x.v !== String(r) && Number(x.v) > 0),
+        steps: [`${p}% van ${n} = ${(n * p) / 100}. Er blijven ${after1} over.`, `${fr[0]}/${fr[1]} van ${after1} = ${out} vallen af. Er blijven ${r} over.`], kind: 'Procenten en breuken', lesson: 'Let op: “van de rest” betekent dat je met het nieuwe aantal verder rekent.' };
+    } },
+    { lv: [4, 5], make() {
+      const p = pick([10, 12, 15, 20]), dd = pick([15, 20, 24, 30]), passed = pick([3, 5, 6, 10]), extra = pick([5, 8, 10, 15, 20]);
+      const left = (dd - passed) * p;
+      if (passed >= dd || left % (p + extra)) return null;
+      const r = left / (p + extra);
+      return { q: `Een voorraad eten is genoeg voor ${p} mariniers gedurende ${dd} dagen. Na ${passed} dagen komen er ${extra} mariniers bij. Hoeveel dagen doen ze nog met de rest van de voorraad?`, a: `${r} dagen`, vals: [{ v: `${(dd * p) / (p + extra)} dagen`, why: `Je vergat dat er al ${passed} dagen voorbij waren.` }, { v: `${dd - passed - extra} dagen`, why: 'Je trok mensen af van dagen. Reken met “mandagen”.' }, { v: `${r + 1} dagen`, why: 'Rekenfout.' }, { v: `${dd - passed} dagen`, why: 'Met meer mensen gaat de voorraad sneller op.' }].filter((x) => x.v !== `${r} dagen` && !x.v.includes('.') && !x.v.startsWith('-') && !x.v.startsWith('0')),
+        steps: [`Na ${passed} dagen is er nog eten voor ${p} mariniers × ${dd - passed} dagen = ${left} mandagen.`, `Nu zijn er ${p + extra} mariniers: ${left} ÷ ${p + extra} = ${r} dagen.`], kind: 'Voorraad (mandagen)', lesson: 'Reken met één totaal (mandagen) en verdeel dat daarna.' };
+    } },
+  ];
+  function sumQ(d) {
+    const S = pick(SUMS.filter((s) => d >= s.lv[0] && d <= s.lv[1]));
+    const r = S.make();
+    if (!r) return null;
+    const pool = shuffle(r.vals).map((x) => ({ key: x.v, html: esc(x.v), text: x.v, why: x.why, tag: /Rekenfout/.test(x.why) ? 'Rekenfout' : 'Verkeerde regel' }));
+    const built = buildOptions({ key: r.a, html: esc(r.a), text: r.a }, pool, Math.min(optCount(d), pool.length + 1));
+    if (!built || built.opts.length < 4) return null;
+    return {
+      cat: 'log', diff: d, kindId: 'sum', kind: r.kind,
+      prompt: r.q, stem: '', opts: built.opts, ans: built.ans, layout: 'text',
+      steps: r.steps, hint: 'Schrijf de gegevens eerst op in een klein lijstje.',
+      quick: 'Schat eerst het antwoord. Opties die ver van je schatting af liggen, kun je meteen wegstrepen.',
+      lesson: r.lesson,
+    };
+  }
+
+  function generate(d, opt = {}) {
+    const kinds = d <= 1 ? ['order', 'code', 'sum'] : ['order', 'syl', 'code', 'sum'];
+    const k = opt.kind && kinds.includes(opt.kind) ? opt.kind : pick(kinds);
+    return attempt(() => ({ order: orderQ, syl: sylQ, code: codeQ, sum: sumQ }[k](d)));
+  }
+  MT.gens.log = { generate, _models: models, _holds: holds, SYL };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+/* Marinier Selectietrainer — trainer-app
+ * Zelfgemaakte oefenvragen. Geen officiële vragen of simulatie van Defensie of het Korps Mariniers. */
+(function () {
+  'use strict';
+  const MT = window.MT;
+  const { esc, shuffle, pick, clamp, LETTERS } = MT.util;
+  const CATS = MT.CATS, CAT_IDS = MT.CAT_IDS;
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const APP = $('#app');
+  const now = () => performance.now();
+
+  /* ================= Instellingen ================= */
+  const LEVELS = [
+    { v: 1, k: '1', label: 'Beginner', desc: 'Ik heb weinig ervaring met cognitieve assessments.' },
+    { v: 2, k: '2', label: 'Basis', desc: 'Ik begrijp de belangrijkste soorten vragen.' },
+    { v: 3, k: '3', label: 'Gemiddeld', desc: 'Ik heb al geoefend en herken veel basispatronen.' },
+    { v: 4, k: '4', label: 'Gevorderd', desc: 'Ik los standaardvragen meestal goed op en wil moeilijkere patronen.' },
+    { v: 5, k: '5', label: 'Expert', desc: 'Ik wil complexe vragen, hoge snelheid en minimale foutmarge.' },
+    { v: 'calib', k: '6', label: 'Automatische niveaubepaling', desc: 'Eerst een korte nulmeting van 10 vragen. Daarna bepaalt de trainer je startniveau.' },
+  ];
+  const DIFFS = [
+    { v: '1', k: '1', label: '1/5 – Makkelijk', desc: 'Eenvoudige patronen en veel tijd.' },
+    { v: '2', k: '2', label: '2/5 – Normaal', desc: 'Basisniveau.' },
+    { v: '3', k: '3', label: '3/5 – Uitdagend', desc: 'Meer denkstappen en minder voor de hand liggende patronen.' },
+    { v: '4', k: '4', label: '4/5 – Moeilijk', desc: 'Complexe patronen, afleiders en hogere tijdsdruk.' },
+    { v: '5', k: '5', label: '5/5 – Extreem', desc: 'Complexe combinaties, weinig tijd en hoge nauwkeurigheid vereist.' },
+    { v: 'auto', k: 'A', label: 'AUTO – Adaptief', desc: 'Begint passend bij je niveau en past de moeilijkheid automatisch aan.' },
+  ];
+  const CATEGORY_OPTS = [
+    ...CAT_IDS.map((id) => ({ v: id, k: CATS[id].letter, label: `${CATS[id].icon} ${CATS[id].name}`, desc: '' })),
+    { v: 'mix', k: 'G', label: '🔀 Gemengde training', desc: 'Alle onderdelen door elkaar.' },
+    { v: 'auto', k: 'H', label: '🎯 Automatisch', desc: 'De trainer kiest vaker de onderdelen waarin je in deze sessie de meeste fouten maakt.' },
+  ];
+  CATEGORY_OPTS[0].desc = 'Welk getal komt hierna?';
+  CATEGORY_OPTS[1].desc = 'Woord-, getal- en letterverbanden.';
+  CATEGORY_OPTS[2].desc = 'Bewerkingen op een rij letters.';
+  CATEGORY_OPTS[3].desc = 'Welke figuur komt hierna?';
+  CATEGORY_OPTS[4].desc = 'Volgordes, conclusies, codes en redeneersommen.';
+  CATEGORY_OPTS[5].desc = 'Afwijkers, figuuranalogieën en matrices.';
+  const DURATIONS = [
+    { v: 5, k: '1', label: 'Kort – 5 vragen' },
+    { v: 10, k: '2', label: 'Normaal – 10 vragen' },
+    { v: 20, k: '3', label: 'Lang – 20 vragen' },
+    { v: 30, k: '4', label: 'Intensief – 30 vragen' },
+    { v: 40, k: '5', label: 'Mariniers Training – 40 gemengde vragen' },
+    { v: Infinity, k: '6', label: 'Vrij trainen', desc: 'Doorgaan tot je op STOP drukt.' },
+  ];
+  const PRESSURES = [
+    { v: 'none', k: '1', label: 'Geen tijdsdruk', desc: 'Focus volledig op begrijpen.', f: null },
+    { v: 'light', k: '2', label: 'Licht', desc: 'Ruime tijd per vraag.', f: 1.6 },
+    { v: 'normal', k: '3', label: 'Normaal', desc: 'Gemiddelde tijdsdruk.', f: 1.0 },
+    { v: 'high', k: '4', label: 'Hoog', desc: 'Weinig tijd per vraag.', f: 0.7 },
+    { v: 'extreme', k: '5', label: 'Extreem', desc: 'Zeer weinig tijd; snelheid en nauwkeurigheid tellen allebei.', f: 0.5 },
+    { v: 'adaptive', k: '6', label: 'Adaptief', desc: 'De tijd per vraag past zich aan je prestaties aan.', f: 1.0 },
+  ];
+  const FEEDBACKS = [
+    { v: 'each', k: '1', label: 'Na iedere vraag', desc: 'Direct beoordeling en uitleg.' },
+    { v: 'end', k: '2', label: 'Alleen aan het eind', desc: 'Zoals bij een assessment: pas feedback in het eindrapport.' },
+  ];
+  const HINTS = [
+    { v: true, k: '1', label: 'Hints aan', desc: 'Je kunt per vraag één kleine hint vragen.' },
+    { v: false, k: '2', label: 'Hints uit', desc: '' },
+  ];
+  const STEP_DEFS = {
+    level: { title: 'Kies je niveau', q: 'Wat is je huidige niveau?', opts: LEVELS },
+    difficulty: { title: 'Moeilijkheid', q: 'Hoe moeilijk wil je beginnen?', opts: DIFFS, note: 'Deze niveaus zijn trainingsniveaus van deze oefenomgeving. Ze zeggen niets over het officiële niveau van Defensie.' },
+    category: { title: 'Oefencategorie', q: 'Wat wil je oefenen?', opts: CATEGORY_OPTS },
+    duration: { title: 'Trainingsduur', q: 'Hoeveel vragen?', opts: DURATIONS },
+    pressure: { title: 'Tijdsdruk', q: 'Hoeveel tijdsdruk wil je?', opts: PRESSURES, note: 'De tijdslimieten zijn trainingsinstellingen, geen officiële tijdslimieten van het echte assessment.' },
+    feedback: { title: 'Feedback', q: 'Wanneer wil je feedback?', opts: FEEDBACKS },
+    hints: { title: 'Hints', q: 'Wil je hints kunnen gebruiken?', opts: HINTS },
+  };
+
+  const MODES = {
+    1: { icon: '📚', name: 'Leren & Uitleggen', bullets: ['Eén vraag per keer', 'Direct feedback', 'Uitgebreide uitleg', 'Geen tijdsdruk', 'Gericht op begrijpen'],
+      steps: ['level', 'difficulty', 'category', 'duration'], fixed: { pressure: 'none', feedback: 'each', hints: true }, def: { difficulty: 'auto', category: 'mix', duration: 10 } },
+    2: { icon: '🧠', name: 'Adaptieve Training', bullets: ['Moeilijkheid past zich automatisch aan', 'Analyseert je fouten', 'Herhaalt zwakke onderwerpen met nieuwe vragen', 'Wordt moeilijker als je goed presteert'],
+      steps: ['level', 'category', 'duration', 'pressure'], fixed: { difficulty: 'auto', feedback: 'each', hints: true }, def: { category: 'auto', duration: 20, pressure: 'adaptive' } },
+    3: { icon: '⚓', name: 'Mariniers Training Mode', bullets: ['Intensieve gemengde training', 'Tijd en nauwkeurigheid tellen', 'Geen hints tenzij ingesteld', 'Moeilijkheid loopt op', 'Uitgebreide analyse na afloop'],
+      steps: ['level'], fixed: { category: 'mix', difficulty: 'auto', duration: 30, feedback: 'each', hints: false, pressure: 'adaptive' }, def: {} },
+    4: { icon: '⏱️', name: 'Assessment Simulatie', bullets: ['Meerdere vragen achter elkaar', 'Geen feedback tussendoor', 'Geen hints', 'Assessmentachtige tijdsdruk', 'Eindrapport na afloop'],
+      steps: ['level', 'category', 'duration', 'pressure'], fixed: { difficulty: 'auto', feedback: 'end', hints: false }, def: { category: 'mix', duration: 20, pressure: 'normal' }, pressureOpts: ['normal', 'high', 'extreme'] },
+    5: { icon: '🎯', name: 'Zwakke Punten Training', bullets: ['Gebruikt je resultaten uit deze sessie', 'Kiest automatisch je zwakste onderdelen', 'Extra oefeningen op die onderwerpen'],
+      steps: ['duration'], fixed: { category: 'weak', difficulty: 'auto', feedback: 'each', hints: true, pressure: 'light' }, def: { duration: 10 } },
+    6: { icon: '🛠️', name: 'Zelf Instellen', bullets: ['Kies alle instellingen zelf'],
+      steps: ['level', 'difficulty', 'category', 'duration', 'pressure', 'feedback', 'hints'], fixed: {}, def: { difficulty: 'auto', category: 'mix', duration: 10, pressure: 'normal', feedback: 'each', hints: true } },
+  };
+
+  const TAG_ADVICE = {
+    'Rekenfout': 'Schrijf tussenstappen op en reken de laatste stap altijd even na.',
+    'Verkeerde regel': 'Test je regel op álle getallen of figuren, niet alleen op de eerste twee.',
+    'Tweede regel gemist': 'Heb je één regel gevonden? Check dan of er nog iets anders verandert.',
+    'Regel gemist': 'Loop elke eigenschap apart af: vorm, vulling, richting, aantal.',
+    'Verkeerde richting': 'Let op richting: met of tegen de klok in, vooruit of terug.',
+    'Volgorde van bewerkingen': 'Werk strikt van links naar rechts en schrijf elke tussenstap op.',
+    'Bewerking overgeslagen': 'Tik elke bewerking af zodra je hem hebt uitgevoerd.',
+    'Bewerking verward': 'Lees de legenda bij elke vraag opnieuw: de symbolen wisselen.',
+    'Relatie niet gelijk': 'Maak een korte zin van het eerste paar en zet het nieuwe woord in precies dezelfde zin.',
+    'Mogelijk maar niet zeker': 'Zoek bij elke conclusie een tegenvoorbeeld. “Kan waar zijn” is niet genoeg.',
+    'In strijd met de gegevens': 'Teken de groepen als cirkels voordat je een conclusie kiest.',
+    'Volgorde verkeerd': 'Schrijf alle zinnen om naar dezelfde richting en teken een lijn.',
+    'Regel niet gevonden': 'Vind je niets? Zoek een verband tussen twee eigenschappen.',
+    'Tijd op': 'Te lang blijven hangen. Gok na je tijdslimiet en ga door; oefen tempo met Licht → Normaal.',
+    'Overig': 'Lees de uitleg bij de vragen die fout gingen goed door.',
+  };
+
+  /* ================= Sessie (lokaal bewaard) ================= */
+  const SKEY = 'mst-session-v2';
+  let SESSION = { history: [], created: Date.now() };
+  try { const s = JSON.parse(localStorage.getItem(SKEY) || 'null'); if (s && Array.isArray(s.history)) SESSION = s; } catch (e) { /* geen opslag */ }
+  const saveSession = () => { try { SESSION.history = SESSION.history.slice(-600); localStorage.setItem(SKEY, JSON.stringify(SESSION)); } catch (e) { /* negeren */ } };
+
+  function catStats(list) {
+    const S = {};
+    CAT_IDS.forEach((c) => (S[c] = { n: 0, ok: 0, t: 0, tn: 0 }));
+    for (const r of list) {
+      const s = S[r.c];
+      if (!s) continue;
+      s.n++; if (r.ok) s.ok++;
+      if (r.t != null && !r.to) { s.t += r.t; s.tn++; }
+    }
+    return S;
+  }
+  const pct = (a, b) => (b ? Math.round((a / b) * 100) : 0);
+  function strongest(S) {
+    const c = CAT_IDS.filter((k) => S[k].n >= 2).sort((a, b) => S[b].ok / S[b].n - S[a].ok / S[a].n || S[b].n - S[a].n);
+    return c[0] && S[c[0]].ok / S[c[0]].n >= 0.5 ? c[0] : null;
+  }
+  function weakest(S, n = 2) {
+    return CAT_IDS.filter((k) => S[k].n >= 1 && S[k].ok < S[k].n).sort((a, b) => S[a].ok / S[a].n - S[b].ok / S[b].n || S[b].n - S[a].n).slice(0, n);
+  }
+
+  /* ================= Hulp: UI ================= */
+  let keyHandler = null;
+  document.addEventListener('keydown', (e) => {
+    if (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if ($('.overlay')) { if (e.key === 'Escape') closePanel(); return; }
+    if (keyHandler) keyHandler(e);
+  });
+  function view(html, keys) {
+    APP.innerHTML = html;
+    keyHandler = keys || null;
+    window.scrollTo({ top: 0 });
+  }
+  let toastT;
+  function toast(msg) {
+    let t = $('.toast');
+    if (!t) { t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
+    t.textContent = msg;
+    clearTimeout(toastT);
+    toastT = setTimeout(() => t.remove(), 2600);
+  }
+  let panelOpenedAt = null;
+  function openPanel(html) {
+    closePanel();
+    const o = document.createElement('div');
+    o.className = 'overlay';
+    o.innerHTML = `<div class="panel" role="dialog" aria-modal="true">${html}<div class="row" style="margin-top:16px"><button class="btn quiet" data-close>Sluiten</button></div></div>`;
+    o.addEventListener('click', (e) => { if (e.target === o || e.target.hasAttribute('data-close')) closePanel(); });
+    document.body.appendChild(o);
+    if (RUN && RUN.cur && !RUN.cur.done) panelOpenedAt = now();
+    const b = $('[data-close]', o); if (b) b.focus();
+    return o;
+  }
+  function closePanel() {
+    const o = $('.overlay');
+    if (o) o.remove();
+    if (panelOpenedAt != null && RUN && RUN.cur) { RUN.cur.t0 += now() - panelOpenedAt; }
+    panelOpenedAt = null;
+  }
+  const levelName = (v) => (LEVELS.find((l) => l.v === v) || {}).label || '';
+  const settingLabel = (key, v) => {
+    const list = { difficulty: DIFFS, category: CATEGORY_OPTS.concat([{ v: 'weak', label: '🎯 Zwakste onderdelen' }]), duration: DURATIONS, pressure: PRESSURES, feedback: FEEDBACKS, hints: HINTS }[key];
+    if (key === 'level') return `${v} – ${levelName(v)}`;
+    const o = list && list.find((x) => x.v === v);
+    return o ? o.label : String(v);
+  };
+
+  /* ================= Hoofdmenu ================= */
+  function renderMenu() {
+    stopTimer();
+    RUN = null;
+    const H = SESSION.history;
+    const S = catStats(H);
+    const ok = H.filter((r) => r.ok).length;
+    const weak = weakest(S);
+    const bar = H.length
+      ? `<div class="sessionbar"><span>Deze sessie: <b>${H.length}</b> vragen · <b>${pct(ok, H.length)}%</b> goed</span>${weak.length ? `<span>Extra aandacht: ${weak.map((c) => CATS[c].name).join(', ')}</span>` : ''}
+         <span class="row" style="margin-left:auto"><button class="btn quiet small" id="m-weak">ZWAKKE PUNTEN</button><button class="btn quiet small" id="m-clear">Sessie wissen</button></span></div>`
+      : '';
+    view(`${bar}
+      <h2>🎯 Kies je trainingsmodus</h2>
+      <div class="modes">${Object.entries(MODES).map(([k, m]) => `<button class="mode ${k === '3' ? 'star' : ''}" data-mode="${k}"><span class="no">${k}</span><h3>${m.icon} ${m.name}</h3><ul>${m.bullets.map((b) => `<li>${b}</li>`).join('')}</ul></button>`).join('')}</div>
+      <p style="margin-top:16px"><b>Welke modus wil je starten? Kies 1 t/m 6.</b></p>
+      <p class="muted small">Alle vragen worden ter plekke gemaakt, dus elke training is anders. Het zijn zelfgemaakte oefenvragen, geen officiële vragen van Defensie of het Korps Mariniers.</p>`,
+      (e) => { if (/^[1-6]$/.test(e.key)) chooseMode(Number(e.key)); });
+    $$('[data-mode]').forEach((b) => (b.onclick = () => chooseMode(Number(b.dataset.mode))));
+    if ($('#m-weak')) $('#m-weak').onclick = showWeak;
+    if ($('#m-clear')) $('#m-clear').onclick = () => {
+      const o = openPanel(`<h2>Sessie wissen?</h2><p>Alle resultaten van deze sessie worden verwijderd. Zwakke Punten Training begint dan weer bij nul.</p><button class="btn" id="yes-clear">Ja, wissen</button>`);
+      $('#yes-clear', o).onclick = () => { SESSION = { history: [], created: Date.now() }; saveSession(); closePanel(); renderMenu(); toast('Sessie gewist'); };
+    };
+  }
+
+  /* ================= Wizard ================= */
+  let W = null;
+  function chooseMode(m, preset) {
+    const M = MODES[m];
+    W = { mode: m, label: `${M.icon} ${M.name}`, s: { ...M.def, ...M.fixed, ...(preset || {}) }, steps: M.steps.slice(), i: 0 };
+    if (m === 5) {
+      const S = catStats(SESSION.history);
+      const n = SESSION.history.length;
+      if (n < 6) {
+        view(`<div class="eyebrow">${W.label}</div><h2>Nog te weinig resultaten</h2>
+          <p>Zwakke Punten Training gebruikt je resultaten uit deze sessie. Je hebt nu ${n} ${n === 1 ? 'vraag' : 'vragen'} gemaakt; er zijn er minstens 6 nodig.</p>
+          <p>Doe eerst een korte nulmeting (10 gemengde vragen). Daarna weet de trainer waar je zwakke punten zitten.</p>
+          <div class="row"><button class="btn" id="go-cal">Start nulmeting</button><button class="btn ghost" id="back">Terug naar menu</button></div>`,
+          (e) => { if (e.key === 'Escape') renderMenu(); });
+        $('#go-cal').onclick = () => startCalibration(() => chooseMode(5));
+        $('#back').onclick = renderMenu;
+        return;
+      }
+      const lv = Math.round(SESSION.history.slice(-20).reduce((a, r) => a + r.d, 0) / Math.min(20, n)) || 3;
+      W.s.level = clamp(lv, 1, 5);
+      W.weakCats = weakest(S);
+    }
+    renderStep();
+  }
+  function renderStep() {
+    if (W.i >= W.steps.length) return renderSummary();
+    const key = W.steps[W.i];
+    const D = STEP_DEFS[key];
+    let opts = D.opts;
+    if (key === 'pressure' && MODES[W.mode].pressureOpts) opts = opts.filter((o) => MODES[W.mode].pressureOpts.includes(o.v));
+    const cur = W.s[key];
+    view(`<div class="eyebrow">${esc(W.label)} · stap ${W.i + 1} van ${W.steps.length}</div>
+      <div class="steps-dots">${W.steps.map((_, i) => `<i class="${i <= W.i ? 'on' : ''}"></i>`).join('')}</div>
+      <h2>${D.title}</h2><p class="muted">${D.q}</p>
+      <div class="choices-list">${opts.map((o, i) => `<button class="pick" data-i="${i}" aria-pressed="${cur === o.v}"><span class="k">${o.k}</span><b>${o.label}${key === 'level' && o.v === 'calib' ? '' : ''}</b>${o.desc ? `<span class="d">${o.desc}</span>` : '<span></span>'}</button>`).join('')}</div>
+      ${D.note ? `<p class="note">${D.note}</p>` : ''}
+      <div class="row"><button class="btn ghost" id="back">Terug</button></div>`,
+      (e) => {
+        const o = opts.findIndex((x) => x.k.toLowerCase() === e.key.toLowerCase());
+        if (o >= 0) choose(o);
+        if (e.key === 'Escape' || e.key === 'Backspace') back();
+      });
+    const choose = (i) => {
+      const o = opts[i];
+      if (key === 'level' && o.v === 'calib') { startCalibration((lv) => { W.s.level = lv; W.i++; renderStep(); }); return; }
+      W.s[key] = o.v;
+      if (key === 'duration' && o.v === 40) W.s.category = 'mix';
+      if (key === 'duration' && o.v === 40 && W.steps.includes('category') && W.steps.indexOf('category') > W.i) W.steps.splice(W.steps.indexOf('category'), 1);
+      W.i++;
+      renderStep();
+    };
+    const back = () => { if (W.i === 0) renderMenu(); else { W.i--; renderStep(); } };
+    $$('.pick').forEach((b) => (b.onclick = () => choose(Number(b.dataset.i))));
+    $('#back').onclick = back;
+  }
+  function renderSummary() {
+    const s = W.s;
+    const rows = [['Niveau', settingLabel('level', s.level)], ['Moeilijkheid', settingLabel('difficulty', s.difficulty)], ['Categorie', settingLabel('category', s.category)], ['Aantal vragen', settingLabel('duration', s.duration)], ['Tijdsdruk', settingLabel('pressure', s.pressure)], ['Feedback', settingLabel('feedback', s.feedback)], ['Hints', s.hints ? 'Aan' : 'Uit']];
+    if (W.mode === 5 && W.weakCats && W.weakCats.length) rows.splice(2, 1, ['Focus op', W.weakCats.map((c) => CATS[c].name).join(' en ')]);
+    view(`<div class="eyebrow">${esc(W.label)}</div><h2>Klaar om te starten</h2>
+      ${W.mode === 3 ? '<p class="muted">Een zelfgemaakte, intensieve trainingsmodus ter voorbereiding. Geen officiële simulatie van het Korps Mariniers.</p>' : ''}
+      <dl class="summary">${rows.map(([a, b]) => `<dt>${a}</dt><dd>${esc(b)}</dd>`).join('')}</dl>
+      <div class="row"><button class="btn" id="start">Start training</button>${W.mode === 3 ? '<button class="btn ghost" id="adjust">Instellingen aanpassen</button>' : ''}<button class="btn quiet" id="back">Terug</button></div>
+      <p class="muted small" style="margin-top:14px">Tijdens de training: HINT, UITLEG, VOLGENDE, MOEILIJKER, MAKKELIJKER, SCORE, ZWAKKE PUNTEN, STOP en MENU staan als knoppen onder elke vraag. Antwoorden kan ook met de toetsen A–E.</p>`,
+      (e) => { if (e.key === 'Enter') startRun(W.s, W.label, W.mode); if (e.key === 'Escape') renderMenu(); });
+    $('#start').onclick = () => startRun(W.s, W.label, W.mode);
+    $('#back').onclick = () => { if (W.steps.length) { W.i = W.steps.length - 1; renderStep(); } else renderMenu(); };
+    if ($('#adjust')) $('#adjust').onclick = () => { const s0 = { ...W.s }; chooseMode(6, s0); W.label = '⚓ Mariniers Training (aangepast)'; W.s = { ...MODES[6].def, ...s0 }; W.steps = ['difficulty', 'category', 'duration', 'pressure', 'feedback', 'hints']; renderStep(); };
+  }
+
+  /* ================= Nulmeting ================= */
+  function startCalibration(done) {
+    const cats = shuffle([...CAT_IDS, ...shuffle(CAT_IDS).slice(0, 4)]);
+    const diffs = [1, 1, 2, 2, 3, 3, 4, 4, 5, 5];
+    startRun({ level: 1, difficulty: 'fixed', category: 'calib', duration: 10, pressure: 'none', feedback: 'end', hints: false }, '📏 Nulmeting', 0, { plan: cats.map((c, i) => ({ cat: c, d: diffs[i] })), onDone: done });
+  }
+
+  /* ================= Training ================= */
+  let RUN = null, TIMER = null;
+  function stopTimer() { clearInterval(TIMER); TIMER = null; }
+
+  function startRun(s, label, mode, extra = {}) {
+    s = { ...s };
+    const lvl = typeof s.level === 'number' ? s.level : 3;
+    const startD = s.difficulty === 'auto' || s.difficulty === 'fixed' ? lvl : Number(s.difficulty);
+    RUN = {
+      s, label, mode, total: s.duration, i: 0, results: [], lv: {}, streak: {}, wstreak: {}, diag: null, retest: null,
+      timeF: 1, bag: [], seen: new Set(), startLv: startD, plan: extra.plan || null, onDone: extra.onDone || null,
+      weakCats: mode === 5 ? (W && W.weakCats) || weakest(catStats(SESSION.history)) : null,
+    };
+    CAT_IDS.forEach((c) => { RUN.lv[c] = startD; RUN.streak[c] = 0; RUN.wstreak[c] = 0; });
+    nextQuestion();
+  }
+  const isAuto = () => RUN.s.difficulty === 'auto';
+  const curLevel = () => {
+    if (CATS[RUN.s.category]) return RUN.lv[RUN.s.category];
+    const used = [...new Set(RUN.results.map((r) => r.q.cat))];
+    const list = used.length ? used : CAT_IDS;
+    return Math.round(list.reduce((a, c) => a + RUN.lv[c], 0) / list.length);
+  };
+
+  function chooseCat() {
+    const c = RUN.s.category;
+    if (CATS[c]) return c;
+    if (c === 'mix') { if (!RUN.bag.length) RUN.bag = shuffle(CAT_IDS); return RUN.bag.pop(); }
+    const S = catStats([...SESSION.history]);
+    const err = (k) => (S[k].n - S[k].ok + 1) / (S[k].n + 2);
+    let pool = CAT_IDS;
+    if (c === 'weak') {
+      const w = (RUN.weakCats && RUN.weakCats.length ? RUN.weakCats : CAT_IDS.slice().sort((a, b) => err(b) - err(a)).slice(0, 2));
+      pool = w;
+    }
+    const weights = pool.map((k) => err(k) + (S[k].n < 2 ? 0.5 : 0) + 0.05);
+    let r = Math.random() * weights.reduce((a, b) => a + b, 0);
+    for (let i = 0; i < pool.length; i++) { r -= weights[i]; if (r <= 0) return pool[i]; }
+    return pool[pool.length - 1];
+  }
+
+  function targetSecs(cat, d) {
+    const P = PRESSURES.find((p) => p.v === RUN.s.pressure);
+    if (!P || P.f == null) return null;
+    const f = RUN.s.pressure === 'adaptive' ? RUN.timeF : P.f;
+    return Math.max(10, Math.round((CATS[cat].base * f * (1 + 0.12 * (d - 3))) / 5) * 5);
+  }
+
+  function nextQuestion() {
+    stopTimer();
+    if (RUN.i >= RUN.total) return finishRun();
+    let cat, d, kind = null, flag = null;
+    if (RUN.plan) { ({ cat, d } = RUN.plan[RUN.i]); }
+    else if (RUN.diag) { cat = RUN.diag.cat; kind = RUN.diag.kind; d = Math.max(1, RUN.diag.from - 1); flag = 'diag'; }
+    else if (RUN.retest) { cat = RUN.retest.cat; kind = RUN.retest.kind; d = RUN.retest.at; flag = 'retest'; }
+    else { cat = chooseCat(); d = RUN.lv[cat]; }
+    let q;
+    for (let k = 0; k < 8; k++) {
+      q = MT.gens[cat].generate(d, kind ? { kind } : {});
+      const sig = q.prompt + q.stem + q.opts.map((o) => o.key).join();
+      if (!RUN.seen.has(sig)) { RUN.seen.add(sig); break; }
+    }
+    RUN.cur = { q, cat, d, flag, t0: now(), target: targetSecs(cat, d), hint: false, done: false };
+    renderQuestion();
+  }
+
+  const cmdBtn = (id, label, dis, cls = '') => `<button class="cmd ${cls}" data-cmd="${id}" ${dis ? 'disabled' : ''}>${label}</button>`;
+  function commandBar(phase) {
+    const s = RUN.s, calib = !!RUN.plan;
+    if (calib) return `<div class="cmds">${cmdBtn('stop', 'STOP', false, 'stop')}${cmdBtn('menu', 'MENU')}</div>`;
+    return `<div class="cmds">
+      ${phase === 'q' ? cmdBtn('hint', 'HINT', !s.hints || RUN.cur.hint) : cmdBtn('uitleg', 'UITLEG', false)}
+      ${phase === 'fb' ? cmdBtn('next', 'VOLGENDE') : ''}
+      ${cmdBtn('harder', 'MOEILIJKER', curLevel() >= 5 && !CATS[s.category] ? false : false)}
+      ${cmdBtn('easier', 'MAKKELIJKER')}
+      ${cmdBtn('score', 'SCORE')}
+      ${cmdBtn('weak', 'ZWAKKE PUNTEN')}
+      ${cmdBtn('stop', 'STOP', false, 'stop')}
+      ${cmdBtn('menu', 'MENU')}
+    </div>`;
+  }
+  function bindCommands() {
+    $$('[data-cmd]').forEach((b) => (b.onclick = () => runCommand(b.dataset.cmd)));
+  }
+  function runCommand(c) {
+    if (!RUN) return;
+    switch (c) {
+      case 'hint': return showHint();
+      case 'uitleg': return toggleUitleg();
+      case 'next': return nextQuestion();
+      case 'harder': return shiftLevel(1);
+      case 'easier': return shiftLevel(-1);
+      case 'score': return showScore();
+      case 'weak': return showWeak();
+      case 'stop': return finishRun(true);
+      case 'menu': {
+        if (!RUN.results.length) return renderMenu();
+        const o = openPanel('<h2>Terug naar het menu?</h2><p>Je resultaten tot nu toe blijven bewaard in deze sessie.</p><div class="row"><button class="btn" id="to-menu">Naar menu</button><button class="btn ghost" id="to-report">Eerst rapport tonen</button></div>');
+        $('#to-menu', o).onclick = () => { closePanel(); renderMenu(); };
+        $('#to-report', o).onclick = () => { closePanel(); finishRun(true); };
+      }
+    }
+  }
+  function shiftLevel(dir) {
+    const s = RUN.s;
+    if (s.difficulty !== 'auto') s.difficulty = String(clamp(Number(s.difficulty) + dir, 1, 5));
+    CAT_IDS.forEach((c) => (RUN.lv[c] = clamp(RUN.lv[c] + dir, 1, 5)));
+    toast(`Niveau ${dir > 0 ? 'omhoog' : 'omlaag'}: nu ${curLevel()}/5 (vanaf de volgende vraag)`);
+    const chip = $('#lvl-chip'); if (chip) chip.textContent = `Niveau ${RUN.cur ? RUN.cur.d : curLevel()}/5 · volgende: ${curLevel()}/5`;
+  }
+  function showHint() {
+    if (!RUN.s.hints || !RUN.cur || RUN.cur.done || RUN.cur.hint) return;
+    RUN.cur.hint = true;
+    $('#hintbox').innerHTML = `<div class="hintbox"><b>Hint:</b> ${esc(RUN.cur.q.hint)}</div>`;
+    const b = $('[data-cmd="hint"]'); if (b) b.disabled = true;
+  }
+
+  function stemHTML(q, marks) {
+    const L = q.layout === 'fig' ? 'figopts' : '';
+    return `<div class="qtext">${esc(q.prompt)}</div>${q.stem}
+      <div class="answers ${L}">${q.opts.map((o, i) => {
+        let cls = '';
+        if (marks) { if (i === q.ans) cls = 'ok'; else if (i === marks.chosen) cls = 'no'; }
+        const val = q.layout === 'fig' ? o.html : q.layout === 'op' ? o.html : `<span class="v ${q.layout === 'mono' ? 'mono' : ''}">${o.html}</span>`;
+        return `<button class="ans ${cls}" data-i="${i}" ${marks ? 'disabled' : ''} aria-label="Antwoord ${LETTERS[i]}"><span class="k">${LETTERS[i]}</span>${val}</button>`;
+      }).join('')}</div>`;
+  }
+
+  function renderQuestion() {
+    const C = RUN.cur, q = C.q, cat = CATS[C.cat];
+    const count = RUN.total === Infinity ? `Vraag ${RUN.i + 1} · vrij trainen` : `Vraag ${RUN.i + 1}/${RUN.total}`;
+    const flag = C.flag === 'diag' ? '<span class="chip warn">Diagnostische vraag</span>' : C.flag === 'retest' ? '<span class="chip olive">Hertest</span>' : '';
+    view(`<div class="qbar"><div class="left"><span class="chip">${cat.icon} ${cat.name}</span><span class="chip olive" id="lvl-chip">Niveau ${C.d}/5</span>${flag}<span class="counter">${count}</span></div>
+        ${C.target ? `<div class="timer" id="timer">${C.target}s</div>` : ''}</div>
+      ${C.target ? '<div class="tbar"><i id="tbar" style="width:100%"></i></div>' : ''}
+      <div class="card">${stemHTML(q)}<div id="hintbox"></div>${commandBar('q')}</div>
+      <p class="muted small" style="margin-top:10px">${esc(RUN.label)} · ${RUN.plan ? 'geen feedback tijdens de nulmeting' : RUN.s.feedback === 'end' ? 'feedback volgt in het eindrapport' : 'antwoord met een klik of met A–E'}</p>`,
+      (e) => {
+        const k = e.key.toUpperCase();
+        let idx = LETTERS.indexOf(k);
+        if (idx < 0 && /^[1-5]$/.test(e.key)) idx = Number(e.key) - 1;
+        if (idx >= 0 && idx < q.opts.length) return submit(idx);
+        if (k === 'H') showHint();
+      });
+    $$('.ans').forEach((b) => (b.onclick = () => submit(Number(b.dataset.i))));
+    bindCommands();
+    if (C.target) {
+      TIMER = setInterval(() => {
+        if (panelOpenedAt != null) return;
+        const left = C.target - (now() - C.t0) / 1000;
+        const t = $('#timer'), bar = $('#tbar');
+        if (t) { t.textContent = `${Math.max(0, Math.ceil(left))}s`; t.classList.toggle('low', left <= 5); }
+        if (bar) { bar.style.width = `${clamp((left / C.target) * 100, 0, 100)}%`; bar.classList.toggle('low', left <= 5); }
+        if (left <= 0) submit(null, true);
+      }, 250);
+    }
+  }
+
+  function submit(idx, timedOut = false) {
+    const C = RUN.cur;
+    if (!C || C.done) return;
+    C.done = true;
+    stopTimer();
+    const q = C.q;
+    const ms = Math.round(now() - C.t0);
+    const ok = !timedOut && idx === q.ans;
+    const chosen = idx == null ? null : q.opts[idx];
+    const tag = ok ? null : timedOut ? 'Tijd op' : (chosen && chosen.tag) || 'Overig';
+    const res = { q, chosen: idx, ok, ms, timedOut, hint: C.hint, flag: C.flag, d: C.d, target: C.target, tag };
+    RUN.results.push(res);
+    RUN.i++;
+    SESSION.history.push({ c: q.cat, d: C.d, k: q.kindId, kn: q.kind, ok, t: ms, to: timedOut, tag, m: RUN.mode });
+    saveSession();
+    const notes = RUN.plan ? [] : adapt(res);
+    if (RUN.plan || RUN.s.feedback === 'end') return nextQuestion();
+    renderFeedback(res, notes);
+  }
+
+  function adapt(res) {
+    const c = res.q.cat, notes = [], auto = isAuto(), s = RUN.s;
+    if (s.pressure === 'adaptive' && res.target) {
+      if (res.ok && res.ms < res.target * 600) RUN.timeF = clamp(RUN.timeF * 0.92, 0.5, 1.6);
+      else if (!res.ok) RUN.timeF = clamp(RUN.timeF * 1.1, 0.5, 1.6);
+    }
+    const fb = s.feedback === 'each';
+    if (res.ok) {
+      RUN.streak[c]++; RUN.wstreak[c] = 0;
+      if (res.flag === 'diag') {
+        RUN.retest = { cat: c, kind: res.q.kindId, at: RUN.diag.from };
+        RUN.diag = null;
+        notes.push('Goed! De volgende vraag test hetzelfde principe weer op je eigen niveau.');
+      } else if (res.flag === 'retest') {
+        RUN.retest = null;
+        notes.push('Hertest gehaald: dit principe beheers je weer.');
+      }
+      const fast = !res.target || res.ms <= res.target * 1000 * 0.85;
+      if (auto && RUN.streak[c] >= 2 && fast && !res.hint && RUN.lv[c] < 5) {
+        RUN.lv[c]++; RUN.streak[c] = 0;
+        notes.push(`Twee keer overtuigend goed bij ${CATS[c].name}: niveau omhoog naar ${RUN.lv[c]}/5.`);
+      }
+    } else {
+      RUN.wstreak[c]++; RUN.streak[c] = 0;
+      if (res.flag === 'diag') {
+        RUN.diag.count = (RUN.diag.count || 0) + 1;
+        if (RUN.diag.count >= 2) {
+          notes.push(`Dit principe (${res.q.kind}) is nog lastig. Probeer het ook eens in de modus 📚 Leren & Uitleggen.`);
+          if (auto) RUN.lv[c] = Math.max(1, RUN.diag.from - 1);
+          RUN.diag = null; RUN.wstreak[c] = 0;
+        } else notes.push('Nog een oefenvraag over hetzelfde principe, weer iets eenvoudiger.');
+      } else if (res.flag === 'retest') {
+        RUN.retest = null;
+        if (auto) { RUN.lv[c] = Math.max(1, RUN.lv[c] - 1); notes.push(`Hertest niet gehaald. Niveau voor ${CATS[c].name} gaat tijdelijk naar ${RUN.lv[c]}/5.`); }
+      } else if (RUN.wstreak[c] >= 2 && fb) {
+        RUN.diag = { cat: c, kind: res.q.kindId, from: RUN.lv[c], count: 0 };
+        RUN.wstreak[c] = 0;
+        notes.push(`Twee fouten achter elkaar bij ${CATS[c].name}. Lees eerst de uitleg; de volgende vraag is een iets eenvoudigere diagnostische vraag over hetzelfde principe.`);
+      } else if (RUN.wstreak[c] >= 2 && auto) {
+        RUN.lv[c] = Math.max(1, RUN.lv[c] - 1); RUN.wstreak[c] = 0;
+      }
+    }
+    return notes;
+  }
+
+  function progressHTML() {
+    const S = catStats(RUN.results.map((r) => ({ c: r.q.cat, ok: r.ok, t: r.ms, to: r.timedOut })));
+    const n = RUN.results.length, ok = RUN.results.filter((r) => r.ok).length;
+    const st = strongest(S), wk = weakest(S, 1)[0];
+    return `<div class="progress">
+      <div><small>Score</small><b>${ok}/${n}</b></div>
+      <div><small>Nauwkeurigheid</small><b>${pct(ok, n)}%</b></div>
+      <div><small>Huidig niveau</small><b>${curLevel()}/5</b></div>
+      <div><small>Sterkste categorie</small><b class="txt">${st ? CATS[st].name : '—'}</b></div>
+      <div><small>Extra aandacht</small><b class="txt">${wk ? CATS[wk].name : '—'}</b></div>
+    </div>`;
+  }
+
+  function othersHTML(q) {
+    return `<ul class="others">${q.opts.map((o, i) => (i === q.ans ? `<li><span class="k">${LETTERS[i]}</span><span><b>Juist.</b></span></li>` : `<li><span class="k">${LETTERS[i]}</span><span>${esc(o.why || '')}</span></li>`)).join('')}</ul>`;
+  }
+
+  function renderFeedback(res, notes) {
+    const q = res.q;
+    const secs = (res.ms / 1000).toFixed(1).replace('.', ',');
+    const verdict = res.ok ? '<b class="good">✅ Goed</b>' : res.timedOut ? '<b class="bad">⏱️ Tijd op</b>' : '<b class="bad">❌ Fout</b>';
+    const count = RUN.total === Infinity ? `${RUN.i}` : `${RUN.i}/${RUN.total}`;
+    let miss = '';
+    if (!res.ok) {
+      miss = res.timedOut
+        ? `<h3>Waar ging het mis?</h3><p class="miss">De tijd was op voordat je een antwoord koos. Kom je er niet uit, gok dan en ga door: een lege vraag levert nooit punten op.</p>`
+        : `<h3>Waar ging het mis?</h3><p class="miss">Je koos ${LETTERS[res.chosen]}. ${esc(q.opts[res.chosen].why || '')}</p><p class="muted small">Dit is waarom het antwoord niet klopt. Hoe je tot ${LETTERS[res.chosen]} kwam, weet de trainer niet; herken je de fout niet, lees dan de stappen hierboven nog eens.</p>`;
+    }
+    const timeNote = res.target ? ` <span class="muted">(limiet ${res.target} s)</span>` : '';
+    view(`<div class="qbar"><div class="left"><span class="chip">${CATS[q.cat].icon} ${CATS[q.cat].name}</span><span class="chip olive">Niveau ${res.d}/5</span><span class="counter">${esc(q.kind)}</span></div></div>
+      <div class="verdict">
+        <div><small>Vraag</small><b class="num">${count}</b></div>
+        <div><small>Resultaat</small>${verdict}</div>
+        <div><small>Juiste antwoord</small><b>${LETTERS[q.ans]}</b></div>
+        <div><small>Jouw antwoord</small><b>${res.chosen == null ? '—' : LETTERS[res.chosen]}</b></div>
+        <div><small>Tijd</small><b class="num">${secs} s</b>${timeNote}</div>
+      </div>
+      <div class="card">${stemHTML(q, { chosen: res.chosen })}
+        <div class="fb">
+          <h3>Uitleg</h3><ol>${q.steps.map((s) => `<li>${s}</li>`).join('')}</ol>
+          ${miss}
+          <div id="uitleg" hidden><h3>Waarom de andere opties niet kloppen</h3>${othersHTML(q)}</div>
+          <h3>Snellere methode</h3><p>${esc(q.quick)}</p>
+          <h3>Leerpunt</h3><p class="lesson">${esc(q.lesson)}</p>
+        </div>
+        ${notes.length ? `<div class="notes">${notes.map((n) => `<div>${esc(n)}</div>`).join('')}</div>` : ''}
+        <h3 style="margin:18px 0 0;font-size:15px;text-transform:uppercase;letter-spacing:.06em;color:var(--olive)">Voortgang</h3>
+        ${progressHTML()}
+        <div class="row" style="margin-top:18px"><button class="btn" id="next">${RUN.i >= RUN.total ? 'Naar het rapport' : 'Volgende vraag'}</button></div>
+        ${commandBar('fb')}
+      </div>`,
+      (e) => { if (e.key === 'Enter' || e.key.toUpperCase() === 'N') nextQuestion(); if (e.key.toUpperCase() === 'U') toggleUitleg(); });
+    $('#next').onclick = nextQuestion;
+    $('#next').focus({ preventScroll: true });
+    bindCommands();
+  }
+  function toggleUitleg() {
+    const u = $('#uitleg');
+    if (u) { u.hidden = !u.hidden; if (!u.hidden) u.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+  }
+
+  function showScore() {
+    const n = RUN.results.length, ok = RUN.results.filter((r) => r.ok).length;
+    const S = catStats(RUN.results.map((r) => ({ c: r.q.cat, ok: r.ok, t: r.ms, to: r.timedOut })));
+    openPanel(`<h2>Score</h2><p><b class="num">${ok}/${n}</b> goed · <b class="num">${pct(ok, n)}%</b> nauwkeurig · niveau <b class="num">${curLevel()}/5</b></p>
+      ${catTable(S)}`);
+  }
+  function showWeak() {
+    const H = SESSION.history;
+    const S = catStats(H);
+    const wk = weakest(S, 3);
+    const kinds = {};
+    H.filter((r) => !r.ok).forEach((r) => { const k = `${CATS[r.c].name} – ${r.kn}`; kinds[k] = (kinds[k] || 0) + 1; });
+    const topK = Object.entries(kinds).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    const tags = {};
+    H.filter((r) => !r.ok && r.tag).forEach((r) => (tags[r.tag] = (tags[r.tag] || 0) + 1));
+    const topT = Object.entries(tags).sort((a, b) => b[1] - a[1]).slice(0, 3);
+    const o = openPanel(`<h2>Zwakke punten</h2>
+      ${H.length ? '' : '<p>Nog geen resultaten in deze sessie.</p>'}
+      ${wk.length ? `<h3>Onderdelen</h3>${catTable(S, wk)}` : H.length ? '<p>Nog geen zwakke onderdelen: alles tot nu toe goed.</p>' : ''}
+      ${topK.length ? `<h3 style="margin-top:14px">Soorten patronen die fout gingen</h3><ul class="list">${topK.map(([k, v]) => `<li>${esc(k)} <span class="muted">(${v}×)</span></li>`).join('')}</ul>` : ''}
+      ${topT.length ? `<h3 style="margin-top:14px">Meest voorkomende fouten</h3><ul class="list">${topT.map(([k, v]) => `<li><b>${esc(k)}</b> (${v}×): ${esc(TAG_ADVICE[k] || '')}</li>`).join('')}</ul>` : ''}
+      ${H.length >= 6 ? '<div class="row" style="margin-top:16px"><button class="btn" id="tw">TRAIN ZWAKKE PUNTEN</button></div>' : ''}`);
+    const tw = $('#tw', o);
+    if (tw) tw.onclick = () => { closePanel(); stopTimer(); RUN = null; chooseMode(5); };
+  }
+  function catTable(S, only) {
+    const ids = (only || CAT_IDS).filter((c) => S[c].n);
+    if (!ids.length) return '<p class="muted">Nog geen vragen beantwoord.</p>';
+    return `<div class="tbl"><table><thead><tr><th>Onderdeel</th><th>Score</th><th></th><th>Gem. tijd</th></tr></thead><tbody>${ids.map((c) => {
+      const r = S[c].ok / S[c].n;
+      return `<tr><td>${CATS[c].icon} ${CATS[c].name}</td><td class="n">${S[c].ok}/${S[c].n}</td><td><div class="meter"><i class="${r >= 0.75 ? '' : r >= 0.5 ? 'mid' : 'low'}" style="width:${Math.max(4, r * 100)}%"></i></div></td><td class="n">${S[c].tn ? (S[c].t / S[c].tn / 1000).toFixed(0) + ' s' : '—'}</td></tr>`;
+    }).join('')}</tbody></table></div>`;
+  }
+
+  /* ================= Einde: rapport ================= */
+  function finishRun(stopped) {
+    stopTimer();
+    closePanel();
+    if (!RUN) return renderMenu();
+    if (RUN.plan) return calibrationResult();
+    if (!RUN.results.length) return renderMenu();
+    renderReport(stopped);
+  }
+
+  function calibrationResult() {
+    const res = RUN.results;
+    const ok = res.filter((r) => r.ok).length;
+    const byD = [1, 2, 3, 4, 5].map((d) => res.filter((r) => r.d === d));
+    let lv = 1;
+    for (let d = 1; d <= 5; d++) { const g = byD[d - 1]; if (g.length && g.filter((r) => r.ok).length >= Math.ceil(g.length / 2)) lv = d; else break; }
+    lv = clamp(Math.max(lv, Math.round(ok / 2)), 1, 5);
+    const done = RUN.onDone;
+    view(`<div class="eyebrow">📏 Nulmeting klaar</div><h2>Startniveau: ${lv}/5 – ${levelName(lv)}</h2>
+      <p>Je had <b>${ok} van de ${res.length}</b> vragen goed. De vragen liepen op van niveau 1 naar 5.</p>
+      <div class="tbl"><table><thead><tr><th>Vraag</th><th>Onderdeel</th><th>Niveau</th><th>Resultaat</th></tr></thead><tbody>
+      ${res.map((r, i) => `<tr><td class="n">${i + 1}</td><td>${CATS[r.q.cat].name}</td><td class="n">${r.d}</td><td>${r.ok ? '✅' : '❌'}</td></tr>`).join('')}</tbody></table></div>
+      <p class="muted small" style="margin-top:10px">Dit startniveau is alleen een vertrekpunt voor de training. Tijdens het oefenen past de trainer het verder aan.</p>
+      <div class="row" style="margin-top:14px"><button class="btn" id="cont">Verder</button></div>`,
+      (e) => { if (e.key === 'Enter') go(); });
+    const go = () => { RUN = null; if (done) done(lv); else renderMenu(); };
+    $('#cont').onclick = go;
+  }
+
+  function renderReport(stopped) {
+    const R = RUN.results;
+    const n = R.length, ok = R.filter((r) => r.ok).length;
+    const S = catStats(R.map((r) => ({ c: r.q.cat, ok: r.ok, t: r.ms, to: r.timedOut })));
+    const used = CAT_IDS.filter((c) => S[c].n);
+    const strong = used.filter((c) => S[c].n >= 2 && S[c].ok / S[c].n >= 0.75);
+    const weak = used.filter((c) => S[c].ok / S[c].n < 0.6);
+    const tags = {};
+    R.filter((r) => !r.ok).forEach((r) => (tags[r.tag] = (tags[r.tag] || 0) + 1));
+    const topTag = Object.entries(tags).sort((a, b) => b[1] - a[1])[0];
+    const kindStats = {};
+    R.forEach((r) => { const k = `${CATS[r.q.cat].name} – ${r.q.kind}`; kindStats[k] = kindStats[k] || { n: 0, ok: 0 }; kindStats[k].n++; if (r.ok) kindStats[k].ok++; });
+    const goodKinds = Object.entries(kindStats).filter(([, v]) => v.n >= 2 && v.ok === v.n).map(([k]) => k);
+    const badKinds = Object.entries(kindStats).filter(([, v]) => v.ok < v.n).sort((a, b) => (a[1].ok - a[1].n) - (b[1].ok - b[1].n)).slice(0, 4).map(([k, v]) => `${k} (${v.n - v.ok} fout)`);
+    const timed = R.filter((r) => r.target);
+    const inTime = timed.filter((r) => !r.timedOut).length;
+    const avg = (R.reduce((a, r) => a + r.ms, 0) / n / 1000).toFixed(0);
+    let maxStreak = 0, cur = 0;
+    R.forEach((r) => { cur = r.ok ? cur + 1 : 0; maxStreak = Math.max(maxStreak, cur); });
+    const hints = R.filter((r) => r.hint).length, tos = R.filter((r) => r.timedOut).length;
+
+    const goodList = [];
+    if (strong.length) goodList.push(`Sterk in ${strong.map((c) => CATS[c].name).join(', ')}.`);
+    if (goodKinds.length) goodList.push(`Foutloos: ${goodKinds.slice(0, 4).join('; ')}.`);
+    if (maxStreak >= 3) goodList.push(`Langste reeks goede antwoorden: ${maxStreak}.`);
+    if (timed.length && inTime === timed.length) goodList.push('Alle vragen binnen de tijd beantwoord.');
+    if (!goodList.length) goodList.push(ok ? `${ok} ${ok === 1 ? 'vraag' : 'vragen'} goed; bouw daarop voort.` : 'Je hebt de eerste stap gezet. Met de uitleg per vraag kom je verder.');
+    const betterList = [];
+    if (weak.length) betterList.push(`Onderdelen onder de 60%: ${weak.map((c) => CATS[c].name).join(', ')}.`);
+    if (badKinds.length) betterList.push(`Patronen die fout gingen: ${badKinds.join('; ')}.`);
+    if (topTag) betterList.push(`${topTag[0]}: ${TAG_ADVICE[topTag[0]] || ''}`);
+    if (tos) betterList.push(`${tos}× was de tijd op. Oefen eerst zonder of met lichte tijdsdruk en voer die daarna op.`);
+    if (hints > n / 3) betterList.push(`Je gebruikte ${hints} hints. Probeer de volgende keer eerst zelf een regel te testen.`);
+    if (!betterList.length) betterList.push('Weinig fouten. Verhoog de moeilijkheid of de tijdsdruk om verder te groeien.');
+
+    let rec, recStart;
+    const endLv = curLevel();
+    if (weak.length) {
+      rec = `🎯 Zwakke Punten Training, 10 vragen, met focus op ${weak.slice(0, 2).map((c) => CATS[c].name).join(' en ')}.`;
+      recStart = () => { W = { mode: 5, label: '🎯 Zwakke Punten Training', s: { ...MODES[5].fixed, duration: 10, level: endLv }, steps: [], i: 0, weakCats: weak.slice(0, 2) }; renderSummary(); };
+    } else if (pct(ok, n) >= 85 && endLv >= 4) {
+      rec = '⚓ Mariniers Training Mode (30 gemengde vragen, adaptief) of een ⏱️ Assessment Simulatie met hoge tijdsdruk.';
+      recStart = () => { W = { mode: 3, label: '⚓ Mariniers Training Mode', s: { ...MODES[3].fixed, level: endLv }, steps: [], i: 0 }; renderSummary(); };
+    } else {
+      rec = `🧠 Adaptieve Training, 20 vragen, startniveau ${endLv}.`;
+      recStart = () => { W = { mode: 2, label: '🧠 Adaptieve Training', s: { ...MODES[2].def, ...MODES[2].fixed, level: endLv }, steps: [], i: 0 }; renderSummary(); };
+    }
+    const tagTxt = topTag ? `${topTag[0]} (${topTag[1]}×)` : 'Geen fouten';
+
+    view(`<div class="report">
+      <div class="eyebrow">${esc(RUN.label)}${stopped && RUN.total !== Infinity && R.length < RUN.total ? ' · voortijdig gestopt' : ''}</div>
+      <h2>📊 Trainingsrapport</h2>
+      <div class="kpis">
+        <div><small>Totaalscore</small><b>${ok}/${n}</b></div>
+        <div><small>Nauwkeurigheid</small><b>${pct(ok, n)}%</b></div>
+        <div><small>Niveau aan het begin</small><b>${RUN.startLv}</b></div>
+        <div><small>Niveau aan het einde</small><b>${endLv}</b></div>
+        <div><small>Gem. tijd per vraag</small><b>${avg} s</b></div>
+      </div>
+      <h3>Per onderdeel</h3>${catTable(S)}
+      <h3>Sterke onderdelen</h3><p>${strong.length ? strong.map((c) => CATS[c].name).join(', ') : 'Nog geen onderdeel met 75% of meer (bij minstens 2 vragen).'}</p>
+      <h3>Zwakke onderdelen</h3><p>${weak.length ? weak.map((c) => CATS[c].name).join(', ') : 'Geen onderdelen onder de 60%.'}</p>
+      <h3>Meest voorkomende fouttype</h3><p>${esc(tagTxt)}</p>
+      <h3>Wat gaat al goed?</h3><ul class="list">${goodList.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
+      <h3>Wat moet beter?</h3><ul class="list">${betterList.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
+      <h3>Aanbevolen volgende training</h3><p>${esc(rec)}</p>
+      <div class="row"><button class="btn" id="rec">Start aanbevolen training</button><button class="btn ghost" id="menu">Terug naar menu</button></div>
+      <p class="muted small" style="margin-top:12px">Dit rapport gaat alleen over deze oefentraining. Het voorspelt niet of je het echte assessment haalt.</p>
+      <h3>Alle vragen nakijken</h3>
+      ${R.map((r, i) => `<details class="rev"><summary><span class="mark ${r.ok ? 'ok' : 'no'}">${r.ok ? '✓' : '✗'}</span><span>${i + 1}. ${CATS[r.q.cat].name} · ${esc(r.q.kind)}</span><span class="muted small" style="margin-left:auto">niveau ${r.d} · ${(r.ms / 1000).toFixed(0)} s${r.timedOut ? ' · tijd op' : ''}</span></summary>
+        <div class="body">${stemHTML(r.q, { chosen: r.chosen })}<div class="fb"><h3>Uitleg</h3><ol>${r.q.steps.map((s) => `<li>${s}</li>`).join('')}</ol>${!r.ok && r.chosen != null ? `<p class="miss" style="margin-top:10px">Jouw antwoord ${LETTERS[r.chosen]}: ${esc(r.q.opts[r.chosen].why || '')}</p>` : ''}<p class="lesson" style="margin-top:10px">${esc(r.q.lesson)}</p></div></div></details>`).join('')}
+    </div>`, (e) => { if (e.key === 'Escape') renderMenu(); });
+    $('#rec').onclick = () => { RUN = null; recStart(); };
+    $('#menu').onclick = renderMenu;
+  }
+
+  /* ================= Tabs ================= */
+  function showTab(t) {
+    $$('nav.tabs button').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === t)));
+    $('#app').hidden = t !== 'train';
+    $('#info').hidden = t !== 'info';
+  }
+  $$('nav.tabs button').forEach((b) => (b.onclick = () => showTab(b.dataset.tab)));
+  if (location.hash === '#selectie') showTab('info');
+  renderMenu();
+})();
+
+</script>
+</body>
+</html>
