@@ -84,7 +84,7 @@
     const stem = `<div class="figs">${frames.map((f, k) => (k === gi ? '<div class="fig q">?</div>' : `<div class="fig">${F.draw(f)}</div>`)).join('')}</div>`;
     const ruleTxt = changing.map((a) => rules[a].txt);
     return {
-      cat: 'fig', diff: d, kindId: changing.length > 1 ? 'multi' : 'fig-' + changing[0], kind: changing.length > 1 ? `${changing.length} regels tegelijk` : { rot: 'Draaiing', fill: 'Vulling', shape: 'Vorm', dots: 'Aantal stippen' }[changing[0]],
+      cat: 'fig', diff: d, meta: { changes: changing.slice() }, kindId: changing.length > 1 ? 'multi' : 'fig-' + changing[0], kind: changing.length > 1 ? `${changing.length} regels tegelijk` : { rot: 'Draaiing', fill: 'Vulling', shape: 'Vorm', dots: 'Aantal stippen' }[changing[0]],
       prompt: gi === total - 1 ? 'Welke figuur komt hierna?' : 'Welke figuur hoort op de plek van het vraagteken?',
       stem, opts: built.opts, ans: built.ans, layout: 'fig',
       steps: [`Bekijk elke eigenschap apart: vorm, vulling, pijl en stippen.`, ...ruleTxt, `${changing.length < 4 ? 'De andere eigenschappen blijven gelijk. ' : ''}Het antwoord: ${F.describe(ans)}.`],
@@ -129,7 +129,7 @@
     if (!built) return null;
     const txt = ms.map((mk) => `${name(mk.m)} loopt langs de rand, steeds ${mk.st} ${mk.st === 1 ? 'vak' : 'vakken'} ${cw(mk.dir)}.`);
     return {
-      cat: 'fig', diff: d, kindId: nm > 1 ? 'grid2' : 'grid', kind: nm > 1 ? 'Raster met twee bewegingen' : 'Raster',
+      cat: 'fig', diff: d, meta: { changes: ms.map((mk) => 'm' + mk.m), grid: true }, kindId: nm > 1 ? 'grid2' : 'grid', kind: nm > 1 ? 'Raster met twee bewegingen' : 'Raster',
       prompt: 'Welk raster komt hierna?',
       stem: `<div class="figs">${Array.from({ length: shownN }, (_, k) => `<div class="fig">${F.drawGrid(n, frame(k))}</div>`).join('')}<div class="fig q">?</div></div>`,
       opts: built.opts, ans: built.ans, layout: 'fig',

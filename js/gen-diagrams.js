@@ -118,7 +118,7 @@
     const boxes = chain.map((k, i) => `<span class="arr">→</span><span class="opbox ${i === hole ? 'q' : ''}">${i === hole ? '?' : sym[k]}</span>`).join('');
     const stem = `${legend}<div class="flow"><span class="str ${flowIn ? '' : 'q'}">${flowIn || '?'.repeat(len)}</span>${boxes}<span class="arr">→</span><span class="str ${flowOut ? '' : 'q'}">${flowOut || '?'.repeat(len)}</span></div>`;
     return {
-      cat: 'dia', diff: d, kindId: 'dia-' + mode, kind: { out: 'Uitkomst bepalen', op: 'Ontbrekende bewerking', in: 'Terugrekenen' }[mode],
+      cat: 'dia', diff: d, kindId: 'dia-' + mode, meta: { mode, chainLen: chain.length }, kind: { out: 'Uitkomst bepalen', op: 'Ontbrekende bewerking', in: 'Terugrekenen' }[mode],
       prompt, stem, opts: built.opts, ans: built.ans, layout: mode === 'op' ? 'op' : 'mono',
       steps,
       hint: mode === 'in' ? 'Begin bij de uitkomst en doe de laatste bewerking eerst omgekeerd.' : 'Volg één letter door alle bewerkingen heen.',

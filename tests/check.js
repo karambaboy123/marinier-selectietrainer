@@ -4,10 +4,10 @@ const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 
-const ctx = { console, Math, JSON, Set, Map, Object, Array, String, Number, Error };
+const ctx = { console, Math, JSON, Set, Map, Object, Array, String, Number, Error, Date, Buffer, escape, unescape, encodeURIComponent, decodeURIComponent };
 ctx.globalThis = ctx;
 vm.createContext(ctx);
-for (const f of ['util.js', 'figures.js', 'gen-numbers.js', 'gen-analogies.js', 'gen-diagrams.js', 'gen-figseries.js', 'gen-abstract.js', 'gen-logic.js']) {
+for (const f of ['util.js', 'figures.js', 'gen-numbers.js', 'gen-analogies.js', 'gen-diagrams.js', 'gen-figseries.js', 'gen-abstract.js', 'gen-logic.js', 'reasoning.js', 'profile.js']) {
   vm.runInContext(fs.readFileSync(path.join(__dirname, '..', 'js', f), 'utf8'), ctx, { filename: f });
 }
 const MT = ctx.MT;
@@ -35,6 +35,12 @@ for (const cat of MT.CAT_IDS) {
       if (q.cat !== cat || q.diff !== d) err.push('cat/diff klopt niet');
       if (JSON.stringify(q).includes('undefined') || JSON.stringify(q).includes('NaN')) err.push('undefined/NaN in tekst');
       if (err.length) { fails++; if (fails < 40) console.log(`FOUT ${cat} d${d} ${q.kindId}: ${err.join('; ')}`); }
+      const R = MT.reason.build(q);
+      if (!R || R.options.length < 3) err.push('redeneeropties ontbreken');
+      else if (R.type === 'single' && !R.options.some((o) => o.status === 'correct')) err.push('geen juiste redenering');
+      else if (R.type === 'multi' && (!R.correct.length || R.correct.some((k) => !R.options.find((o) => o.id === k)))) err.push('multi-redenering klopt niet');
+      if (err.length && fails < 40) console.log(`FOUT ${cat} d${d} ${q.kindId}: ${err.join('; ')}`);
+      if (err.length) fails++;
       seen.add(q.stem + q.prompt + q.opts.map((o) => o.key).sort().join());
       kinds[`${cat}:${q.kindId}`] = (kinds[`${cat}:${q.kindId}`] || 0) + 1;
     }
@@ -48,6 +54,18 @@ for (const T of MT.gens.log.SYL) {
   const M = MT.gens.log._models(T.n, prem);
   const c = { t: T.c[0], x: T.c[1], y: T.c[2] };
   if (!M.length || !M.every((occ) => MT.gens.log._holds(c, occ))) { fails++; console.log('Ongeldig syllogisme', JSON.stringify(T.p)); }
+}
+// Profiel: opbouwen, als tekst uitvoeren en weer inlezen
+{
+  const recs = [];
+  for (let i = 0; i < 30; i++) recs.push({ c: MT.CAT_IDS[i % 6], d: 1 + (i % 5), k: 'x', kn: 'Soort ' + (i % 4), ok: i % 3 !== 0, err: i % 3 === 0 ? 'Rekenfout' : null, qd: 'ABCD'[i % 4], rs: 'correct', fast: false });
+  const P = MT.profile.update(null, recs, { diag: 8, intake: { exp: 'Geen', goal: 'Beide' } });
+  const txt = MT.profile.toText(P);
+  const back = MT.profile.parse(txt);
+  if (!back || back.source !== 'code' || back.profile.version !== 1) { fails++; console.log('Profiel-roundtrip mislukt'); }
+  const t2 = MT.profile.parse(txt.replace(/Profielcode.*\n/, ''));
+  if (!t2 || t2.profile.cats.num.n !== P.cats.num.n) { fails++; console.log('Profiel tekst-inlezen mislukt'); }
+  if (/undefined|NaN|\[object/.test(txt)) { fails++; console.log('Profieltekst bevat undefined/NaN'); }
 }
 console.log(`\n${total} vragen gecontroleerd in ${((Date.now() - t0) / 1000).toFixed(1)} s, ${fails} fouten.`);
 console.log('Soorten:', Object.keys(kinds).sort().join(', '));

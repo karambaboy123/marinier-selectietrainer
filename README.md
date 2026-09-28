@@ -8,6 +8,22 @@ Alle vragen worden **ter plekke gegenereerd**. Elke training heeft dus andere ge
 
 ## Functies
 
+**Profielsysteem**
+
+- Start met een keuze: 🆕 nieuwe gebruiker (intake + nulmeting), 📂 bestaand Assessmentprofiel laden, of 🔄 profiel laden + korte herkalibratie (3–5 controlevragen).
+- Intake van 6 korte vragen (ervaring, moeilijke/makkelijke onderdelen, waar je moeite mee hebt, doel), daarna een adaptieve nulmeting van 6–10 vragen over alle categorieën.
+- Na de nulmeting volgt een analyse en een volledig **Assessmentprofiel** in tekst: niveau per categorie, denkprofiel, soorten fouten, sterke en zwakke punten, aanbevolen training en instellingen, en persoonlijke leerregels. Kopieer het en plak het later weer in (of in een andere chat).
+- Het profiel bevat een profielcode, zodat de trainer het exact kan terugladen. Een profiel zonder code (bijv. uit ChatGPT) wordt zo goed mogelijk uit de tekst gelezen; de trainer vraagt alleen naar wat echt ontbreekt.
+- Na een training van minstens 5 vragen: “Wil je je Assessmentprofiel bijwerken?” → een volledige nieuwe versie (v1 → v2 → v3). Oude gegevens en nieuwe resultaten worden gecombineerd; bij weinig nieuwe vragen past het niveau maar voorzichtig aan.
+
+**Antwoord én denkwijze**
+
+- In de nulmeting, Leren & Uitleggen en Zwakke Punten Training geef je na je antwoord ook aan hoe je het aanpakte (welk patroon, welke regel, welke veranderingen je zag), plus optioneel in eigen woorden.
+- Antwoord en redenering worden apart beoordeeld: **A** goed + goed, **B** goed antwoord met verkeerde redenering, **C** fout antwoord met goede aanpak, **D** fout + fout.
+- Fouttypes: patroonherkenning, rekenen, lezen, logica, verkeerde aanname, correcte methode verkeerd uitgevoerd, te vroeg antwoord gekozen, onnodig ingewikkeld gedacht.
+- Feedback: wat ging goed, wat ging fout, stap-voor-stap oplossing, waarom de methode werkt, snellere aanpak en leerpunt. Bij cijferreeksen zie je de systematische zoekvolgorde en waar je kunt stoppen.
+- Principes die fout gingen komen later in de training terug in een andere vorm.
+
 **6 trainingsmodi**
 
 1. 📚 Leren & Uitleggen: één vraag per keer, direct uitleg, geen tijdsdruk
@@ -37,7 +53,7 @@ Alle vragen worden **ter plekke gegenereerd**. Elke training heeft dus andere ge
 
 **Feedback per vraag**: resultaat, juiste antwoord, jouw antwoord, antwoordtijd, stapsgewijze uitleg, waarom jouw antwoord niet klopt, een snellere methode, een leerpunt en je voortgang.
 
-**Commando's** (knoppen onder elke vraag): HINT · UITLEG · VOLGENDE · MOEILIJKER · MAKKELIJKER · SCORE · ZWAKKE PUNTEN · STOP · MENU. Antwoorden kan ook met de toetsen A–E.
+**Commando's** (als knoppen): MENU · PROFIEL · UPDATE PROFIEL · NULMETING · HERKALIBREER · ZWAKKE PUNTEN · TRAIN ZWAKKE PUNTEN · MOEILIJKER · MAKKELIJKER · HINT · UITLEG · VOLGENDE · SCORE · STOP. Antwoorden kan ook met de toetsen A–E.
 
 Resultaten blijven alleen in de eigen browser (localStorage). Er is geen server en er wordt niets verstuurd.
 
@@ -68,7 +84,7 @@ Dit maakt `dist/marinier-selectietrainer.html`, met alle CSS en JavaScript erin.
 node tests/check.js 500
 ```
 
-Genereert 500 vragen per categorie per niveau (15.000 in totaal) en controleert onder meer: precies één juist antwoord, geen dubbele opties, uitleg bij elke foute optie, en of elk syllogisme logisch klopt.
+Genereert 500 vragen per categorie per niveau (15.000 in totaal) en controleert onder meer: precies één juist antwoord, geen dubbele opties, uitleg bij elke foute optie, of elk syllogisme logisch klopt, of er bij elke vraag een juiste redeneeroptie is, en of een profiel correct heen en terug gaat.
 
 ## Projectstructuur
 
@@ -78,6 +94,8 @@ css/style.css         opmaak (licht en donker thema)
 js/util.js            hulpfuncties en categorieën
 js/figures.js         SVG-figuren en rasters
 js/gen-*.js           vraaggeneratoren per categorie
+js/reasoning.js       redeneeropties, A/B/C/D-beoordeling, fouttypes
+js/profile.js         Assessmentprofiel: opbouwen, samenvoegen, tekst, inlezen
 js/app.js             menu, modi, adaptief systeem, feedback, rapport
 tests/check.js        automatische controle van de generatoren
 tools/build_single.py bouwt één los HTML-bestand

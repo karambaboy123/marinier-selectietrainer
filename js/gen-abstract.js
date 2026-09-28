@@ -69,7 +69,7 @@
     const pool = figs.map((f) => ({ key: F.key(f), html: F.draw(f), text: F.describe(f), tag: 'Regel niet gevonden', why: `Deze figuur volgt de regel wel. ${R.ex(f)}` }));
     const built = buildOptions({ key: F.key(odd), html: F.draw(odd), text: F.describe(odd) }, pool, n);
     return {
-      cat: 'abs', diff: d, kindId: 'odd', kind: 'Welke hoort er niet bij',
+      cat: 'abs', diff: d, kindId: 'odd', meta: { rule: R.id }, kind: 'Welke hoort er niet bij',
       prompt: 'Welke figuur hoort er niet bij?',
       stem: '<p class="muted small">Vier van de figuren volgen dezelfde regel. Eén niet.</p>'.replace('Vier', n === 4 ? 'Drie' : 'Vier'),
       opts: built.opts, ans: built.ans, layout: 'fig',
@@ -115,7 +115,7 @@
     const built = buildOptions({ key: F.key(ans), html: F.draw(ans), text: F.describe(ans) }, P, optCount(d));
     if (!built) return null;
     return {
-      cat: 'abs', diff: d, kindId: 'figana', kind: 'Figuuranalogie',
+      cat: 'abs', diff: d, kindId: 'figana', meta: { changes: groups.slice() }, kind: 'Figuuranalogie',
       prompt: 'Welke figuur hoort op de open plek?',
       stem: `<div class="figs ana"><div class="fig">${F.draw(A)}</div><span class="op">:</span><div class="fig">${F.draw(B)}</div><span class="op">=</span><div class="fig">${F.draw(C)}</div><span class="op">:</span><div class="fig q">?</div></div>`,
       opts: built.opts, ans: built.ans, layout: 'fig',
@@ -156,7 +156,7 @@
     let grid = '';
     for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) grid += r === 2 && c === 2 ? '<div class="fig q">?</div>' : `<div class="fig">${F.draw(cell(r, c))}</div>`;
     return {
-      cat: 'abs', diff: d, kindId: 'matrix', kind: 'Matrix',
+      cat: 'abs', diff: d, kindId: 'matrix', meta: { changes: d <= 3 ? ['shape', 'fill'] : d === 4 ? ['shape', 'fill', 'dots'] : ['shape', 'fill', 'rot', 'dots'] }, kind: 'Matrix',
       prompt: 'Welke figuur hoort in het lege vak?',
       stem: `<div class="matrix">${grid}</div>`,
       opts: built.opts, ans: built.ans, layout: 'fig',
@@ -172,5 +172,5 @@
     const k = opt.kind && kinds.includes(opt.kind) ? opt.kind : pick(kinds);
     return attempt(() => (k === 'odd' ? oddQ(d) : k === 'figana' ? anaQ(d) : matrixQ(d)));
   }
-  MT.gens.abs = { generate };
+  MT.gens.abs = { generate, ODD };
 })(typeof window !== 'undefined' ? window : globalThis);

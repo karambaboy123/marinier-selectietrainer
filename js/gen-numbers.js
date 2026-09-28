@@ -344,10 +344,13 @@
       const built = buildOptions({ key: String(ans), html: fmtNum(ans), text: fmtNum(ans) }, pool2, n);
       if (!built) return null;
       const shown = s.map((v, i) => (i === gi ? '<span class="q">?</span>' : `<span>${fmtNum(v)}</span>`)).join('');
-      const steps = [r.rule, `Dus: ${r.derive(gi)}.`];
+      const dl = [];
+      for (let i = 1; i < s.length && dl.length < 4; i++) if (i !== gi && i - 1 !== gi) dl.push(`${fmtNum(s[i])} − ${fmtNum(s[i - 1])} = ${fmtNum(s[i] - s[i - 1])}`);
+      const steps = [`Bekijk eerst de verschillen: ${dl.join(', ')}${dl.length < s.length - 2 ? ', …' : ''}.`, r.rule, `Dus: ${r.derive(gi)}.`];
       if (gi < last) steps.push(`Controle: het getal na het vraagteken klopt dan ook: ${r.derive(gi + 1)}.`);
+      steps.push('Deze regel verklaart álle overgangen. Dan kun je stoppen met zoeken.');
       return {
-        cat: 'num', diff: d, kindId: p.id, kind: p.name,
+        cat: 'num', diff: d, kindId: p.id, kind: p.name, meta: { gap: gi },
         prompt: gi === last ? 'Welk getal komt hierna?' : 'Welk getal hoort op de plek van het vraagteken?',
         stem: `<div class="seq">${shown}</div>`,
         opts: built.opts, ans: built.ans, layout: 'mono',

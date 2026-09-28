@@ -68,7 +68,7 @@
     }));
     const built = buildOptions({ key: dd, html: esc(dd), text: dd }, pool, n);
     return {
-      cat: 'ana', diff: d, kindId: 'word', kind: 'Woordanalogie',
+      cat: 'ana', diff: d, kindId: 'word', kind: 'Woordanalogie', meta: { sub: 'word', rel },
       prompt: 'Welk woord hoort op de open plek?',
       stem: `<div class="analogy"><b>${esc(a)}</b><span class="op">:</span><b>${esc(b)}</b><span class="op">=</span><b>${esc(c)}</b><span class="op">:</span><span class="gap">?</span></div>`,
       opts: built.opts, ans: built.ans, layout: 'text',
@@ -111,7 +111,7 @@
       const a1 = g.f(xs[0]) === y[0], a2 = g.f(xs[1]) === y[1];
       if (a1 !== a2) {
         const v = g.f(x3);
-        if (v >= 0) pool.push({ key: String(v), html: String(v), text: String(v), tag: 'Verkeerde regel', why: `Met de regel “${g.n}” klopt ${a1 ? `${xs[0]} → ${y[0]}` : `${xs[1]} → ${y[1]}`}, maar ${a1 ? `${xs[1]} → ${y[1]}` : `${xs[0]} → ${y[0]}`} niet. Controleer altijd beide voorbeelden.` });
+        if (v >= 0) pool.push({ rn: g.n, key: String(v), html: String(v), text: String(v), tag: 'Verkeerde regel', why: `Met de regel “${g.n}” klopt ${a1 ? `${xs[0]} → ${y[0]}` : `${xs[1]} → ${y[1]}`}, maar ${a1 ? `${xs[1]} → ${y[1]}` : `${xs[0]} → ${y[0]}`} niet. Controleer altijd beide voorbeelden.` });
       }
       if (pool.length > 8) break;
     }
@@ -119,7 +119,7 @@
     const built = buildOptions({ key: String(ans), html: String(ans), text: String(ans) }, pool, optCount(d));
     if (!built) return null;
     return {
-      cat: 'ana', diff: d, kindId: 'num', kind: 'Getalanalogie',
+      cat: 'ana', diff: d, kindId: 'num', kind: 'Getalanalogie', meta: { sub: 'num', rule: R.n, say: R.say, oneFit: pool.filter((p) => p.tag === 'Verkeerde regel').map((p) => p.rn).filter(Boolean) },
       prompt: `Welk getal hoort bij ${x3}, volgens dezelfde regel?`,
       stem: `<div class="pairs"><span>${xs[0]} <i>→</i> ${y[0]}</span><span>${xs[1]} <i>→</i> ${y[1]}</span><span>${x3} <i>→</i> <b class="q">?</b></span></div>`,
       opts: built.opts, ans: built.ans, layout: 'mono',
@@ -162,7 +162,7 @@
     const built = buildOptions({ key: ans, html: ans, text: ans }, pool, optCount(d));
     if (!built) return null;
     return {
-      cat: 'ana', diff: d, kindId: 'let', kind: 'Letteranalogie',
+      cat: 'ana', diff: d, kindId: 'let', kind: 'Letteranalogie', meta: { sub: 'let', rule: R.n, others: shuffle(LF.filter((g) => !fits.includes(g))).slice(0, 4).map((g) => g.n) },
       prompt: 'Welke lettercombinatie hoort op de open plek?',
       stem: `<div class="analogy mono"><b>${toS(E)}</b><span class="op">:</span><b>${eOut}</b><span class="op">=</span><b>${toS(T)}</b><span class="op">:</span><span class="gap">?</span></div>`,
       opts: built.opts, ans: built.ans, layout: 'mono',

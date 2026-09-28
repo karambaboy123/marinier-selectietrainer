@@ -63,7 +63,7 @@
     const built = buildOptions({ key: ans, html: esc(ans), text: ans }, pool, optCount(d));
     if (!built) return null;
     return {
-      cat: 'log', diff: d, kindId: 'order', kind: 'Volgorde bepalen',
+      cat: 'log', diff: d, kindId: 'order', meta: { more: D.more }, kind: 'Volgorde bepalen',
       prompt: Q.t,
       stem: `<ul class="facts">${sentences.map((s) => `<li>${esc(s)}</li>`).join('')}</ul>`,
       opts: built.opts, ans: built.ans, layout: 'text',
@@ -148,7 +148,7 @@
     let ex = T.ex;
     for (let i = T.n; i >= 1; i--) ex = ex.split(String(i)).join(W[i - 1]);
     return {
-      cat: 'log', diff: d, kindId: 'syl', kind: 'Syllogisme (wat volgt zeker?)',
+      cat: 'log', diff: d, kindId: 'syl', meta: {}, kind: 'Syllogisme (wat volgt zeker?)',
       prompt: 'Welke conclusie volgt zeker uit de gegevens?',
       stem: `<ul class="facts">${shuffle(prem).map((p) => `<li>${esc(say(p, W))}</li>`).join('')}</ul><p class="muted small">Ga ervan uit dat alle genoemde groepen bestaan. Gebruik alleen deze gegevens.</p>`,
       opts: built.opts, ans: built.ans, layout: 'text',
@@ -196,7 +196,7 @@
     const built = buildOptions({ key: ans, html: ans, text: ans }, pool, optCount(d));
     if (!built) return null;
     return {
-      cat: 'log', diff: d, kindId: 'code', kind: 'Geheimschrift',
+      cat: 'log', diff: d, kindId: 'code', meta: { rule: R.n, others: shuffle(CODES.filter((c) => !fits.includes(c))).slice(0, 4).map((c) => c.n) }, kind: 'Geheimschrift',
       prompt: `In een geheimtaal wordt ${w1} geschreven als ${e1}. Hoe schrijf je ${w2}?`,
       stem: `<div class="analogy mono"><b>${w1}</b><span class="op">→</span><b>${e1}</b></div><div class="analogy mono"><b>${w2}</b><span class="op">→</span><span class="gap">?</span></div>`,
       opts: built.opts, ans: built.ans, layout: 'mono',
@@ -219,20 +219,20 @@
       const wrong = [{ m: mins + 30, why: 'Reken na: tijd = afstand ÷ snelheid.' }, { m: mins - 15, why: 'Reken na: tijd = afstand ÷ snelheid.' }, { m: mins + 15, why: 'Reken na: tijd = afstand ÷ snelheid.' }];
       if (fr) wrong.unshift({ m: h * 60 + fr, why: `Je las ${String(hrs).replace('.', ',')} uur als ${h} uur en ${fr} minuten. Maar een uur heeft 60 minuten, geen 100.` });
       return { q: `Een groep marcheert met een snelheid van ${v} km per uur. Hoe lang doet de groep over ${kmT} km?`, a: hm(mins), vals: wrong.filter((x) => x.m > 0 && x.m !== mins).map((x) => ({ v: hm(x.m), why: x.why })),
-        steps: [`Tijd = afstand ÷ snelheid = ${kmT} ÷ ${v} = ${String(km / v).replace('.', ',')} uur.`, `${String(km / v).replace('.', ',')} uur = ${hm(mins)}.`], kind: 'Snelheid, afstand, tijd', lesson: 'Tijd = afstand ÷ snelheid. Een half uur is 30 minuten, niet 50.' };
+        steps: [`Tijd = afstand ÷ snelheid = ${kmT} ÷ ${v} = ${String(km / v).replace('.', ',')} uur.`, `${String(km / v).replace('.', ',')} uur = ${hm(mins)}.`], kind: 'Snelheid, afstand, tijd', method: 'Tijd = afstand ÷ snelheid, en de uren daarna omrekenen naar minuten (× 60).', wm: ['Afstand × snelheid', 'Decimalen van uren direct als minuten lezen (1,5 uur = 1 uur 50)'], lesson: 'Tijd = afstand ÷ snelheid. Een half uur is 30 minuten, niet 50.' };
     } },
     { lv: [1, 3], make() {
       const start = rand(18, 23) * 60 + pick([0, 15, 30, 45]), dur = rand(5, 9) * 60 + pick([10, 20, 35, 40, 50]);
       const end = start + dur;
       return { q: `Een wacht begint om ${clock(start)} en duurt ${hm(dur)}. Hoe laat is de wacht voorbij?`, a: clock(end), vals: [{ v: clock(end + 60), why: 'Je telde een uur te veel.' }, { v: clock(end - 60), why: 'Je telde een uur te weinig.' }, { v: clock(end - (dur % 60)), why: 'Je vergat de minuten op te tellen.' }, { v: clock(end + 10), why: 'De minuten kloppen niet.' }],
-        steps: [`${clock(start)} + ${Math.floor(dur / 60)} uur = ${clock(start + Math.floor(dur / 60) * 60)}.`, `Daarna nog ${dur % 60} minuten erbij: ${clock(end)}. Let op middernacht.`], kind: 'Kloktijden', lesson: 'Tel eerst de hele uren op en daarna pas de minuten.' };
+        steps: [`${clock(start)} + ${Math.floor(dur / 60)} uur = ${clock(start + Math.floor(dur / 60) * 60)}.`, `Daarna nog ${dur % 60} minuten erbij: ${clock(end)}. Let op middernacht.`], kind: 'Kloktijden', method: 'Eerst de hele uren optellen, daarna de minuten, en letten op middernacht.', wm: ['Uren en minuten tegelijk optellen alsof een uur 100 minuten heeft', 'Alleen de uren optellen'], lesson: 'Tel eerst de hele uren op en daarna pas de minuten.' };
     } },
     { lv: [2, 4], make() {
       const a = pick([2, 3, 4, 6]), t = pick([6, 8, 12, 9]), b = pick([3, 4, 6, 8, 2].filter((x) => x !== a)), tot = a * t;
       if (tot % b) return null;
       const r = tot / b;
       return { q: `${a} mariniers graven samen een stelling in ${t} uur. Hoe lang doen ${b} mariniers erover, als iedereen even hard werkt?`, a: `${r} uur`, vals: [{ v: `${(t * b) / a} uur`, why: 'Je rekende alsof meer mensen er langer over doen. Meer mensen = minder tijd.' }, { v: `${r + 1} uur`, why: 'Rekenfout.' }, { v: `${Math.max(1, r - 1)} uur`, why: 'Rekenfout.' }, { v: `${t + (a - b)} uur`, why: 'Je rekende met optellen en aftrekken. Dit is een omgekeerd evenredige som.' }].filter((x) => x.v !== `${r} uur`),
-        steps: [`Totaal werk = ${a} mariniers × ${t} uur = ${tot} “manuren”.`, `Met ${b} mariniers: ${tot} ÷ ${b} = ${r} uur.`], kind: 'Omgekeerd evenredig', lesson: 'Meer mensen, minder tijd: reken eerst het totaal aantal manuren uit.' };
+        steps: [`Totaal werk = ${a} mariniers × ${t} uur = ${tot} “manuren”.`, `Met ${b} mariniers: ${tot} ÷ ${b} = ${r} uur.`], kind: 'Omgekeerd evenredig', method: 'Totaal aantal manuren uitrekenen en dat delen door het nieuwe aantal mensen.', wm: ['Meer mensen = evenredig meer tijd', 'Het verschil in mensen optellen of aftrekken bij de tijd'], lesson: 'Meer mensen, minder tijd: reken eerst het totaal aantal manuren uit.' };
     } },
     { lv: [3, 5], make() {
       const n = pick([200, 240, 300, 360, 400, 480, 600]), p = pick([10, 20, 25, 30, 40]), fr = pick([[1, 4], [1, 3], [1, 2], [2, 3]]);
@@ -242,7 +242,7 @@
       const r = after1 - out;
       const wrong1 = n - (n * p) / 100 - (n * fr[0]) / fr[1];
       return { q: `Van ${n} kandidaten valt ${p}% af bij de sporttest. Van de rest valt daarna nog ${fr[0]}/${fr[1]} deel af bij het gesprek. Hoeveel kandidaten blijven er over?`, a: String(r), vals: [{ v: String(wrong1), why: `Je nam ${fr[0]}/${fr[1]} van alle ${n} kandidaten. Het gaat om ${fr[0]}/${fr[1]} van de rest.` }, { v: String(out), why: 'Dat is het aantal dat afvalt bij het gesprek, niet het aantal dat overblijft.' }, { v: String(after1), why: 'Je vergat de tweede ronde.' }, { v: String(r + 10), why: 'Rekenfout.' }].filter((x) => x.v !== String(r) && Number(x.v) > 0),
-        steps: [`${p}% van ${n} = ${(n * p) / 100}. Er blijven ${after1} over.`, `${fr[0]}/${fr[1]} van ${after1} = ${out} vallen af. Er blijven ${r} over.`], kind: 'Procenten en breuken', lesson: 'Let op: “van de rest” betekent dat je met het nieuwe aantal verder rekent.' };
+        steps: [`${p}% van ${n} = ${(n * p) / 100}. Er blijven ${after1} over.`, `${fr[0]}/${fr[1]} van ${after1} = ${out} vallen af. Er blijven ${r} over.`], kind: 'Procenten en breuken', method: 'Eerst het percentage van het totaal afhalen, daarna de breuk van wat er over is.', wm: ['Beide afvallers berekenen van het oorspronkelijke totaal', 'Alleen de eerste ronde uitrekenen'], lesson: 'Let op: “van de rest” betekent dat je met het nieuwe aantal verder rekent.' };
     } },
     { lv: [4, 5], make() {
       const p = pick([10, 12, 15, 20]), dd = pick([15, 20, 24, 30]), passed = pick([3, 5, 6, 10]), extra = pick([5, 8, 10, 15, 20]);
@@ -250,7 +250,7 @@
       if (passed >= dd || left % (p + extra)) return null;
       const r = left / (p + extra);
       return { q: `Een voorraad eten is genoeg voor ${p} mariniers gedurende ${dd} dagen. Na ${passed} dagen komen er ${extra} mariniers bij. Hoeveel dagen doen ze nog met de rest van de voorraad?`, a: `${r} dagen`, vals: [{ v: `${(dd * p) / (p + extra)} dagen`, why: `Je vergat dat er al ${passed} dagen voorbij waren.` }, { v: `${dd - passed - extra} dagen`, why: 'Je trok mensen af van dagen. Reken met “mandagen”.' }, { v: `${r + 1} dagen`, why: 'Rekenfout.' }, { v: `${dd - passed} dagen`, why: 'Met meer mensen gaat de voorraad sneller op.' }].filter((x) => x.v !== `${r} dagen` && !x.v.includes('.') && !x.v.startsWith('-') && !x.v.startsWith('0')),
-        steps: [`Na ${passed} dagen is er nog eten voor ${p} mariniers × ${dd - passed} dagen = ${left} mandagen.`, `Nu zijn er ${p + extra} mariniers: ${left} ÷ ${p + extra} = ${r} dagen.`], kind: 'Voorraad (mandagen)', lesson: 'Reken met één totaal (mandagen) en verdeel dat daarna.' };
+        steps: [`Na ${passed} dagen is er nog eten voor ${p} mariniers × ${dd - passed} dagen = ${left} mandagen.`, `Nu zijn er ${p + extra} mariniers: ${left} ÷ ${p + extra} = ${r} dagen.`], kind: 'Voorraad (mandagen)', method: 'Uitrekenen hoeveel mandagen er over zijn en die delen door het nieuwe aantal mensen.', wm: ['De hele voorraad delen door het nieuwe aantal, zonder de dagen die al voorbij zijn', 'Mensen van dagen aftrekken'], lesson: 'Reken met één totaal (mandagen) en verdeel dat daarna.' };
     } },
   ];
   function sumQ(d) {
@@ -261,7 +261,7 @@
     const built = buildOptions({ key: r.a, html: esc(r.a), text: r.a }, pool, Math.min(optCount(d), pool.length + 1));
     if (!built || built.opts.length < 4) return null;
     return {
-      cat: 'log', diff: d, kindId: 'sum', kind: r.kind,
+      cat: 'log', diff: d, kindId: 'sum', kind: r.kind, meta: { method: r.method, wrong: r.wm },
       prompt: r.q, stem: '', opts: built.opts, ans: built.ans, layout: 'text',
       steps: r.steps, hint: 'Schrijf de gegevens eerst op in een klein lijstje.',
       quick: 'Schat eerst het antwoord. Opties die ver van je schatting af liggen, kun je meteen wegstrepen.',
