@@ -57,54 +57,6 @@ Alle vragen worden **ter plekke gegenereerd**. Elke training heeft dus andere ge
 
 Resultaten blijven alleen in de eigen browser (localStorage). Er is geen server en er wordt niets verstuurd.
 
-## Gebruiken
-
-Het is een statische website zonder build-stap: open `index.html` in een browser.
-
-### Online zetten met GitHub Pages
-
-1. Maak een nieuwe repository op GitHub, bijvoorbeeld `marinier-selectietrainer`.
-2. Upload alle bestanden uit deze map (via **Add file → Upload files** of met `git push`).
-3. Ga naar **Settings → Pages**, kies bij *Source* “Deploy from a branch”, branch `main`, map `/ (root)`.
-4. Na een minuut staat de trainer op `https://<gebruikersnaam>.github.io/marinier-selectietrainer/`.
-
-Netlify, Vercel of Cloudflare Pages werken ook: sleep de map erin, er is geen build-commando nodig.
-
-### Eén los bestand
-
-```bash
-python3 tools/build_single.py
-```
-
-Dit maakt `dist/marinier-selectietrainer.html`, met alle CSS en JavaScript erin. Dat bestand kun je delen of los openen.
-
-## Vragen controleren
-
-```bash
-node tests/check.js 500
-```
-
-Genereert 500 vragen per categorie per niveau (15.000 in totaal) en controleert onder meer: precies één juist antwoord, geen dubbele opties, uitleg bij elke foute optie, of elk syllogisme logisch klopt, of er bij elke vraag een juiste redeneeroptie is, en of een profiel correct heen en terug gaat.
-
-## Projectstructuur
-
-```
-index.html            pagina + tab met selectie-informatie
-css/style.css         opmaak (licht en donker thema)
-js/util.js            hulpfuncties en categorieën
-js/figures.js         SVG-figuren en rasters
-js/gen-*.js           vraaggeneratoren per categorie
-js/reasoning.js       redeneeropties, A/B/C/D-beoordeling, fouttypes
-js/profile.js         Assessmentprofiel: opbouwen, samenvoegen, tekst, inlezen
-js/app.js             menu, modi, adaptief systeem, feedback, rapport
-tests/check.js        automatische controle van de generatoren
-tools/build_single.py bouwt één los HTML-bestand
-```
-
-## Uitbreiden
-
-Elke generator exporteert `MT.gens.<categorie>.generate(niveau, { kind })` en geeft een vraag terug met `prompt`, `stem`, `opts` (elke foute optie met `why` en `tag`), `ans`, `steps`, `hint`, `quick` en `lesson`. Een nieuw patroon toevoegen = één object in de juiste generator. Draai daarna `node tests/check.js`.
-
 ## Licentie
 
 MIT: vrij te gebruiken, aan te passen en te delen.
