@@ -134,5 +134,92 @@
       return q;
     });
   }
-  MT.gens.dia = { generate, OPS };
+  /* ---- Venn-diagrammen (Mariniers Training Mode) ----
+   * Drie begrippen; kies het diagram dat hun onderlinge verhouding laat zien. */
+  const { esc } = MT.util;
+  const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  const VS = 'fill="none" stroke="currentColor" stroke-width="1.7"';
+  const ven = (inner) => `<svg viewBox="0 0 100 60" style="width:118px;height:71px" role="img" aria-hidden="true">${inner}</svg>`;
+  const C = (cx, cy, r) => `<circle cx="${cx}" cy="${cy}" r="${r}" ${VS}/>`;
+  const E = (cx, cy, rx, ry) => `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" ${VS}/>`;
+  const SHAPES = {
+    nest: ven(C(50, 30, 27) + C(50, 30, 18) + C(50, 30, 9)),
+    in2d: ven(E(50, 30, 45, 26) + C(32, 30, 11) + C(68, 30, 11)),
+    in2o: ven(E(50, 30, 45, 26) + C(41, 30, 14) + C(59, 30, 14)),
+    tri: ven(C(50, 20, 16) + C(38, 40, 16) + C(62, 40, 16)),
+    sep3: ven(C(17, 30, 13) + C(50, 30, 13) + C(83, 30, 13)),
+    chain: ven(C(27, 30, 18) + C(50, 30, 18) + C(73, 30, 18)),
+    insep: ven(C(32, 30, 25) + C(32, 30, 13) + C(82, 30, 14)),
+    ovsep: ven(C(23, 30, 17) + C(43, 30, 17) + C(83, 30, 13)),
+    nestover: ven(E(35, 30, 30, 24) + C(23, 30, 9) + E(67, 30, 30, 24)),
+  };
+  const GEN = {
+    nest: 'drie begrippen die elk helemaal in het volgende passen',
+    in2d: 'een groot begrip met daarin twee delen die elkaar niet raken',
+    in2o: 'een groot begrip met daarin twee delen die elkaar overlappen',
+    tri: 'drie begrippen die elkaar alle drie gedeeltelijk overlappen',
+    sep3: 'drie begrippen zonder enige overlap',
+    chain: 'drie begrippen waarvan alleen het middelste beide andere gedeeltelijk overlapt',
+    insep: 'een begrip dat helemaal in een tweede past, plus een derde dat er los van staat',
+    ovsep: 'twee begrippen die elkaar overlappen, plus een derde dat er los van staat',
+    nestover: 'een begrip dat helemaal in een tweede past, terwijl een derde dat tweede gedeeltelijk overlapt',
+  };
+  const REASON = {
+    nest: ([a, b, c]) => `${cap(a)} zijn altijd ${b}, en ${b} zijn altijd ${c}.`,
+    in2d: ([c, a, b]) => `${cap(a)} en ${b} horen allebei bij ${c}, maar iets is nooit tegelijk ${a} en ${b}.`,
+    in2o: ([c, a, b]) => `${cap(a)} en ${b} horen allebei bij ${c}, en sommige ${c} zijn tegelijk ${a} en ${b}.`,
+    tri: ([a, b, c]) => `Elk paar overlapt: sommige ${a} zijn ook ${b}, sommige ${b} zijn ook ${c} en sommige ${a} zijn ook ${c}. Geen enkel begrip valt helemaal binnen een ander.`,
+    sep3: ([a, b, c]) => `${cap(a)}, ${b} en ${c} sluiten elkaar volledig uit.`,
+    chain: ([a, b, c]) => `${cap(b)} overlapt zowel ${a} als ${c}, maar ${a} en ${c} sluiten elkaar uit.`,
+    insep: ([a, b, c]) => `${cap(a)} zijn altijd ${b}. ${cap(c)} heeft daar niets mee te maken.`,
+    ovsep: ([a, b, c]) => `Sommige ${a} zijn ook ${b}. ${cap(c)} staat daar los van.`,
+    nestover: ([a, b, c]) => `${cap(a)} zijn altijd ${b}. ${cap(c)} overlapt ${b} gedeeltelijk, maar nooit ${a}.`,
+  };
+  const NEAR = {
+    in2d: ['in2o', 'nest'], in2o: ['in2d', 'tri'], nest: ['in2d', 'insep'], tri: ['chain', 'in2o'], sep3: ['ovsep', 'insep'],
+    chain: ['tri', 'ovsep'], insep: ['nest', 'sep3'], ovsep: ['chain', 'sep3'], nestover: ['in2o', 'chain'],
+  };
+  // [soort, begrippen in de volgorde van REASON]
+  const VEN = [
+    ['in2d', 'dieren', 'honden', 'katten'], ['in2d', 'fruit', 'appels', 'bananen'], ['in2d', 'voertuigen', 'auto\'s', 'fietsen'], ['in2d', 'meubels', 'tafels', 'stoelen'],
+    ['in2d', 'gebouwen', 'kerken', 'scholen'], ['in2d', 'groenten', 'wortels', 'uien'], ['in2d', 'gereedschappen', 'hamers', 'zagen'], ['in2d', 'hemellichamen', 'sterren', 'planeten'],
+    ['in2o', 'mensen', 'vrouwen', 'studenten'], ['in2o', 'boeken', 'kinderboeken', 'prentenboeken'], ['in2o', 'films', 'komedies', 'familiefilms'], ['in2o', 'gebouwen', 'oude gebouwen', 'kerken'],
+    ['in2o', 'planten', 'bomen', 'giftige planten'], ['in2o', 'voertuigen', 'elektrische voertuigen', 'fietsen'], ['in2o', 'gerechten', 'soepen', 'warme gerechten'], ['in2o', 'dieren', 'roofdieren', 'vogels'],
+    ['in2o', 'kleding', 'sportkleding', 'jassen'], ['in2o', 'muziek', 'klassieke muziek', 'filmmuziek'],
+    ['nest', 'poedels', 'honden', 'dieren'], ['nest', 'tulpen', 'bloemen', 'planten'], ['nest', 'sedans', 'auto\'s', 'voertuigen'], ['nest', 'eiken', 'bomen', 'planten'],
+    ['nest', 'fregatten', 'schepen', 'vaartuigen'], ['nest', 'sonnetten', 'gedichten', 'teksten'], ['nest', 'Amsterdammers', 'Nederlanders', 'Europeanen'], ['nest', 'mussen', 'vogels', 'dieren'], ['nest', 'kleuters', 'kinderen', 'mensen'],
+    ['tri', 'studenten', 'sporters', 'muzikanten'], ['tri', 'Nederlanders', 'fietsers', 'studenten'], ['tri', 'rokers', 'sporters', 'automobilisten'], ['tri', 'wandelaars', 'fotografen', 'vogelaars'],
+    ['tri', 'lezers', 'reizigers', 'kookliefhebbers'], ['tri', 'kinderen', 'zwemmers', 'vegetariërs'],
+    ['sep3', 'bloemen', 'schoenen', 'sterren'], ['sep3', 'honden', 'tafels', 'wolken'], ['sep3', 'boeken', 'vulkanen', 'fietsen'], ['sep3', 'kerken', 'bananen', 'vliegtuigen'], ['sep3', 'kussens', 'muren', 'vogels'],
+    ['chain', 'kleine dieren', 'huisdieren', 'grote dieren'], ['chain', 'goedkope producten', 'biologische producten', 'dure producten'], ['chain', 'korte films', 'familiefilms', 'lange films'],
+    ['chain', 'zomerkleding', 'katoenen kleding', 'winterkleding'], ['chain', 'jonge mensen', 'studenten', 'oude mensen'], ['chain', 'warme dranken', 'zoete dranken', 'koude dranken'], ['chain', 'kleine auto\'s', 'elektrische auto\'s', 'grote auto\'s'],
+    ['insep', 'mussen', 'vogels', 'vlinders'], ['insep', 'appels', 'fruit', 'groenten'], ['insep', 'honden', 'dieren', 'planten'], ['insep', 'haaien', 'vissen', 'zoogdieren'],
+    ['insep', 'pianos', 'muziekinstrumenten', 'gereedschappen'], ['insep', 'fietsen', 'voertuigen', 'gebouwen'],
+    ['ovsep', 'studenten', 'sporters', 'vulkanen'], ['ovsep', 'vrouwen', 'artsen', 'bergen'], ['ovsep', 'kinderen', 'zwemmers', 'sterren'], ['ovsep', 'muzikanten', 'leraren', 'wolken'], ['ovsep', 'fietsers', 'Nederlanders', 'planeten'],
+    ['nestover', 'dolfijnen', 'zoogdieren', 'landdieren'], ['nestover', 'koeien', 'zoogdieren', 'zeedieren'], ['nestover', 'kolibries', 'vogels', 'roofdieren'], ['nestover', 'struisvogels', 'vogels', 'zeedieren'],
+  ];
+
+  function vennQ(d, n = 4) {
+    return attempt(() => {
+      const [t, ...roles] = pick(VEN);
+      const why = (T) => `Dit diagram laat zien: ${GEN[T]}. Bij deze begrippen klopt dat niet. ${REASON[t](roles)}`;
+      const others = Object.keys(SHAPES).filter((k) => k !== t);
+      const order = [...NEAR[t], ...shuffle(others.filter((k) => !NEAR[t].includes(k)))];
+      const pool = order.map((T) => ({ key: T, html: SHAPES[T], text: cap(GEN[T]), why: why(T), tag: 'Relatie niet gelijk' }));
+      const built = buildOptions({ key: t, html: SHAPES[t], text: cap(GEN[t]) }, pool, n);
+      if (!built) return null;
+      return {
+        cat: 'dia', diff: 3, kindId: 'venn', kind: 'Venn-diagram', meta: { mode: 'venn', rule: t },
+        prompt: 'Welk diagram laat de verhouding tussen deze drie begrippen het best zien?',
+        stem: `<div class="venn">${shuffle(roles).map((r) => `<div>${esc(r)}</div>`).join('')}</div>`,
+        opts: built.opts, ans: built.ans, layout: 'fig',
+        steps: ['Bekijk elk paar begrippen apart: valt het ene altijd binnen het andere, kunnen ze tegelijk voorkomen, of sluiten ze elkaar uit?', REASON[t](roles), `Het diagram met precies deze verhoudingen toont ${GEN[t]}.`],
+        hint: 'Vraag je per paar: valt het ene altijd binnen het andere, overlappen ze, of hebben ze niets met elkaar te maken?',
+        quick: 'Zoek eerst het begrip dat de andere omvat (als dat er is). Kijk daarna of de overige twee elkaar overlappen of uitsluiten.',
+        lesson: 'Bekijk elk paar apart: helemaal binnen, gedeeltelijk overlappend, of los van elkaar.',
+      };
+    });
+  }
+
+  MT.gens.dia = { generate: (d, opt = {}) => (opt.exam || opt.kind === 'venn' ? vennQ(d, opt.exam ? 4 : optCount(d)) : generate(d, opt)), OPS };
 })(typeof window !== 'undefined' ? window : globalThis);

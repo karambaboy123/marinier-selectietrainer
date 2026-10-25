@@ -28,7 +28,7 @@ Alle vragen worden **ter plekke gegenereerd**. Elke training heeft dus andere ge
 
 1. 📚 Leren & Uitleggen: één vraag per keer, direct uitleg, geen tijdsdruk
 2. 🧠 Adaptieve Training: moeilijkheid en tijd passen zich aan je prestaties aan
-3. ⚓ Mariniers Training Mode: 30 gemengde vragen, adaptief, geen hints, uitgebreide analyse
+3. ⚓ Mariniers Training Mode: vaste opbouw van 55 vragen (13 cijferreeksen, 13 analogieën, 13 figuurreeksen en 16 Venn-diagrammen), zonder niveaus en hints, met uitgebreide analyse
 4. ⏱️ Assessment Simulatie: geen feedback tussendoor, tijdsdruk, eindrapport
 5. 🎯 Zwakke Punten Training: kiest automatisch je zwakste onderdelen uit de sessie
 6. 🛠️ Zelf Instellen: niveau, moeilijkheid, categorie, duur, tijdsdruk, feedback en hints
@@ -37,14 +37,18 @@ Alle vragen worden **ter plekke gegenereerd**. Elke training heeft dus andere ge
 
 | | Categorie | Soorten vragen |
 |---|---|---|
-| A | 🔢 Cijferreeksen | 15 patronen: vaste stap, ×/÷, oplopende verschillen, twee reeksen door elkaar, kwadraten, som van vorige twee/drie, priemverschillen … |
-| B | 🔤 Analogieën | Woordanalogieën (bijna 50 paren), getalanalogieën en letteranalogieën |
-| C | ◯ Diagrammen | Uitkomst bepalen, ontbrekende bewerking vinden, terugrekenen; symbolen wisselen per vraag |
+| A | 🔢 Cijferreeksen | Alle getallen hebben twee cijfers (10–99); één getal is gevraagd. 13 patronen: vaste stap, afwisselende stappen, veranderende verschillen, twee reeksen door elkaar (ook met veranderende stap), verschillen in twee reeksen, groeiende zigzag, kwadraten, som van vorige twee/drie, priemverschillen … |
+| B | 🔤 Analogieën | Woordanalogieën, getalanalogieën en letteranalogieën. In de Mariniers Training Mode kies je bij elke woordanalogie het woord links én rechts (31 eigen woordparen met bewust verleidelijke combinaties) |
+| C | ◯ Diagrammen | Uitkomst bepalen, ontbrekende bewerking vinden, terugrekenen; symbolen wisselen per vraag. In de Mariniers Training Mode: Venn-diagrammen met drie begrippen en negen soorten verhoudingen |
 | D | 🔷 Figuurreeksen | Draaiing, vulling, vorm, stippen, 1–3 regels tegelijk, rasters met één of twee bewegingen |
 | E | 🧩 Logisch redeneren | Volgordes, syllogismen (gecontroleerd met een logica-checker), geheimschrift, redeneersommen |
 | F | 🧠 Abstract redeneren | Welke hoort er niet bij, figuuranalogieën, 3×3-matrices |
 
-**Adaptief systeem**
+**Mariniers Training Mode**
+
+Deze modus heeft geen niveaukeuze en past zijn moeilijkheid niet aan. De vragen zijn opgebouwd naar het formaat van de oefenopgaven die gebruikers kennen: cijferreeksen met een lange reeks getallen van twee cijfers en vier antwoordopties, analogieën met twee open plekken, figuurreeksen met vier opties en Venn-diagrammen (kies het diagram dat de verhouding tussen drie begrippen toont). De vragen zijn zelf gemaakt en komen niet uit het echte assessment.
+
+**Adaptief systeem** (de andere modi)
 
 - Twee keer overtuigend goed (binnen de tijd, zonder hint) → niveau omhoog voor die categorie
 - Twee keer fout in dezelfde categorie → eerst uitleg, dan een iets eenvoudigere diagnostische vraag over hetzelfde principe, daarna een hertest op het oude niveau

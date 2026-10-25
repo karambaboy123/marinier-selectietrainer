@@ -11,6 +11,7 @@ for (const f of ['util.js', 'figures.js', 'gen-numbers.js', 'gen-analogies.js', 
   vm.runInContext(fs.readFileSync(path.join(__dirname, '..', 'js', f), 'utf8'), ctx, { filename: f });
 }
 const MT = ctx.MT;
+const inRange = (q) => [...String(q.stem).matchAll(/<span>(\d+)<\/span>/g)].map((m) => +m[1]).concat(q.opts.map((o) => +o.key)).every((v) => v >= 10 && v <= 99);
 const N = Number(process.argv[2] || 300);
 let fails = 0, total = 0;
 const kinds = {};
@@ -34,6 +35,7 @@ for (const cat of MT.CAT_IDS) {
       if (!q.steps || !q.steps.length || !q.lesson || !q.quick || !q.hint) err.push('uitleg ontbreekt');
       if (q.cat !== cat || q.diff !== d) err.push('cat/diff klopt niet');
       if (JSON.stringify(q).includes('undefined') || JSON.stringify(q).includes('NaN')) err.push('undefined/NaN in tekst');
+      if (cat === 'num' && !inRange(q)) err.push('getal buiten 10–99');
       if (err.length) { fails++; if (fails < 40) console.log(`FOUT ${cat} d${d} ${q.kindId}: ${err.join('; ')}`); }
       const R = MT.reason.build(q);
       if (!R || R.options.length < 3) err.push('redeneeropties ontbreken');
@@ -46,6 +48,26 @@ for (const cat of MT.CAT_IDS) {
     }
     const uniq = seen.size / N;
     if (uniq < 0.6) console.log(`LET OP: ${cat} d${d} weinig variatie (${Math.round(uniq * 100)}% uniek)`);
+  }
+}
+// Mariniers Training Mode: examenvorm (4 opties, cijferreeksen 10–99, analogieën met twee woorden)
+for (const cat of ['num', 'ana', 'fig', 'dia']) {
+  for (let i = 0; i < N; i++) {
+    total++;
+    let q;
+    try { q = MT.gens[cat].generate(3, { exam: true }); } catch (e) { fails++; console.log(`FOUT exam ${cat}: ${e.message}`); continue; }
+    const err = [];
+    if (q.opts.length !== 4) err.push(`aantal opties ${q.opts.length} != 4`);
+    if (q.opts.filter((o) => o.correct).length !== 1) err.push('niet precies 1 juiste optie');
+    if (new Set(q.opts.map((o) => o.key)).size !== q.opts.length) err.push('dubbele opties');
+    if (q.opts.some((o) => !o.correct && !o.why)) err.push('afleider zonder uitleg');
+    if (cat === 'num' && !inRange(q)) err.push('getal buiten 10–99');
+    if (cat === 'dia' && q.kindId !== 'venn') err.push('geen venn-diagram');
+    if (cat === 'ana' && !q.opts[q.ans].key.includes('|')) err.push('analogie zonder twee woorden');
+    if (JSON.stringify(q).includes('undefined') || JSON.stringify(q).includes('NaN')) err.push('undefined/NaN in tekst');
+    const R = MT.reason.build(q);
+    if (!R || R.options.length < 3) err.push('redeneeropties ontbreken');
+    if (err.length) { fails++; if (fails < 40) console.log(`FOUT exam ${cat}: ${err.join('; ')}`); }
   }
 }
 // Syllogismen: elk sjabloon moet geldig zijn

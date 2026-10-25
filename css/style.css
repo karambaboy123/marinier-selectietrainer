@@ -148,6 +148,7 @@ nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(-
 @media (max-width:420px){.fig{width:68px;height:68px}}
 .fig.q{border-style:dashed;border-color:var(--acc);color:var(--acc);font-family:var(--mono);font-size:26px}
 .fig svg{width:88%;height:88%}
+.venn{border:1px solid var(--line);border-radius:6px;background:var(--figbg);padding:14px 30px;margin:14px 0;width:fit-content;max-width:100%;text-align:center;font-weight:700;line-height:1.7}
 .matrix{display:grid;grid-template-columns:repeat(3,84px);gap:6px}
 @media (max-width:420px){.matrix{grid-template-columns:repeat(3,68px)}}
 .facts{margin:0;padding-left:20px;font-size:17px;display:grid;gap:4px}

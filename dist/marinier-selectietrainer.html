@@ -159,6 +159,7 @@ nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(-
 @media (max-width:420px){.fig{width:68px;height:68px}}
 .fig.q{border-style:dashed;border-color:var(--acc);color:var(--acc);font-family:var(--mono);font-size:26px}
 .fig svg{width:88%;height:88%}
+.venn{border:1px solid var(--line);border-radius:6px;background:var(--figbg);padding:14px 30px;margin:14px 0;width:fit-content;max-width:100%;text-align:center;font-weight:700;line-height:1.7}
 .matrix{display:grid;grid-template-columns:repeat(3,84px);gap:6px}
 @media (max-width:420px){.matrix{grid-template-columns:repeat(3,68px)}}
 .facts{margin:0;padding-left:20px;font-size:17px;display:grid;gap:4px}
@@ -485,28 +486,35 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
 
 </script>
 <script>
-/* A. Cijferreeksen */
+/* A. Cijferreeksen
+ * Alle getallen in een reeks (ook het antwoord) zijn getallen van twee cijfers: 10 t/m 99.
+ * Het laatste getal van de reeks wordt gevraagd. */
 (function (G) {
   'use strict';
   const MT = G.MT;
   const { rand, pick, chance, shuffle, fmtNum, sgn, optCount, buildOptions, attempt } = MT.util;
 
+  const LO = 10, HI = 99;
   const diffs = (a) => a.slice(1).map((v, i) => v - a[i]);
   const fd = (d) => (d >= 0 ? '+' + d : '−' + Math.abs(d));
+  const sg = () => (chance(0.5) ? 1 : -1);
+  const nz = (m) => { let v = 0; while (!v) v = rand(-m, m); return v; };
+  const cum = (start, ds) => ds.reduce((a, d) => (a.push(a[a.length - 1] + d), a), [start]);
+  // Schuift een reeks zo op dat het laagste getal LO + extra wordt
+  const lift = (arr, extra) => { const mn = Math.min(...arr); return arr.map((v) => v - mn + LO + extra); };
   const P = [];
   const def = (o) => P.push(o);
 
-  // Elk patroon: id, naam, niveaus [min,max], make(d) -> {seq, rule, derive(i), traps(i), midOk}
+  // Elk patroon: id, naam, niveaus [min,max], exam (komt voor in de Mariniers Training Mode),
+  // make(d) -> {seq, rule, derive(i), traps(i)}
   def({
     id: 'arith', name: 'Vaste stap', lv: [1, 3],
     hint: 'Kijk naar het verschil tussen twee opeenvolgende getallen.',
     quick: 'Trek twee buren van elkaar af. Is dat verschil steeds gelijk, dan ben je klaar.',
     lesson: 'Begin altijd met de verschillen tussen de getallen.',
     make(d) {
-      const st = d === 1 ? rand(2, 6) : rand(3, 14) * (chance(0.4) ? -1 : 1);
-      let a = rand(1, d === 1 ? 20 : 70);
-      if (st < 0) a += Math.abs(st) * 7;
-      const seq = Array.from({ length: 6 }, (_, k) => a + k * st);
+      const st = d === 1 ? rand(2, 6) : rand(3, 12) * (chance(0.4) ? -1 : 1);
+      const seq = lift(Array.from({ length: 8 }, (_, k) => k * st), rand(0, 12));
       return {
         seq, rule: `Elke stap is ${fd(st)}.`,
         derive: (i) => `${fmtNum(seq[i - 1])} ${sgn(st)} = ${fmtNum(seq[i])}`,
@@ -515,115 +523,148 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
     },
   });
   def({
-    id: 'geo', name: 'Vermenigvuldigen / delen', lv: [1, 3],
-    hint: 'De getallen groeien (of krimpen) steeds sneller. Probeer delen in plaats van aftrekken.',
-    quick: 'Deel een getal door het vorige. Komt er steeds hetzelfde uit, dan is het ×.',
-    lesson: 'Groeien de verschillen snel? Denk aan vermenigvuldigen.',
-    make(d) {
-      const r = d === 1 ? 2 : pick([2, 3]);
-      const a = rand(1, d === 1 ? 4 : 5);
-      const down = d === 3 && chance(0.5);
-      const up = Array.from({ length: 6 }, (_, k) => a * r ** k);
-      const seq = down ? up.slice().reverse() : up;
-      return {
-        seq, rule: down ? `Elke stap wordt het getal gedeeld door ${r}.` : `Elke stap wordt het getal ×${r}.`,
-        derive: (i) => (down ? `${seq[i - 1]} ÷ ${r} = ${seq[i]}` : `${seq[i - 1]} × ${r} = ${seq[i]}`),
-        traps: (i) => [{
-          v: down ? seq[i - 1] - (seq[i - 2] - seq[i - 1]) : seq[i - 1] + (seq[i - 1] - seq[i - 2]),
-          why: 'Je herhaalde het laatste verschil. Hier wordt niet opgeteld maar vermenigvuldigd of gedeeld.', tag: 'Verkeerde regel',
-        }],
-      };
-    },
-  });
-  def({
-    id: 'plusmin', name: 'Afwisselend + en −', lv: [2, 3],
+    id: 'plusmin', name: 'Afwisselende stappen', lv: [2, 4], exam: true,
     hint: 'Het verschil is niet steeds hetzelfde, maar wisselt om en om.',
-    quick: 'Schrijf de verschillen onder de reeks. Een zigzag (+ − + −) valt dan meteen op.',
-    lesson: 'Wisselen de verschillen van teken? Dan zijn er twee stappen die om en om gaan.',
+    quick: 'Schrijf de verschillen onder de reeks. Een zigzag (bijv. −5, +20, −5, +20) valt dan meteen op.',
+    lesson: 'Wisselen de verschillen om en om? Dan zijn er twee stappen die elkaar afwisselen.',
     make() {
-      const a = rand(3, 9), b = rand(1, a - 1), s0 = rand(1, 25);
-      const seq = [s0];
-      for (let k = 0; k < 6; k++) seq.push(seq[k] + (k % 2 === 0 ? a : -b));
+      const p = rand(2, 9) * sg(), q = rand(2, 20) * sg();
+      if (p === q) return null;
+      const seq = lift(cum(0, Array.from({ length: 7 }, (_, k) => (k % 2 === 0 ? p : q))), rand(0, 30));
       return {
-        seq, rule: `De stappen wisselen om en om: +${a}, −${b}, +${a}, −${b}, …`,
-        derive: (i) => `${seq[i - 1]} ${(i - 1) % 2 === 0 ? '+ ' + a : '− ' + b} = ${seq[i]}`,
-        traps: (i) => [{
-          v: seq[i - 1] + ((i - 1) % 2 === 0 ? -b : a),
-          why: 'Je gebruikte de verkeerde stap. De stappen wisselen om en om, kijk welke nu aan de beurt is.', tag: 'Verkeerde regel',
-        }],
-      };
-    },
-  });
-  def({
-    id: 'incdiff', name: 'Oplopende verschillen', lv: [2, 4],
-    hint: 'Bekijk de verschillen. Is daar zelf een patroon in?',
-    quick: 'Schrijf de verschillen op een tweede regel. Die vormen vaak zelf een simpele reeks.',
-    lesson: 'Geen vaste stap? Zoek het patroon in de verschillen.',
-    make(d) {
-      const d0 = rand(1, 5), st = d >= 4 ? rand(2, 4) : rand(1, 3), a = rand(1, 25);
-      const seq = [a];
-      for (let k = 0; k < 6; k++) seq.push(seq[k] + d0 + k * st);
-      const df = diffs(seq);
-      return {
-        seq, rule: `De verschillen lopen steeds met ${st} op: ${df.map(fd).join(', ')}.`,
-        derive: (i) => `${seq[i - 1]} ${sgn(seq[i] - seq[i - 1])} = ${seq[i]}`,
+        seq, rule: `De stappen wisselen om en om: ${fd(p)}, ${fd(q)}, ${fd(p)}, ${fd(q)}, …`,
+        derive: (i) => `${fmtNum(seq[i - 1])} ${sgn(seq[i] - seq[i - 1])} = ${fmtNum(seq[i])}`,
         traps: (i) => [
-          { v: seq[i - 1] + (seq[i - 1] - seq[i - 2]), why: 'Je herhaalde het vorige verschil, maar de verschillen lopen op.', tag: 'Verkeerde regel' },
-          { v: seq[i] + st, why: `De verschillen groeien met ${st}, niet met ${2 * st}.`, tag: 'Rekenfout' },
+          { v: seq[i - 1] + ((i - 1) % 2 === 0 ? q : p), why: 'Je gebruikte de verkeerde stap. De stappen wisselen om en om, kijk welke nu aan de beurt is.', tag: 'Verkeerde regel' },
+          { v: seq[i - 1] + (seq[i - 1] - seq[i - 2]), why: 'Je herhaalde het vorige verschil, maar de stappen wisselen af.', tag: 'Verkeerde regel' },
         ],
       };
     },
   });
   def({
-    id: 'alt2', name: 'Twee reeksen door elkaar', lv: [2, 4],
-    hint: 'Kijk alleen naar de 1e, 3e, 5e… getallen, en daarna naar de 2e, 4e, 6e…',
-    quick: 'Springt de reeks op en neer? Lees om en om: dan zie je twee simpele reeksen.',
-    lesson: 'Rare sprongen? Probeer om-en-om te lezen.',
+    id: 'incdiff', name: 'Verschillen veranderen vast', lv: [2, 4], exam: true,
+    hint: 'Bekijk de verschillen. Is daar zelf een patroon in?',
+    quick: 'Schrijf de verschillen op een tweede regel. Die vormen vaak zelf een simpele reeks (+1, +2, +3 … of −2, −4, −6 …).',
+    lesson: 'Geen vaste stap? Zoek het patroon in de verschillen.',
     make(d) {
-      const a = rand(1, 20), d1 = rand(2, 7);
-      const geoB = d >= 4 && chance(0.6);
-      const b = geoB ? rand(1, 3) : rand(30, 70), d2 = rand(2, 6);
-      const seq = [];
-      for (let k = 0; k < 8; k++) {
-        const j = Math.floor(k / 2);
-        seq.push(k % 2 === 0 ? a + j * d1 : geoB ? b * 2 ** j : b - j * d2);
-      }
-      const opB = geoB ? '×2' : '−' + d2;
+      const s = d >= 3 ? sg() : 1;
+      const d0 = s * rand(1, d >= 4 ? 5 : 4), st = s * (d >= 4 ? rand(1, 3) : rand(1, 2));
+      const seq = lift(cum(0, Array.from({ length: 7 }, (_, k) => d0 + k * st)), rand(0, 20));
+      const df = diffs(seq);
       return {
-        seq, rule: `Twee reeksen om en om. De 1e, 3e, 5e… gaan steeds +${d1}. De 2e, 4e, 6e… gaan steeds ${opB}.`,
-        derive: (i) => {
-          const first = i % 2 === 0;
-          return `Plek ${i + 1} hoort bij de ${first ? 'eerste' : 'tweede'} reeks: ${seq[i - 2]} ${first ? '+ ' + d1 : geoB ? '× 2' : '− ' + d2} = ${seq[i]}`;
-        },
+        seq, rule: `De verschillen veranderen steeds met ${fd(st)}: ${df.slice(0, 6).map(fd).join(', ')}, …`,
+        derive: (i) => `${fmtNum(seq[i - 1])} ${sgn(seq[i] - seq[i - 1])} = ${fmtNum(seq[i])}`,
         traps: (i) => {
-          const first = i % 2 === 0;
+          const last = seq[i - 1] - seq[i - 2];
           return [
-            { v: first ? seq[i - 1] + d1 : geoB ? seq[i - 1] * 2 : seq[i - 1] - d2, why: 'Je paste de juiste stap toe op het getal ervoor. Die hoort bij de andere reeks.', tag: 'Verkeerde regel' },
-            { v: first ? (geoB ? seq[i - 2] * 2 : seq[i - 2] - d2) : seq[i - 2] + d1, why: 'Je gebruikte de stap van de andere reeks.', tag: 'Verkeerde regel' },
+            { v: seq[i - 1] + last, why: 'Je herhaalde het vorige verschil, maar de verschillen veranderen steeds.', tag: 'Verkeerde regel' },
+            { v: seq[i - 1] + last + 2 * st, why: `De verschillen veranderen met ${fd(st)} per stap, niet met ${fd(2 * st)}.`, tag: 'Rekenfout' },
           ];
         },
       };
     },
   });
   def({
-    id: 'altop', name: 'Afwisselende bewerkingen', lv: [3, 4],
-    hint: 'Er zijn twee verschillende bewerkingen die elkaar afwisselen.',
-    quick: 'Kijk naar paren stappen: één kleine (+ of −) en één grote (×).',
-    lesson: 'Groot, klein, groot, klein? Twee bewerkingen die afwisselen.',
+    id: 'alt2', name: 'Twee reeksen door elkaar', lv: [2, 4], exam: true,
+    hint: 'Kijk alleen naar de 1e, 3e, 5e… getallen, en daarna naar de 2e, 4e, 6e…',
+    quick: 'Springt de reeks op en neer? Lees om en om: dan zie je twee simpele reeksen.',
+    lesson: 'Rare sprongen? Probeer om-en-om te lezen.',
     make(d) {
-      const m = d >= 4 ? pick([2, 3]) : 2, x = rand(1, 5), neg = d >= 4 && m === 2 && chance(0.5);
-      const a = rand(neg ? 4 : 1, neg ? 8 : 6);
-      const seq = [a];
-      for (let k = 0; k < 6; k++) seq.push(k % 2 === 0 ? seq[k] + (neg ? -x : x) : seq[k] * m);
-      const op1 = neg ? '−' + x : '+' + x;
-      if (seq.some((v) => v <= 0)) return null;
+      const d1 = nz(d >= 3 ? 9 : 4), geoB = d >= 4 && chance(0.35), d2 = nz(d >= 3 ? 9 : 4);
+      let seq;
+      if (geoB) {
+        const a = rand(15, 60), b = rand(10, 12);
+        seq = Array.from({ length: 8 }, (_, k) => { const j = Math.floor(k / 2); return k % 2 === 0 ? a + j * d1 : b * 2 ** j; });
+      } else {
+        const off = nz(25);
+        const raw = Array.from({ length: 8 }, (_, k) => { const j = Math.floor(k / 2); return k % 2 === 0 ? j * d1 : off + j * d2; });
+        seq = lift(raw, rand(0, 25));
+      }
+      const opB = geoB ? '×2' : fd(d2);
       return {
-        seq, rule: `De bewerkingen wisselen om en om: ${op1}, ×${m}, ${op1}, ×${m}, …`,
-        derive: (i) => ((i - 1) % 2 === 0 ? `${seq[i - 1]} ${neg ? '− ' + x : '+ ' + x} = ${seq[i]}` : `${seq[i - 1]} × ${m} = ${seq[i]}`),
-        traps: (i) => [{
-          v: (i - 1) % 2 === 0 ? seq[i - 1] * m : seq[i - 1] + (neg ? -x : x),
-          why: 'Je paste de verkeerde bewerking toe. Ze wisselen om en om; kijk welke nu aan de beurt is.', tag: 'Verkeerde regel',
-        }],
+        seq, rule: `Twee reeksen om en om. De 1e, 3e, 5e… gaan steeds ${fd(d1)}. De 2e, 4e, 6e… gaan steeds ${opB}.`,
+        derive: (i) => {
+          const first = i % 2 === 0;
+          return `Plek ${i + 1} hoort bij de ${first ? 'eerste' : 'tweede'} reeks: ${fmtNum(seq[i - 2])} ${first ? sgn(d1) : geoB ? '× 2' : sgn(d2)} = ${fmtNum(seq[i])}`;
+        },
+        traps: (i) => {
+          const first = i % 2 === 0;
+          return [
+            { v: first ? seq[i - 1] + d1 : geoB ? seq[i - 1] * 2 : seq[i - 1] + d2, why: 'Je paste de juiste stap toe op het getal ervoor. Die hoort bij de andere reeks.', tag: 'Verkeerde regel' },
+            { v: first ? (geoB ? seq[i - 2] * 2 : seq[i - 2] + d2) : seq[i - 2] + d1, why: 'Je gebruikte de stap van de andere reeks.', tag: 'Verkeerde regel' },
+          ];
+        },
+      };
+    },
+  });
+  def({
+    id: 'altdiff', name: 'Verschillen in twee reeksen', lv: [3, 5], exam: true,
+    hint: 'Schrijf de verschillen op. Kijk dan alleen naar de 1e, 3e, 5e… verschillen, en daarna naar de 2e, 4e, 6e…',
+    quick: 'Verschillen zoals −7, −2, −8, −3, −9, −4 springen heen en weer. Lees ze om en om: −7, −8, −9 en −2, −3, −4.',
+    lesson: 'Geen vast patroon in de verschillen? Lees de verschillen zelf om en om.',
+    make() {
+      const p0 = nz(9), ps = pick([-2, -1, 1, 2]), q0 = nz(6), qs = pick([-2, -1, 1, 2]);
+      const ds = Array.from({ length: 7 }, (_, k) => (k % 2 === 0 ? p0 + (k / 2) * ps : q0 + ((k - 1) / 2) * qs));
+      if (ds.some((v) => v === 0)) return null;
+      const seq = lift(cum(0, ds), rand(0, 30));
+      return {
+        seq, rule: `De verschillen vormen zelf twee reeksen om en om: ${ds.slice(0, 6).map(fd).join(', ')}, … De 1e, 3e, 5e… verschillen veranderen steeds met ${fd(ps)}, de 2e, 4e, 6e… met ${fd(qs)}.`,
+        derive: (i) => `${fmtNum(seq[i - 1])} ${sgn(seq[i] - seq[i - 1])} = ${fmtNum(seq[i])}`,
+        traps: (i) => {
+          const last = seq[i - 1] - seq[i - 2], prev = seq[i - 2] - seq[i - 3];
+          return [
+            { v: seq[i - 1] + last, why: 'Je herhaalde het vorige verschil.', tag: 'Verkeerde regel' },
+            { v: seq[i - 1] + last + (last - prev), why: 'Je liet de verschillen met één vaste stap veranderen, maar het zijn twee reeksen om en om.', tag: 'Verkeerde regel' },
+          ];
+        },
+      };
+    },
+  });
+  def({
+    id: 'alt2inc', name: 'Twee reeksen met veranderende stap', lv: [3, 5], exam: true,
+    hint: 'Lees de reeks om en om. Bij beide reeksen veranderen de stappen zelf ook steeds een beetje.',
+    quick: 'Splits in twee reeksen en schrijf per reeks de verschillen op. Die lopen bijvoorbeeld −7, −5, −3.',
+    lesson: 'Twee reeksen door elkaar kunnen elk hun eigen veranderende stap hebben.',
+    make() {
+      const mk = () => { const e = nz(8); return { e, s: chance(0.7) ? -Math.sign(e) * rand(1, 2) : Math.sign(e) * rand(1, 2) }; };
+      const A = mk(), B = mk(), off = nz(12);
+      const a = [0], b = [off];
+      for (let k = 0; k < 3; k++) a.push(a[k] + A.e + k * A.s);
+      for (let k = 0; k < 3; k++) b.push(b[k] + B.e + k * B.s);
+      const raw = Array.from({ length: 8 }, (_, k) => (k % 2 === 0 ? a[k / 2] : b[(k - 1) / 2]));
+      const seq = lift(raw, rand(0, 20));
+      const da = [0, 1].map((k) => A.e + k * A.s), db = [0, 1].map((k) => B.e + k * B.s);
+      return {
+        seq, rule: `Twee reeksen om en om. Bij de 1e, 3e, 5e… zijn de stappen ${da.map(fd).join(', ')}, … (steeds ${fd(A.s)}). Bij de 2e, 4e, 6e… zijn de stappen ${db.map(fd).join(', ')}, … (steeds ${fd(B.s)}).`,
+        derive: (i) => `Plek ${i + 1}: ${fmtNum(seq[i - 2])} ${sgn(seq[i] - seq[i - 2])} = ${fmtNum(seq[i])}`,
+        traps: (i) => [
+          { v: seq[i - 2] + (seq[i - 2] - seq[i - 4]), why: 'Je herhaalde de vorige stap van dezelfde reeks, maar die stap verandert elke keer.', tag: 'Verkeerde regel' },
+          { v: seq[i - 2] + (seq[i - 3] - seq[i - 5]), why: 'Je gebruikte de stap van de andere reeks.', tag: 'Verkeerde regel' },
+        ],
+      };
+    },
+  });
+  def({
+    id: 'zigzag', name: 'Groeiende zigzag met +1 / −1', lv: [4, 5], exam: true,
+    hint: 'Schrijf de verschillen op. Er zitten twee regels door elkaar: kleine stappen van +1 en −1, en grote stappen die steeds groter worden.',
+    quick: 'Verschillen zoals −18, +1, +19, −1, −20, +1: lees ze om en om. De 2e, 4e, 6e… zijn +1/−1, de rest wisselt van teken en groeit.',
+    lesson: 'Zie je grote en kleine verschillen om en om? Lees ze als twee aparte reeksen.',
+    make() {
+      const c = rand(12, 22), fl = sg(), ds = [];
+      for (let k = 0; k < 7; k++) {
+        if (k % 2 === 0) { const m = k / 2; ds.push(fl * (m % 2 === 0 ? -(c + m) : c + m)); } else ds.push(fl * (((k - 1) / 2) % 2 === 0 ? 1 : -1));
+      }
+      const seq = lift(cum(0, ds), rand(0, 5));
+      return {
+        seq, rule: `De verschillen vormen twee reeksen om en om: ${ds.slice(0, 6).map(fd).join(', ')}, … De 1e, 3e, 5e… verschillen worden steeds 1 groter en wisselen van teken. De 2e, 4e, 6e… verschillen zijn om en om +1 en −1.`,
+        derive: (i) => `${fmtNum(seq[i - 1])} ${sgn(seq[i] - seq[i - 1])} = ${fmtNum(seq[i])}`,
+        traps: (i) => {
+          const last = seq[i - 1] - seq[i - 2];
+          return [
+            { v: seq[i - 1] + last, why: 'Je herhaalde het vorige verschil.', tag: 'Verkeerde regel' },
+            { v: seq[i - 1] - last, why: 'Je draaide het vorige verschil om, maar er zitten twee reeksen door elkaar.', tag: 'Verkeerde regel' },
+          ];
+        },
       };
     },
   });
@@ -633,8 +674,8 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
     quick: 'Klopt er geen vaste stap, probeer dan: getal 1 + getal 2 = getal 3?',
     lesson: 'Groeien de verschillen mee met de reeks zelf? Denk aan optellen van vorige getallen.',
     make() {
-      const seq = [rand(1, 6), rand(1, 9)];
-      for (let k = 2; k < 7; k++) seq.push(seq[k - 1] + seq[k - 2]);
+      const seq = [rand(10, 14), rand(10, 14)];
+      for (let k = 2; k < 6; k++) seq.push(seq[k - 1] + seq[k - 2]);
       return {
         seq, rule: 'Elk getal is de som van de twee getallen ervoor.',
         derive: (i) => `${seq[i - 2]} + ${seq[i - 1]} = ${seq[i]}`,
@@ -647,17 +688,17 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
   });
   def({
     id: 'pow', name: 'Kwadraten en machten', lv: [2, 5],
-    hint: 'Denk aan bekende getallen: 1, 4, 9, 16, 25… of 1, 8, 27, 64…',
-    quick: 'Ken de kwadraten tot 15 en de derde machten tot 6 uit je hoofd. Dan herken je ze direct.',
-    lesson: 'Verschillen van 3, 5, 7, 9…? Dat zijn kwadraten.',
+    hint: 'Denk aan bekende getallen: 16, 25, 36, 49, 64, 81… of 12, 20, 30, 42, 56…',
+    quick: 'Ken de kwadraten tot 12 uit je hoofd. Dan herken je ze direct.',
+    lesson: 'Verschillen die steeds 2 groter worden (7, 9, 11, 13…)? Dat zijn kwadraten.',
     make(d) {
-      const kind = d >= 5 ? pick(['rect', 'cube', 'sq']) : d === 4 ? pick(['cube', 'sq']) : 'sq';
-      const n0 = kind === 'cube' ? rand(1, 3) : rand(1, 6);
+      const kind = d >= 4 && chance(0.5) ? 'rect' : 'sq';
       const c = d === 2 ? 0 : pick([0, 1, -1, 2, -2, 3]);
-      const f = (n) => (kind === 'sq' ? n * n : kind === 'cube' ? n ** 3 : n * (n + 1)) + c;
-      const fs = (n) => (kind === 'sq' ? `${n}×${n}` : kind === 'cube' ? `${n}×${n}×${n}` : `${n}×${n + 1}`) + (c ? (c > 0 ? ` + ${c}` : ` − ${-c}`) : '');
-      const seq = Array.from({ length: 6 }, (_, k) => f(n0 + k));
-      const nm = { sq: 'kwadraten (n × n)', cube: 'derde machten (n × n × n)', rect: 'n × (n + 1)' }[kind];
+      const n0 = kind === 'sq' ? 4 : rand(3, 4);
+      const f = (n) => (kind === 'sq' ? n * n : n * (n + 1)) + c;
+      const fs = (n) => (kind === 'sq' ? `${n}×${n}` : `${n}×${n + 1}`) + (c ? (c > 0 ? ` + ${c}` : ` − ${-c}`) : '');
+      const seq = Array.from({ length: kind === 'sq' ? 6 : 7 }, (_, k) => f(n0 + k));
+      const nm = { sq: 'kwadraten (n × n)', rect: 'n × (n + 1)' }[kind];
       return {
         seq, rule: `De reeks bestaat uit ${nm}${c ? `, steeds ${c > 0 ? 'plus ' + c : 'min ' + -c}` : ''}.`,
         derive: (i) => `${fs(n0 + i)} = ${seq[i]}`,
@@ -669,65 +710,24 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
     },
   });
   def({
-    id: 'mulminus', name: 'Twee bewerkingen per stap', lv: [3, 4],
-    hint: 'Elke stap bestaat uit twee bewerkingen: eerst vermenigvuldigen, dan iets erbij of eraf.',
-    quick: 'Is het volgende getal bijna het dubbele of driedubbele? Kijk dan hoeveel het ernaast zit.',
-    lesson: 'Bijna ×2? Dan zit er vaak nog een + of − achter.',
-    make(d) {
-      const m = d >= 4 ? pick([2, 3]) : 2, c = rand(1, 4) * (chance(0.6) ? -1 : 1), a = rand(2, 6);
-      const seq = [a];
-      for (let k = 0; k < 5; k++) seq.push(seq[k] * m + c);
-      if (seq.some((v) => v <= 0) || seq[5] > 2000) return null;
-      return {
-        seq, rule: `Elke stap: ×${m} en dan ${fd(c)}.`,
-        derive: (i) => `${seq[i - 1]} × ${m} ${sgn(c)} = ${seq[i]}`,
-        traps: (i) => [
-          { v: seq[i - 1] * m, why: `Je vergat de tweede bewerking (${fd(c)}).`, tag: 'Tweede regel gemist' },
-          { v: seq[i - 1] * m - c, why: `Je deed ${fd(-c)} in plaats van ${fd(c)}.`, tag: 'Verkeerde richting' },
-        ],
-      };
-    },
-  });
-  def({
     id: 'diffmul', name: 'Verschillen vermenigvuldigen', lv: [4, 5],
     hint: 'Schrijf de verschillen op. Hoe hangen die met elkaar samen?',
     quick: 'Schrijf de verschillen op en deel ze door elkaar.',
-    lesson: 'Verschillen kunnen zelf ×2 of ×3 gaan.',
-    make(d) {
-      const r = d >= 5 && chance(0.5) ? 3 : 2, d0 = rand(1, 4), a = rand(1, 20);
-      const seq = [a];
-      for (let k = 0; k < 6; k++) seq.push(seq[k] + d0 * r ** k);
-      if (seq[6] > 3000) return null;
+    lesson: 'Verschillen kunnen zelf ×2 gaan.',
+    make() {
+      const seq = [rand(10, 36)];
+      for (let k = 0; k < 6; k++) seq.push(seq[k] + 2 ** k);
       const df = diffs(seq);
       return {
-        seq, rule: `De verschillen worden steeds ×${r}: ${df.map(fd).join(', ')}.`,
+        seq, rule: `De verschillen worden steeds ×2: ${df.slice(0, 5).map(fd).join(', ')}, …`,
         derive: (i) => `${seq[i - 1]} + ${seq[i] - seq[i - 1]} = ${seq[i]}`,
         traps: (i) => {
           const a1 = seq[i - 1] - seq[i - 2], a0 = seq[i - 2] - seq[i - 3];
           return [
-            { v: seq[i - 1] + a1 + (a1 - a0), why: `Je liet de verschillen met een vast getal groeien. Ze worden ×${r}.`, tag: 'Verkeerde regel' },
+            { v: seq[i - 1] + a1 + (a1 - a0), why: 'Je liet de verschillen met een vast getal groeien. Ze worden ×2.', tag: 'Verkeerde regel' },
             { v: seq[i - 1] + a1, why: 'Je herhaalde het vorige verschil.', tag: 'Verkeerde regel' },
           ];
         },
-      };
-    },
-  });
-  def({
-    id: 'incmul', name: 'Oplopende vermenigvuldiger', lv: [4, 5],
-    hint: 'Deel elk getal door het vorige. Verandert de uitkomst?',
-    quick: 'Deel buren door elkaar: ×1, ×2, ×3… is een bekend patroon.',
-    lesson: 'Groeit de reeks steeds harder? Misschien loopt de vermenigvuldiger op.',
-    make() {
-      const m0 = rand(1, 2), a = rand(1, 3);
-      const seq = [a];
-      for (let k = 0; k < 5; k++) seq.push(seq[k] * (m0 + k));
-      return {
-        seq, rule: `Het getal wordt steeds met een oplopend getal vermenigvuldigd: ×${m0}, ×${m0 + 1}, ×${m0 + 2}, …`,
-        derive: (i) => `${seq[i - 1]} × ${m0 + i - 1} = ${seq[i]}`,
-        traps: (i) => [
-          { v: seq[i - 1] * (m0 + i - 2), why: 'Je gebruikte dezelfde vermenigvuldiger als bij de vorige stap. Die loopt op.', tag: 'Verkeerde regel' },
-          { v: seq[i - 1] * (m0 + i), why: 'Je nam de vermenigvuldiger één te hoog.', tag: 'Rekenfout' },
-        ],
       };
     },
   });
@@ -737,13 +737,12 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
     quick: 'Verschillen 1, 4, 9, 16…? Die herken je alleen als je de kwadraten uit je hoofd kent.',
     lesson: 'De verschillen kunnen zelf een bekende reeks zijn.',
     make() {
-      const k0 = rand(1, 3), a = rand(1, 15);
-      const seq = [a];
-      for (let k = 0; k < 5; k++) seq.push(seq[k] + (k0 + k) ** 2);
+      const seq = [rand(10, 40)];
+      for (let k = 0; k < 5; k++) seq.push(seq[k] + (k + 1) ** 2);
       const df = diffs(seq);
       return {
-        seq, rule: `De verschillen zijn kwadraten: ${df.map(fd).join(', ')}.`,
-        derive: (i) => `${seq[i - 1]} + ${k0 + i - 1}×${k0 + i - 1} = ${seq[i]}`,
+        seq, rule: `De verschillen zijn kwadraten: ${df.slice(0, 4).map(fd).join(', ')}, …`,
+        derive: (i) => `${seq[i - 1]} + ${i}×${i} = ${seq[i]}`,
         traps: (i) => {
           const a1 = seq[i - 1] - seq[i - 2], a0 = seq[i - 2] - seq[i - 3];
           return [{ v: seq[i - 1] + a1 + (a1 - a0), why: 'Je liet de verschillen met een vaste stap groeien. Het zijn kwadraten.', tag: 'Verkeerde regel' }];
@@ -757,32 +756,12 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
     quick: 'Test snel: getal 1 + 2 + 3 = getal 4?',
     lesson: 'Werkt “som van twee” niet? Probeer de som van drie.',
     make() {
-      const seq = [rand(1, 4), rand(1, 5), rand(1, 6)];
-      for (let k = 3; k < 8; k++) seq.push(seq[k - 1] + seq[k - 2] + seq[k - 3]);
+      const seq = [rand(10, 11), rand(10, 11), rand(10, 12)];
+      for (let k = 3; k < 6; k++) seq.push(seq[k - 1] + seq[k - 2] + seq[k - 3]);
       return {
         seq, rule: 'Elk getal is de som van de drie getallen ervoor.',
         derive: (i) => `${seq[i - 3]} + ${seq[i - 2]} + ${seq[i - 1]} = ${seq[i]}`,
         traps: (i) => [{ v: seq[i - 1] + seq[i - 2], why: 'Je telde maar twee vorige getallen op. Het zijn er drie.', tag: 'Verkeerde regel' }],
-      };
-    },
-  });
-  def({
-    id: 'altinc', name: 'Afwisselend met oplopende stap', lv: [5, 5],
-    hint: 'Er wisselen twee bewerkingen af, en één ervan verandert steeds een beetje.',
-    quick: 'Schrijf onder elke stap de bewerking. Kijk dan apart naar de oneven en de even stappen.',
-    lesson: 'Twee afwisselende bewerkingen kunnen elk hun eigen patroon hebben.',
-    make() {
-      const x0 = rand(1, 3), a = rand(1, 5);
-      const seq = [a];
-      for (let k = 0; k < 6; k++) seq.push(k % 2 === 0 ? seq[k] + x0 + k / 2 : seq[k] * 2);
-      return {
-        seq, rule: `Om en om: een optelling die steeds 1 groter wordt (+${x0}, +${x0 + 1}, +${x0 + 2}…) en ×2.`,
-        derive: (i) => ((i - 1) % 2 === 0 ? `${seq[i - 1]} + ${x0 + (i - 1) / 2} = ${seq[i]}` : `${seq[i - 1]} × 2 = ${seq[i]}`),
-        traps: (i) => [{
-          v: (i - 1) % 2 === 0 ? seq[i - 1] + x0 + (i - 1) / 2 - 1 : seq[i - 1] + x0 + (i - 2) / 2,
-          why: (i - 1) % 2 === 0 ? 'Je gebruikte dezelfde optelling als de vorige keer. Die wordt steeds 1 groter.' : 'Nu is ×2 aan de beurt, niet de optelling.',
-          tag: 'Verkeerde regel',
-        }],
       };
     },
   });
@@ -792,33 +771,27 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
     quick: 'Ken de priemgetallen: 2, 3, 5, 7, 11, 13, 17, 19, 23.',
     lesson: 'Onregelmatige maar stijgende verschillen? Denk aan priemgetallen.',
     make() {
-      const PR = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29];
-      const p0 = rand(0, 2), a = rand(1, 20);
-      const seq = [a];
-      for (let k = 0; k < 6; k++) seq.push(seq[k] + PR[p0 + k]);
+      const PR = [2, 3, 5, 7, 11, 13, 17, 19];
+      const seq = [rand(10, 40)];
+      for (let k = 0; k < 7; k++) seq.push(seq[k] + PR[k]);
       return {
-        seq, rule: `De verschillen zijn opeenvolgende priemgetallen: ${diffs(seq).map(fd).join(', ')}.`,
+        seq, rule: `De verschillen zijn opeenvolgende priemgetallen: ${diffs(seq).slice(0, 6).map(fd).join(', ')}, …`,
         derive: (i) => `${seq[i - 1]} + ${seq[i] - seq[i - 1]} = ${seq[i]}`,
         traps: (i) => [{ v: seq[i - 1] + (seq[i - 1] - seq[i - 2]) + 2, why: 'Je liet de verschillen steeds met 2 groeien. Het zijn priemgetallen.', tag: 'Verkeerde regel' }],
       };
     },
   });
 
+  /** opt.exam (Mariniers Training Mode): alleen patronen die in de echte opgaven voorkomen, 4 antwoordopties. */
   function generate(d, opt = {}) {
     return attempt(() => {
-      let pool = P.filter((p) => d >= p.lv[0] && d <= p.lv[1]);
-      let p = pick(pool);
-      if (opt.kind) {
-        const k = P.find((x) => x.id === opt.kind);
-        if (k) p = k;
-      }
-      const r = p.make(d);
+      let p = opt.kind ? P.find((x) => x.id === opt.kind) : null;
+      if (!p) p = pick(opt.exam ? P.filter((x) => x.exam) : P.filter((x) => d >= x.lv[0] && d <= x.lv[1]));
+      const r = p.make(opt.exam ? rand(p.lv[0], p.lv[1]) : d);
       if (!r) return null;
-      const s = r.seq;
-      const last = s.length - 1;
-      const gi = d >= 3 && chance(0.3) ? rand(3, last - 1) : last;
-      const ans = s[gi];
-      const n = optCount(d);
+      const s = r.seq, last = s.length - 1;
+      if (s.length < 6 || s.some((v) => !Number.isInteger(v) || v < LO || v > HI)) return null;
+      const gi = last, ans = s[gi];
       const near = shuffle([
         { v: ans + 1, why: 'Rekenfout: je zit er net naast. Reken de laatste stap nog eens na.', tag: 'Rekenfout' },
         { v: ans - 1, why: 'Rekenfout: je zit er net naast. Reken de laatste stap nog eens na.', tag: 'Rekenfout' },
@@ -827,18 +800,16 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
         { v: ans + 10, why: 'Rekenfout met de tientallen.', tag: 'Rekenfout' },
         { v: ans - 10, why: 'Rekenfout met de tientallen.', tag: 'Rekenfout' },
       ]);
-      const pool2 = [...r.traps(gi), ...near].map((t) => ({ key: String(t.v), html: fmtNum(t.v), text: fmtNum(t.v), why: t.why, tag: t.tag }));
-      const built = buildOptions({ key: String(ans), html: fmtNum(ans), text: fmtNum(ans) }, pool2, n);
+      const pool = [...r.traps(gi), ...near].filter((t) => t.v >= LO && t.v <= HI).map((t) => ({ key: String(t.v), html: fmtNum(t.v), text: fmtNum(t.v), why: t.why, tag: t.tag }));
+      const built = buildOptions({ key: String(ans), html: fmtNum(ans), text: fmtNum(ans) }, pool, opt.exam ? 4 : optCount(d));
       if (!built) return null;
       const shown = s.map((v, i) => (i === gi ? '<span class="q">?</span>' : `<span>${fmtNum(v)}</span>`)).join('');
       const dl = [];
-      for (let i = 1; i < s.length && dl.length < 4; i++) if (i !== gi && i - 1 !== gi) dl.push(`${fmtNum(s[i])} − ${fmtNum(s[i - 1])} = ${fmtNum(s[i] - s[i - 1])}`);
-      const steps = [`Bekijk eerst de verschillen: ${dl.join(', ')}${dl.length < s.length - 2 ? ', …' : ''}.`, r.rule, `Dus: ${r.derive(gi)}.`];
-      if (gi < last) steps.push(`Controle: het getal na het vraagteken klopt dan ook: ${r.derive(gi + 1)}.`);
-      steps.push('Deze regel verklaart álle overgangen. Dan kun je stoppen met zoeken.');
+      for (let i = 1; i < gi && dl.length < 4; i++) dl.push(`${fmtNum(s[i])} − ${fmtNum(s[i - 1])} = ${fmtNum(s[i] - s[i - 1])}`);
+      const steps = [`Bekijk eerst de verschillen: ${dl.join(', ')}${dl.length < gi - 1 ? ', …' : ''}.`, r.rule, `Dus: ${r.derive(gi)}.`, 'Deze regel verklaart álle overgangen. Dan kun je stoppen met zoeken.'];
       return {
         cat: 'num', diff: d, kindId: p.id, kind: p.name, meta: { gap: gi },
-        prompt: gi === last ? 'Welk getal komt hierna?' : 'Welk getal hoort op de plek van het vraagteken?',
+        prompt: 'Welk getal komt hierna?',
         stem: `<div class="seq">${shown}</div>`,
         opts: built.opts, ans: built.ans, layout: 'mono',
         steps, hint: p.hint, quick: p.quick, lesson: p.lesson,
@@ -846,7 +817,7 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
     });
   }
 
-  MT.gens.num = { generate, kinds: P.map((p) => ({ id: p.id, name: p.name, lv: p.lv })) };
+  MT.gens.num = { generate, kinds: P.map((p) => ({ id: p.id, name: p.name, lv: p.lv, exam: !!p.exam })) };
 })(typeof window !== 'undefined' ? window : globalThis);
 
 </script>
@@ -1026,7 +997,72 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
     };
   }
 
+  /* ---- Woordanalogieën met twee open plekken (Mariniers Training Mode) ----
+   * "…… : b = c : ……": links kies je een woord dat bij b past, rechts een woord dat bij c past, zodat
+   * beide paren dezelfde relatie hebben. Elk antwoord is een combinatie (links + rechts).
+   * [x, b, c, y, [foute x], [foute y], relatie, uitleg, niveau] */
+  const WORDS2 = [
+    ['honing', 'bij', 'melk', 'koe', ['raat', 'imker'], ['kalf', 'kaas'], 'afkomstig van', 'Honing komt van een bij, melk komt van een koe.', 1],
+    ['vol', 'leeg', 'aan', 'uit', ['half', 'glas'], ['lamp', 'stekker'], 'tegenstelling', 'Vol is het tegenovergestelde van leeg, aan van uit.', 1],
+    ['oog', 'zien', 'neus', 'ruiken', ['bril', 'hoofd'], ['geur', 'parfum'], 'zintuig en wat je ermee doet', 'Met je oog zie je, met je neus ruik je.', 1],
+    ['steen', 'muur', 'woord', 'zin', ['cement', 'huis'], ['taal', 'letter'], 'bouwsteen en geheel', 'Stenen vormen samen een muur, woorden vormen samen een zin.', 1],
+    ['dokter', 'ziekenhuis', 'leraar', 'school', ['patiënt', 'stethoscoop'], ['les', 'schoolbord'], 'beroep en werkplek', 'Een dokter werkt in een ziekenhuis, een leraar in een school.', 1],
+    ['veulen', 'paard', 'lam', 'schaap', ['ruiter', 'hooi'], ['wol', 'wei'], 'jong en ouder', 'Een veulen is het jong van een paard, een lam het jong van een schaap.', 1],
+    ['wiel', 'auto', 'vleugel', 'vliegtuig', ['weg', 'chauffeur'], ['piloot', 'lucht'], 'onderdeel en geheel', 'Een wiel is een onderdeel van een auto, een vleugel van een vliegtuig.', 1],
+    ['koe', 'gras', 'leeuw', 'vlees', ['melk', 'stal'], ['kooi', 'bos'], 'dier en zijn voedsel', 'Een koe eet gras, een leeuw eet vlees.', 1],
+    ['schilder', 'penseel', 'chirurg', 'scalpel', ['verf', 'atelier'], ['operatie', 'ziekenhuis'], 'beroep en zijn gereedschap', 'Een schilder werkt met een penseel, een chirurg met een scalpel.', 1],
+    ['ontbijt', 'ochtend', 'diner', 'avond', ['brood', 'tafel'], ['restaurant', 'honger'], 'maaltijd en moment van de dag', 'Je ontbijt in de ochtend, je dineert in de avond.', 1],
+    ['weg', 'auto', 'spoor', 'trein', ['stad', 'asfalt'], ['station', 'wissel'], 'route en voertuig dat erop rijdt', 'Een auto rijdt over een weg, een trein over een spoor.', 1],
+    ['laken', 'bed', 'tafelkleed', 'tafel', ['slaapkamer', 'kussen'], ['servies', 'eten'], 'wat iets bedekt', 'Een laken ligt over een bed, een tafelkleed over een tafel.', 1],
+    ['bezem', 'vloer', 'ruitenwisser', 'voorruit', ['stof', 'emmer'], ['regen', 'auto'], 'gereedschap en wat het schoonmaakt', 'Met een bezem maak je een vloer schoon, met een ruitenwisser een voorruit.', 2],
+    ['timmerman', 'hout', 'metselaar', 'steen', ['hamer', 'werkplaats'], ['muur', 'kelder'], 'ambachtsman en zijn materiaal', 'Een timmerman werkt met hout, een metselaar met steen.', 2],
+    ['afstand', 'liniaal', 'gewicht', 'weegschaal', ['snelheid', 'hout'], ['kilo', 'boodschappen'], 'wat je meet en het meetinstrument', 'Afstand meet je met een liniaal, gewicht met een weegschaal.', 2],
+    ['bries', 'storm', 'motregen', 'stortbui', ['zeil', 'weerbericht'], ['regenjas', 'plas'], 'zwakke en zeer sterke vorm', 'Een storm is een veel sterkere vorm van een bries, een stortbui van motregen.', 2],
+    ['regisseur', 'film', 'componist', 'lied', ['camera', 'acteur'], ['piano', 'orkest'], 'maker en zijn werk', 'Een regisseur maakt een film, een componist maakt een lied.', 2],
+    ['zwemmer', 'zwembad', 'schaatser', 'ijsbaan', ['medaille', 'water'], ['schaatsen', 'winter'], 'sporter en zijn sportlocatie', 'Een zwemmer zwemt in een zwembad, een schaatser schaatst op een ijsbaan.', 2],
+    ['plant', 'water', 'auto', 'benzine', ['pot', 'tuin'], ['garage', 'wiel'], 'wat iets nodig heeft om te werken', 'Een plant heeft water nodig om te groeien, een auto benzine om te rijden.', 2],
+    ['bril', 'zien', 'hoortoestel', 'horen', ['oog', 'glas'], ['oor', 'geluid'], 'hulpmiddel en wat het mogelijk maakt', 'Een bril helpt je zien, een hoortoestel helpt je horen.', 2],
+    ['brandweer', 'blussen', 'politie', 'arresteren', ['slang', 'brand'], ['uniform', 'misdaad'], 'beroep en zijn taak', 'De brandweer blust branden, de politie arresteert verdachten.', 2],
+    ['suiker', 'zoet', 'citroen', 'zuur', ['koffie', 'lepel'], ['geel', 'vrucht'], 'voedsel en zijn smaak', 'Suiker smaakt zoet, een citroen smaakt zuur.', 2],
+    ['hoofdpijn', 'paracetamol', 'dorst', 'water', ['dokter', 'pijn'], ['fles', 'zomer'], 'probleem en middel ertegen', 'Paracetamol helpt tegen hoofdpijn, water helpt tegen dorst.', 2],
+    ['vlieg', 'spin', 'muis', 'kat', ['web', 'insect'], ['kaas', 'hol'], 'prooi en jager', 'Een vlieg wordt gevangen door een spin, een muis door een kat.', 2],
+    ['klas', 'school', 'hoofdstuk', 'boek', ['leraar', 'bank'], ['bladzijde', 'bibliotheek'], 'onderdeel en geheel', 'Een klas is een onderdeel van een school, een hoofdstuk van een boek.', 2],
+    ['olie', 'smeren', 'lijm', 'plakken', ['motor', 'fles'], ['papier', 'stift'], 'middel en wat je ermee doet', 'Met olie smeer je, met lijm plak je.', 2],
+    ['architect', 'plattegrond', 'componist', 'partituur', ['bouwvakker', 'huis'], ['concert', 'orkest'], 'ontwerper en zijn ontwerp op papier', 'Een architect tekent een plattegrond, een componist schrijft een partituur.', 3],
+    ['zaaien', 'oogst', 'studeren', 'diploma', ['tuin', 'boer'], ['school', 'boek'], 'inspanning en het resultaat daarvan', 'Door te zaaien krijg je een oogst, door te studeren een diploma.', 3],
+    ['gids', 'toerist', 'loods', 'schip', ['museum', 'tour'], ['haven', 'kust'], 'wie begeleidt wie of wat', 'Een gids begeleidt een toerist, een loods begeleidt een schip.', 3],
+    ['chirurg', 'operatie', 'rechter', 'vonnis', ['mes', 'ziekenhuis'], ['wetboek', 'toga'], 'beroep en wat die persoon uitvoert of uitspreekt', 'Een chirurg voert een operatie uit, een rechter spreekt een vonnis uit.', 3],
+    ['oorlog', 'vrede', 'chaos', 'orde', ['soldaat', 'wapen'], ['rommel', 'verwarring'], 'tegenstelling', 'Oorlog is het tegenovergestelde van vrede, chaos van orde.', 3],
+  ];
+
+  function word2Q(d, n = 4) {
+    return attempt(() => {
+      const [x, b, c, y, wx, wy, rel, why] = pick(WORDS2);
+      const mk = (l, r, text) => ({ key: `${l}|${r}`, html: `<b>${esc(l)}</b>&ensp;·&ensp;<b>${esc(r)}</b>`, text: `${l} en ${r}`, why: text, tag: 'Relatie niet gelijk' });
+      const leftBad = (w) => `Links past “${w}” niet bij “${b}” volgens de relatie (${rel}).`;
+      const rightBad = (w) => `Rechts past “${w}” niet bij “${c}” volgens de relatie (${rel}).`;
+      const half = shuffle([
+        ...wx.map((w) => mk(w, y, `${leftBad(w)} Rechts heb je het goed.`)),
+        ...wy.map((w) => mk(x, w, `${rightBad(w)} Links heb je het goed.`)),
+      ]);
+      const both = shuffle(wx.flatMap((l) => wy.map((r) => mk(l, r, `Beide woorden kloppen niet: ${leftBad(l)} ${rightBad(r)}`))));
+      const built = buildOptions({ key: `${x}|${y}`, html: `<b>${esc(x)}</b>&ensp;·&ensp;<b>${esc(y)}</b>`, text: `${x} en ${y}` }, [...half.slice(0, 2), ...both, ...half.slice(2)], n);
+      if (!built) return null;
+      return {
+        cat: 'ana', diff: d, kindId: 'word', kind: 'Woordanalogie (twee woorden)', meta: { sub: 'word', rel },
+        prompt: 'Kies het woord links en het woord rechts dat op de open plekken hoort.',
+        stem: `<div class="analogy"><span class="gap">?</span><span class="op">:</span><b>${esc(b)}</b><span class="op">=</span><b>${esc(c)}</b><span class="op">:</span><span class="gap">?</span></div>`,
+        opts: built.opts, ans: built.ans, layout: 'text',
+        steps: [`Zoek de relatie bij het linkerpaar: “${x}” en “${b}” → ${rel}.`, `Pas dezelfde relatie toe op het rechterpaar: “${c}” en “${y}”. ${why}`, 'Controleer beide kanten: pas als links én rechts kloppen, is de combinatie goed.'],
+        hint: `Bedenk eerst welk woord links bij “${b}” past, en welk woord rechts bij “${c}”. De relatie moet in beide paren hetzelfde zijn.`,
+        quick: 'Begin bij het paar waar je de relatie het snelst ziet, en test dan of de andere kant dezelfde relatie heeft. Een combinatie waarvan één kant klopt is dus nog fout.',
+        lesson: 'Beide kanten moeten kloppen. Opties met één goed woord zijn bewuste valkuilen.',
+      };
+    });
+  }
+
   function generate(d, opt = {}) {
+    if (opt.exam) return word2Q(d);
     const pW = [0, 0.9, 0.65, 0.45, 0.3, 0.25][d];
     let kind = opt.kind;
     if (!kind) kind = chance(pW) ? 'word' : d >= 2 && chance(0.5) ? 'num' : d >= 2 ? 'let' : 'word';
@@ -1034,7 +1070,7 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
     return attempt(() => (kind === 'num' ? numQ(d) : letQ(d)));
   }
 
-  MT.gens.ana = { generate, _words: WORDS };
+  MT.gens.ana = { generate, _words: WORDS.concat(WORDS2.map((w) => [w[0], w[1], w[2], w[3], [], w[6], w[7], w[8]])) };
 })(typeof window !== 'undefined' ? window : globalThis);
 
 </script>
@@ -1175,7 +1211,94 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
       return q;
     });
   }
-  MT.gens.dia = { generate, OPS };
+  /* ---- Venn-diagrammen (Mariniers Training Mode) ----
+   * Drie begrippen; kies het diagram dat hun onderlinge verhouding laat zien. */
+  const { esc } = MT.util;
+  const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  const VS = 'fill="none" stroke="currentColor" stroke-width="1.7"';
+  const ven = (inner) => `<svg viewBox="0 0 100 60" style="width:118px;height:71px" role="img" aria-hidden="true">${inner}</svg>`;
+  const C = (cx, cy, r) => `<circle cx="${cx}" cy="${cy}" r="${r}" ${VS}/>`;
+  const E = (cx, cy, rx, ry) => `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" ${VS}/>`;
+  const SHAPES = {
+    nest: ven(C(50, 30, 27) + C(50, 30, 18) + C(50, 30, 9)),
+    in2d: ven(E(50, 30, 45, 26) + C(32, 30, 11) + C(68, 30, 11)),
+    in2o: ven(E(50, 30, 45, 26) + C(41, 30, 14) + C(59, 30, 14)),
+    tri: ven(C(50, 20, 16) + C(38, 40, 16) + C(62, 40, 16)),
+    sep3: ven(C(17, 30, 13) + C(50, 30, 13) + C(83, 30, 13)),
+    chain: ven(C(27, 30, 18) + C(50, 30, 18) + C(73, 30, 18)),
+    insep: ven(C(32, 30, 25) + C(32, 30, 13) + C(82, 30, 14)),
+    ovsep: ven(C(23, 30, 17) + C(43, 30, 17) + C(83, 30, 13)),
+    nestover: ven(E(35, 30, 30, 24) + C(23, 30, 9) + E(67, 30, 30, 24)),
+  };
+  const GEN = {
+    nest: 'drie begrippen die elk helemaal in het volgende passen',
+    in2d: 'een groot begrip met daarin twee delen die elkaar niet raken',
+    in2o: 'een groot begrip met daarin twee delen die elkaar overlappen',
+    tri: 'drie begrippen die elkaar alle drie gedeeltelijk overlappen',
+    sep3: 'drie begrippen zonder enige overlap',
+    chain: 'drie begrippen waarvan alleen het middelste beide andere gedeeltelijk overlapt',
+    insep: 'een begrip dat helemaal in een tweede past, plus een derde dat er los van staat',
+    ovsep: 'twee begrippen die elkaar overlappen, plus een derde dat er los van staat',
+    nestover: 'een begrip dat helemaal in een tweede past, terwijl een derde dat tweede gedeeltelijk overlapt',
+  };
+  const REASON = {
+    nest: ([a, b, c]) => `${cap(a)} zijn altijd ${b}, en ${b} zijn altijd ${c}.`,
+    in2d: ([c, a, b]) => `${cap(a)} en ${b} horen allebei bij ${c}, maar iets is nooit tegelijk ${a} en ${b}.`,
+    in2o: ([c, a, b]) => `${cap(a)} en ${b} horen allebei bij ${c}, en sommige ${c} zijn tegelijk ${a} en ${b}.`,
+    tri: ([a, b, c]) => `Elk paar overlapt: sommige ${a} zijn ook ${b}, sommige ${b} zijn ook ${c} en sommige ${a} zijn ook ${c}. Geen enkel begrip valt helemaal binnen een ander.`,
+    sep3: ([a, b, c]) => `${cap(a)}, ${b} en ${c} sluiten elkaar volledig uit.`,
+    chain: ([a, b, c]) => `${cap(b)} overlapt zowel ${a} als ${c}, maar ${a} en ${c} sluiten elkaar uit.`,
+    insep: ([a, b, c]) => `${cap(a)} zijn altijd ${b}. ${cap(c)} heeft daar niets mee te maken.`,
+    ovsep: ([a, b, c]) => `Sommige ${a} zijn ook ${b}. ${cap(c)} staat daar los van.`,
+    nestover: ([a, b, c]) => `${cap(a)} zijn altijd ${b}. ${cap(c)} overlapt ${b} gedeeltelijk, maar nooit ${a}.`,
+  };
+  const NEAR = {
+    in2d: ['in2o', 'nest'], in2o: ['in2d', 'tri'], nest: ['in2d', 'insep'], tri: ['chain', 'in2o'], sep3: ['ovsep', 'insep'],
+    chain: ['tri', 'ovsep'], insep: ['nest', 'sep3'], ovsep: ['chain', 'sep3'], nestover: ['in2o', 'chain'],
+  };
+  // [soort, begrippen in de volgorde van REASON]
+  const VEN = [
+    ['in2d', 'dieren', 'honden', 'katten'], ['in2d', 'fruit', 'appels', 'bananen'], ['in2d', 'voertuigen', 'auto\'s', 'fietsen'], ['in2d', 'meubels', 'tafels', 'stoelen'],
+    ['in2d', 'gebouwen', 'kerken', 'scholen'], ['in2d', 'groenten', 'wortels', 'uien'], ['in2d', 'gereedschappen', 'hamers', 'zagen'], ['in2d', 'hemellichamen', 'sterren', 'planeten'],
+    ['in2o', 'mensen', 'vrouwen', 'studenten'], ['in2o', 'boeken', 'kinderboeken', 'prentenboeken'], ['in2o', 'films', 'komedies', 'familiefilms'], ['in2o', 'gebouwen', 'oude gebouwen', 'kerken'],
+    ['in2o', 'planten', 'bomen', 'giftige planten'], ['in2o', 'voertuigen', 'elektrische voertuigen', 'fietsen'], ['in2o', 'gerechten', 'soepen', 'warme gerechten'], ['in2o', 'dieren', 'roofdieren', 'vogels'],
+    ['in2o', 'kleding', 'sportkleding', 'jassen'], ['in2o', 'muziek', 'klassieke muziek', 'filmmuziek'],
+    ['nest', 'poedels', 'honden', 'dieren'], ['nest', 'tulpen', 'bloemen', 'planten'], ['nest', 'sedans', 'auto\'s', 'voertuigen'], ['nest', 'eiken', 'bomen', 'planten'],
+    ['nest', 'fregatten', 'schepen', 'vaartuigen'], ['nest', 'sonnetten', 'gedichten', 'teksten'], ['nest', 'Amsterdammers', 'Nederlanders', 'Europeanen'], ['nest', 'mussen', 'vogels', 'dieren'], ['nest', 'kleuters', 'kinderen', 'mensen'],
+    ['tri', 'studenten', 'sporters', 'muzikanten'], ['tri', 'Nederlanders', 'fietsers', 'studenten'], ['tri', 'rokers', 'sporters', 'automobilisten'], ['tri', 'wandelaars', 'fotografen', 'vogelaars'],
+    ['tri', 'lezers', 'reizigers', 'kookliefhebbers'], ['tri', 'kinderen', 'zwemmers', 'vegetariërs'],
+    ['sep3', 'bloemen', 'schoenen', 'sterren'], ['sep3', 'honden', 'tafels', 'wolken'], ['sep3', 'boeken', 'vulkanen', 'fietsen'], ['sep3', 'kerken', 'bananen', 'vliegtuigen'], ['sep3', 'kussens', 'muren', 'vogels'],
+    ['chain', 'kleine dieren', 'huisdieren', 'grote dieren'], ['chain', 'goedkope producten', 'biologische producten', 'dure producten'], ['chain', 'korte films', 'familiefilms', 'lange films'],
+    ['chain', 'zomerkleding', 'katoenen kleding', 'winterkleding'], ['chain', 'jonge mensen', 'studenten', 'oude mensen'], ['chain', 'warme dranken', 'zoete dranken', 'koude dranken'], ['chain', 'kleine auto\'s', 'elektrische auto\'s', 'grote auto\'s'],
+    ['insep', 'mussen', 'vogels', 'vlinders'], ['insep', 'appels', 'fruit', 'groenten'], ['insep', 'honden', 'dieren', 'planten'], ['insep', 'haaien', 'vissen', 'zoogdieren'],
+    ['insep', 'pianos', 'muziekinstrumenten', 'gereedschappen'], ['insep', 'fietsen', 'voertuigen', 'gebouwen'],
+    ['ovsep', 'studenten', 'sporters', 'vulkanen'], ['ovsep', 'vrouwen', 'artsen', 'bergen'], ['ovsep', 'kinderen', 'zwemmers', 'sterren'], ['ovsep', 'muzikanten', 'leraren', 'wolken'], ['ovsep', 'fietsers', 'Nederlanders', 'planeten'],
+    ['nestover', 'dolfijnen', 'zoogdieren', 'landdieren'], ['nestover', 'koeien', 'zoogdieren', 'zeedieren'], ['nestover', 'kolibries', 'vogels', 'roofdieren'], ['nestover', 'struisvogels', 'vogels', 'zeedieren'],
+  ];
+
+  function vennQ(d, n = 4) {
+    return attempt(() => {
+      const [t, ...roles] = pick(VEN);
+      const why = (T) => `Dit diagram laat zien: ${GEN[T]}. Bij deze begrippen klopt dat niet. ${REASON[t](roles)}`;
+      const others = Object.keys(SHAPES).filter((k) => k !== t);
+      const order = [...NEAR[t], ...shuffle(others.filter((k) => !NEAR[t].includes(k)))];
+      const pool = order.map((T) => ({ key: T, html: SHAPES[T], text: cap(GEN[T]), why: why(T), tag: 'Relatie niet gelijk' }));
+      const built = buildOptions({ key: t, html: SHAPES[t], text: cap(GEN[t]) }, pool, n);
+      if (!built) return null;
+      return {
+        cat: 'dia', diff: 3, kindId: 'venn', kind: 'Venn-diagram', meta: { mode: 'venn', rule: t },
+        prompt: 'Welk diagram laat de verhouding tussen deze drie begrippen het best zien?',
+        stem: `<div class="venn">${shuffle(roles).map((r) => `<div>${esc(r)}</div>`).join('')}</div>`,
+        opts: built.opts, ans: built.ans, layout: 'fig',
+        steps: ['Bekijk elk paar begrippen apart: valt het ene altijd binnen het andere, kunnen ze tegelijk voorkomen, of sluiten ze elkaar uit?', REASON[t](roles), `Het diagram met precies deze verhoudingen toont ${GEN[t]}.`],
+        hint: 'Vraag je per paar: valt het ene altijd binnen het andere, overlappen ze, of hebben ze niets met elkaar te maken?',
+        quick: 'Zoek eerst het begrip dat de andere omvat (als dat er is). Kijk daarna of de overige twee elkaar overlappen of uitsluiten.',
+        lesson: 'Bekijk elk paar apart: helemaal binnen, gedeeltelijk overlappend, of los van elkaar.',
+      };
+    });
+  }
+
+  MT.gens.dia = { generate: (d, opt = {}) => (opt.exam || opt.kind === 'venn' ? vennQ(d, opt.exam ? 4 : optCount(d)) : generate(d, opt)), OPS };
 })(typeof window !== 'undefined' ? window : globalThis);
 
 </script>
@@ -1185,6 +1308,8 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
   'use strict';
   const MT = G.MT;
   const { rand, pick, chance, shuffle, optCount, buildOptions, attempt } = MT.util;
+  let EXAM_N = null;
+  const nOpt = (d) => EXAM_N || optCount(d);
   const F = MT.fig;
   const { norm, SHAPE_NL, FILL_NL, DIR_NL } = F;
   const cw = (d) => (d > 0 ? 'met de klok mee' : 'tegen de klok in');
@@ -1261,7 +1386,7 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
     }
     // Bij meerdere regels: zet een optie met precies één fout vooraan (meest verleidelijk)
     const P = [...first, ...shuffle(extra)].map((p) => ({ key: F.key(p.f), html: F.draw(p.f), text: F.describe(p.f), why: p.why, tag: changing.length > 1 && p.tag === 'Regel gemist' ? 'Tweede regel gemist' : p.tag }));
-    const built = buildOptions({ key: F.key(ans), html: F.draw(ans), text: F.describe(ans) }, P, optCount(d));
+    const built = buildOptions({ key: F.key(ans), html: F.draw(ans), text: F.describe(ans) }, P, nOpt(d));
     if (!built) return null;
     const stem = `<div class="figs">${frames.map((f, k) => (k === gi ? '<div class="fig q">?</div>' : `<div class="fig">${F.draw(f)}</div>`)).join('')}</div>`;
     const ruleTxt = changing.map((a) => rules[a].txt);
@@ -1307,7 +1432,7 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
     if (nm === 2) pool.unshift({ f: [{ pos: ans[0].pos, m: 2 }, { pos: ans[1].pos, m: 1 }], why: 'De plekken kloppen, maar het gekleurde vak en de stip zijn verwisseld.', tag: 'Tweede regel gemist' });
     const clean = pool.filter((p) => p.f.length < 2 || p.f[0].pos !== p.f[1].pos);
     const P = shuffle(clean).map((p) => ({ key: kf(p.f), html: F.drawGrid(n, p.f), text: 'raster', why: p.why, tag: p.tag }));
-    const built = buildOptions({ key: kf(ans), html: F.drawGrid(n, ans), text: 'raster' }, P, optCount(d));
+    const built = buildOptions({ key: kf(ans), html: F.drawGrid(n, ans), text: 'raster' }, P, nOpt(d));
     if (!built) return null;
     const txt = ms.map((mk) => `${name(mk.m)} loopt langs de rand, steeds ${mk.st} ${mk.st === 1 ? 'vak' : 'vakken'} ${cw(mk.dir)}.`);
     return {
@@ -1323,6 +1448,7 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
   }
 
   function generate(d, opt = {}) {
+    EXAM_N = opt.exam ? 4 : null; // Mariniers Training Mode: vier antwoordopties
     return attempt(() => {
       const wantGrid = opt.kind ? opt.kind.startsWith('grid') : chance(0.35);
       const q = wantGrid ? gridQ(d) : attrQ(d);
@@ -1823,13 +1949,16 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
 
   /* ---------- Cijferreeksen: systematische zoekvolgorde ---------- */
   const SEARCH = ['Optellen of aftrekken (vaste stap)', 'Verschillen bekijken', 'Verschillen van verschillen', 'Vermenigvuldigen of delen', 'Afwisselende bewerkingen', 'Oneven en even posities apart', 'Combinaties van meerdere regels'];
-  const FOUND_AT = { arith: 0, prime: 1, sqdiff: 1, incdiff: 2, pow: 2, diffmul: 2, geo: 3, incmul: 3, plusmin: 4, altop: 4, altinc: 4, alt2: 5, fib: 6, trib: 6, mulminus: 6 };
+  const FOUND_AT = { arith: 0, prime: 1, sqdiff: 1, incdiff: 2, pow: 2, diffmul: 2, geo: 3, incmul: 3, plusmin: 4, altop: 4, altinc: 4, alt2: 5, altdiff: 5, alt2inc: 5, zigzag: 6, fib: 6, trib: 6, mulminus: 6 };
   const NUM_DESC = {
     arith: 'Vaste stap: steeds hetzelfde getal erbij of eraf',
     geo: 'Steeds keer (of gedeeld door) hetzelfde getal',
     plusmin: 'Afwisselend een vaste stap erbij en een vaste stap eraf',
     incdiff: 'De verschillen worden steeds een vast getal groter',
     alt2: 'Twee reeksen door elkaar (om en om lezen)',
+    altdiff: 'De verschillen vormen zelf twee reeksen om en om',
+    alt2inc: 'Twee reeksen door elkaar, waarvan de stappen steeds veranderen',
+    zigzag: 'Grote verschillen die groeien en van teken wisselen, met +1 en −1 ertussen',
     altop: 'Twee verschillende bewerkingen wisselen elkaar af (bijv. +3 en ×2)',
     fib: 'Elk getal is de som van de twee getallen ervoor',
     pow: 'Kwadraten of machten (1, 4, 9, 16 … of 1, 8, 27 …)',
@@ -1880,7 +2009,13 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
   function diaReason(q) {
     const mode = (q.meta || {}).mode;
     let opts;
-    if (mode === 'op') opts = [
+    if (mode === 'venn') opts = [
+      { id: 'pairs', text: 'Elk paar begrippen apart bekeken: binnen elkaar, overlappend of los van elkaar', status: 'correct' },
+      { id: 'big', text: 'Eerst het grootste begrip gezocht en daarna gekeken hoe de andere twee zich verhouden', status: 'correct' },
+      { id: 'look', text: 'Het diagram gekozen dat het meest voor de hand lag', status: 'wrong', err: ERR.early, note: 'Zonder elk paar te controleren is dit gokken. Bijna alle diagrammen lijken op elkaar.' },
+      { id: 'topic', text: 'Gekeken of de begrippen iets met elkaar te maken hebben', status: 'wrong', err: ERR.assume, note: 'Dat zegt niets over de verhouding. Het gaat erom of het ene binnen het andere valt, of ze overlappen of elkaar uitsluiten.' },
+    ];
+    else     if (mode === 'op') opts = [
       { id: 'fb', text: 'Vooruit gerekend tot het vraagteken en terug vanaf de uitkomst', status: 'correct' },
       { id: 'try', text: 'Elke bewerking uit de legenda op die plek uitgeprobeerd', status: 'inefficient', note: 'Dat werkt, maar kost bij veel bewerkingen veel tijd.' },
       { id: 'freq', text: 'Gekozen welke bewerking het meest voor de hand lag', status: 'wrong', err: ERR.early, note: 'Zonder narekenen weet je niet of de bewerking de juiste uitkomst geeft.' },
@@ -1998,6 +2133,7 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
     'ana-word': 'Bij een analogie gaat het om de relatie, niet om het onderwerp. Door van het eerste paar een zin te maken, leg je die relatie vast. Het juiste woord past precies in dezelfde zin.',
     'ana-num': 'Eén voorbeeld past bij heel veel regels (3 → 6 kan +3 zijn, maar ook ×2). Met twee voorbeelden blijft er meestal één regel over. Daarom test je elke regel op alle voorbeelden.',
     'ana-let': 'Door letter voor letter te vergelijken zie je of de letters verschuiven (andere letters) of van plek wisselen (zelfde letters). Die ene vaststelling bepaalt al welk soort regel het is.',
+    venn: 'Een Venn-diagram laat de verhouding tussen begrippen zien: helemaal binnen een ander, gedeeltelijk overlappend of los. Door elk paar apart te beoordelen weet je precies welke cirkels in elkaar, door elkaar of naast elkaar horen te staan.',
     dia: 'Elke bewerking werkt op de uitkomst van de vorige. De volgorde bepaalt dus het resultaat: wie een stap verwisselt of overslaat, krijgt een andere uitkomst. Stap voor stap werken sluit dat uit.',
     'dia-in': 'Elke bewerking heeft een tegenbewerking (omkeren ↔ omkeren, eerste naar achteren ↔ laatste naar voren). Door achteraan te beginnen, maak je stap voor stap ongedaan wat er gebeurd is.',
     fig: 'In een figuurreeks kunnen meerdere eigenschappen tegelijk veranderen, elk met een eigen regel. Door ze apart te bekijken raak je er geen kwijt, en voorkom je dat één opvallende verandering een andere verbergt.',
@@ -2012,6 +2148,7 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
   function whyWorks(q) {
     if (q.cat === 'num') return WHY.num;
     if (q.cat === 'ana') return WHY['ana-' + ((q.meta && q.meta.sub) || 'word')];
+    if (q.cat === 'dia' && q.kindId === 'venn') return WHY.venn;
     if (q.cat === 'dia') return q.meta && q.meta.mode === 'in' ? WHY['dia-in'] : WHY.dia;
     if (q.cat === 'fig') return WHY.fig;
     if (q.cat === 'abs') return WHY['abs-' + q.kindId] || WHY['abs-odd'];
@@ -2046,7 +2183,7 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
     CAT_IDS.forEach((c) => (cats[c] = { n: 0, ok: 0, est: null, kOk: {}, kBad: {}, kFast: {}, errs: {} }));
     return { fmt: 'MST2', version: 0, date: today(), diag: 0, intake: {}, cats, errs: {}, quad: { A: 0, B: 0, C: 0, D: 0 }, rs: {}, fast: { n: 0, wrong: 0 }, total: { n: 0, ok: 0 }, numOk: [0, 0, 0, 0, 0, 0, 0], numBad: [0, 0, 0, 0, 0, 0, 0], notes: [], imported: null };
   }
-  const FOUND = { arith: 0, prime: 1, sqdiff: 1, incdiff: 2, pow: 2, diffmul: 2, geo: 3, incmul: 3, plusmin: 4, altop: 4, altinc: 4, alt2: 5, fib: 6, trib: 6, mulminus: 6 };
+  const FOUND = { arith: 0, prime: 1, sqdiff: 1, incdiff: 2, pow: 2, diffmul: 2, geo: 3, incmul: 3, plusmin: 4, altop: 4, altinc: 4, alt2: 5, altdiff: 5, alt2inc: 5, zigzag: 6, fib: 6, trib: 6, mulminus: 6 };
 
   /** Voegt nieuwe antwoorden toe aan (een kopie van) een profiel. opts.diag = aantal diagnostische vragen. */
   function update(prev, answers, opts = {}) {
@@ -2389,12 +2526,14 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
     { v: '5', k: '5', label: '5/5 – Extreem', desc: 'Complexe combinaties, weinig tijd en hoge nauwkeurigheid vereist.' },
     { v: 'auto', k: 'A', label: 'AUTO – Adaptief', desc: 'Begint passend bij je niveau en past de moeilijkheid automatisch aan.' },
   ];
-  const CAT_DESC = { num: 'Welk getal komt hierna?', ana: 'Woord-, getal- en letterverbanden.', dia: 'Bewerkingen op een rij letters.', fig: 'Welke figuur komt hierna?', log: 'Volgordes, conclusies, codes en redeneersommen.', abs: 'Afwijkers, figuuranalogieën en matrices.' };
+  const CAT_DESC = { num: 'Welk getal van twee cijfers komt hierna?', ana: 'Woord-, getal- en letterverbanden.', dia: 'Bewerkingen op een rij letters.', fig: 'Welke figuur komt hierna?', log: 'Volgordes, conclusies, codes en redeneersommen.', abs: 'Afwijkers, figuuranalogieën en matrices.' };
   const CATEGORY_OPTS = [
     ...CAT_IDS.map((id) => ({ v: id, k: CATS[id].letter, label: `${CATS[id].icon} ${CATS[id].name}`, desc: CAT_DESC[id] })),
     { v: 'mix', k: 'G', label: '🔀 Gemengd', desc: 'Alle onderdelen door elkaar.' },
     { v: 'weak', k: 'H', label: '🎯 Mijn zwakke punten', desc: 'Onderdelen waar je profiel en deze sessie de meeste fouten laten zien.' },
   ];
+  // Opbouw van de Mariniers Training Mode: 13 cijferreeksen, 13 analogieën, 13 figuurreeksen en 16 Venn-diagrammen
+  const EXAM_PLAN = [...Array(13).fill('num'), ...Array(13).fill('ana'), ...Array(13).fill('fig'), ...Array(16).fill('dia')];
   const DURATIONS = [
     { v: 5, k: '1', label: '5 vragen', desc: 'Kort' }, { v: 10, k: '2', label: '10 vragen', desc: 'Normaal' }, { v: 20, k: '3', label: '20 vragen', desc: 'Lang' },
     { v: 30, k: '4', label: '30 vragen', desc: 'Intensief' }, { v: 40, k: '5', label: '40 vragen', desc: 'Mariniers Training: gemengd' },
@@ -2426,8 +2565,8 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
       steps: ['level', 'difficulty', 'category', 'duration'], fixed: { pressure: 'none', feedback: 'each', hints: true, reasoning: true }, def: { difficulty: 'auto', category: 'mix', duration: 10 } },
     2: { icon: '🧠', name: 'Adaptieve Training', bullets: ['Moeilijkheid past zich aan je prestaties en profiel aan', 'Herhaalt zwakke onderwerpen met nieuwe vragen'],
       steps: ['level', 'category', 'duration', 'pressure'], fixed: { difficulty: 'auto', feedback: 'each', hints: true, reasoning: false }, def: { category: 'weak', duration: 20, pressure: 'adaptive' } },
-    3: { icon: '⚓', name: 'Mariniers Training Mode', bullets: ['Intensief en gemengd', 'Nadruk op snelheid, nauwkeurigheid en logisch denken', 'Geen hints tenzij ingesteld', 'Zelfgemaakt; geen officiële Defensiesimulatie'],
-      steps: ['level'], fixed: { category: 'mix', difficulty: 'auto', duration: 30, feedback: 'each', hints: false, pressure: 'adaptive', reasoning: false }, def: {} },
+    3: { icon: '⚓', name: 'Mariniers Training Mode', bullets: ['Vaste opbouw: 13 cijferreeksen, 13 analogieën, 13 figuurreeksen en 16 Venn-diagrammen, willekeurig door elkaar', 'Cijferreeksen met getallen van twee cijfers (10–99)', 'Analogieën: kies het woord links én rechts', 'Geen niveaus en geen hints', 'Zelfgemaakt; geen officiële Defensiesimulatie'],
+      steps: [], fixed: { category: 'exam', difficulty: 'exam', level: 3, duration: 55, feedback: 'each', hints: false, pressure: 'adaptive', reasoning: false }, def: {} },
     4: { icon: '⏱️', name: 'Assessment Simulatie', bullets: ['Geen feedback tussendoor', 'Geen hints', 'Assessmentachtige tijdsdruk', 'Analyse na afloop'],
       steps: ['level', 'category', 'duration', 'pressure'], fixed: { difficulty: 'auto', feedback: 'end', hints: false, reasoning: false }, def: { category: 'mix', duration: 20, pressure: 'normal' }, pressureOpts: ['normal', 'high', 'extreme'] },
     5: { icon: '🎯', name: 'Zwakke Punten Training', bullets: ['Gebruikt je Assessmentprofiel en deze sessie', 'Traint gericht je zwakke onderdelen', 'Antwoord + redenering'],
@@ -2487,6 +2626,7 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
   const levelName = (v) => PF.LEVEL_NAMES[v] || '';
   const settingLabel = (key, v) => {
     if (key === 'level') return v === 'profile' ? 'Uit mijn Assessmentprofiel' : `${v} – ${levelName(v)}`;
+    if (key === 'category' && v === 'exam') return 'Cijferreeksen, analogieën, figuurreeksen (13 van elk) en Venn-diagrammen (16)';
     const list = { difficulty: DIFFS, category: CATEGORY_OPTS, duration: DURATIONS, pressure: PRESSURES, feedback: FEEDBACKS, hints: HINTS, reasoning: REASONS }[key];
     const o = list && list.find((x) => x.v === v);
     return o ? o.label : String(v);
@@ -2517,7 +2657,10 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
     const saved = PROFILE ? `<p class="note">In deze browser staat al een profiel: <b>v${PROFILE.version}</b> van ${esc(PROFILE.date)} (niveau ${PF.overall(PROFILE) || '?'}/5). Kies optie 2 of 3 om het te gebruiken.</p>` : '';
     view(`<h2>⚓ Assessmenttrainer</h2>
       <p>Welkom. Voordat we beginnen wil ik weten of je al eerder met deze trainer hebt geoefend.</p>
-      <h3 style="margin-top:14px">👤 Kies je profieloptie</h3>
+      <div class="choices-list">
+        <button class="pick" id="exam-start"><span class="k">M</span><b>⚓ Mariniers toets starten</b><span class="d">Direct beginnen, geen profiel nodig: 55 vragen (cijferreeksen, analogieën, figuurreeksen en Venn-diagrammen).</span></button>
+      </div>
+      <h3 style="margin-top:14px">👤 Of kies je profieloptie</h3>
       <div class="choices-list">
         <button class="pick" data-o="1"><span class="k">1</span><b>🆕 Nieuwe gebruiker</b><span class="d">Start intake + volledige nulmeting.</span></button>
         <button class="pick" data-o="2"><span class="k">2</span><b>📂 Bestaand Assessmentprofiel</b><span class="d">Plak je vorige profiel en ga direct verder.</span></button>
@@ -2526,9 +2669,10 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
       ${saved}
       <p><b>Welke optie kies je: 1, 2 of 3?</b></p>
       <p class="muted small">Je kunt ook <button class="linkbtn" id="skip">zonder profiel direct naar het trainingsmenu</button>.</p>`,
-      (e) => { if (['1', '2', '3'].includes(e.key)) go(e.key); });
+      (e) => { if (['1', '2', '3'].includes(e.key)) go(e.key); if (e.key.toLowerCase() === 'm') chooseMode(3); });
     const go = (o) => (o === '1' ? startIntake() : renderPaste(o === '3' ? 'recal' : 'load'));
     $$('[data-o]').forEach((b) => (b.onclick = () => go(b.dataset.o)));
+    $('#exam-start').onclick = () => chooseMode(3);
     $('#skip').onclick = renderMenu;
   }
 
@@ -2764,7 +2908,7 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
   }
   function renderSummary() {
     const s = W.s;
-    const rows = [['Niveau', settingLabel('level', s.level)], ['Moeilijkheid', settingLabel('difficulty', s.difficulty)], ['Categorie', s.category === 'weak' ? `🎯 ${(W.weakCats || weakPoints(2)).map((c) => CATS[c].name).join(' en ') || 'zwakke punten'}` : settingLabel('category', s.category)], ['Aantal vragen', settingLabel('duration', s.duration)], ['Tijdsdruk', settingLabel('pressure', s.pressure)], ['Feedback', settingLabel('feedback', s.feedback)], ['Hints', s.hints ? 'Aan' : 'Uit'], ['Redenering', s.reasoning ? 'Antwoord + redenering' : 'Alleen antwoord']];
+    const rows = [...(s.difficulty === 'exam' ? [] : [['Niveau', settingLabel('level', s.level)], ['Moeilijkheid', settingLabel('difficulty', s.difficulty)]]), ['Categorie', s.category === 'weak' ? `🎯 ${(W.weakCats || weakPoints(2)).map((c) => CATS[c].name).join(' en ') || 'zwakke punten'}` : settingLabel('category', s.category)], ['Aantal vragen', settingLabel('duration', s.duration)], ['Tijdsdruk', settingLabel('pressure', s.pressure)], ['Feedback', settingLabel('feedback', s.feedback)], ['Hints', s.hints ? 'Aan' : 'Uit'], ['Redenering', s.reasoning ? 'Antwoord + redenering' : 'Alleen antwoord']];
     view(`<div class="eyebrow">${esc(W.label)}</div><h2>Klaar om te starten</h2>
       ${W.mode === 3 ? '<p class="muted">Een zelfgemaakte, intensieve trainingsmodus ter voorbereiding. Geen officiële simulatie van Defensie of het Korps Mariniers.</p>' : ''}
       <dl class="summary">${rows.map(([a, b]) => `<dt>${a}</dt><dd>${esc(b)}</dd>`).join('')}</dl>
@@ -2798,6 +2942,7 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
     nextQuestion();
   }
   const isAuto = () => RUN.s.difficulty === 'auto';
+  const isExam = () => !!RUN && RUN.s.difficulty === 'exam';
   const reasoningOn = () => !!RUN.s.reasoning;
   const curLevel = () => {
     if (CATS[RUN.s.category]) return RUN.lv[RUN.s.category];
@@ -2809,6 +2954,7 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
     const c = RUN.s.category;
     if (CATS[c]) return c;
     if (c === 'mix') { if (!RUN.bag.length) RUN.bag = shuffle(CAT_IDS); return RUN.bag.pop(); }
+    if (c === 'exam') { if (!RUN.bag.length) RUN.bag = shuffle(EXAM_PLAN); return RUN.bag.pop(); }
     const pool = RUN.weakCats && RUN.weakCats.length ? RUN.weakCats : CAT_IDS;
     const S = catStats([...SESSION.history.slice(-60), ...RUN.results.map((r) => ({ c: r.q.cat, ok: r.ok }))]);
     const w = pool.map((k) => (S[k].n - S[k].ok + 1) / (S[k].n + 2) + 0.1);
@@ -2835,9 +2981,10 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
     else if (RUN.retest) { cat = RUN.retest.cat; kind = RUN.retest.kind; d = RUN.retest.at; flag = 'retest'; }
     else if (due >= 0 && RUN.s.feedback === 'each') { const r = RUN.review.splice(due, 1)[0]; cat = r.cat; kind = r.kind; d = RUN.lv[cat]; flag = 'review'; }
     else { cat = chooseCat(); d = RUN.lv[cat]; }
+    const gopt = { ...(kind ? { kind } : {}), ...(isExam() ? { exam: true } : {}) };
     let q;
     for (let k = 0; k < 8; k++) {
-      q = MT.gens[cat].generate(d, kind ? { kind } : {});
+      q = MT.gens[cat].generate(d, gopt);
       const sig = q.prompt + q.stem + q.opts.map((o) => o.key).join();
       if (!RUN.seen.has(sig)) { RUN.seen.add(sig); break; }
     }
@@ -2852,7 +2999,7 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
     return `<div class="cmds">
       ${phase === 'q' ? cmdBtn('hint', 'HINT', !s.hints || RUN.cur.hint) : cmdBtn('uitleg', 'UITLEG')}
       ${phase === 'fb' ? cmdBtn('next', 'VOLGENDE') : ''}
-      ${cmdBtn('harder', 'MOEILIJKER')}${cmdBtn('easier', 'MAKKELIJKER')}${cmdBtn('score', 'SCORE')}
+      ${isExam() ? '' : cmdBtn('harder', 'MOEILIJKER') + cmdBtn('easier', 'MAKKELIJKER')}${cmdBtn('score', 'SCORE')}
       ${cmdBtn('weak', 'ZWAKKE PUNTEN')}${cmdBtn('profiel', 'PROFIEL', !PROFILE)}
       ${cmdBtn('stop', 'STOP', false, 'stop')}${cmdBtn('menu', 'MENU')}
     </div>`;
@@ -2905,7 +3052,7 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
     const cat = CATS[C.cat];
     const count = RUN.total === Infinity ? `Vraag ${RUN.i + 1} · vrij trainen` : `Vraag ${RUN.i + 1}/${RUN.total}`;
     const flag = { diag: '<span class="chip warn">Eenvoudiger oefenvraag</span>', retest: '<span class="chip olive">Hertest</span>', review: '<span class="chip olive">Herhaling in andere vorm</span>' }[C.flag] || '';
-    return `<div class="qbar"><div class="left"><span class="chip">${cat.icon} ${cat.name}</span><span class="chip olive">Niveau ${C.d}/5</span>${flag}<span class="counter">${count}</span></div>${C.target ? `<div class="timer" id="timer">${C.target}s</div>` : ''}</div>`;
+    return `<div class="qbar"><div class="left"><span class="chip">${cat.icon} ${cat.name}</span>${isExam() ? '' : `<span class="chip olive">Niveau ${C.d}/5</span>`}${flag}<span class="counter">${count}</span></div>${C.target ? `<div class="timer" id="timer">${C.target}s</div>` : ''}</div>`;
   }
 
   function renderQuestion() {
@@ -3018,6 +3165,7 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
       if (res.ok && res.ms < res.target * 600) RUN.timeF = clamp(RUN.timeF * 0.92, 0.5, 1.6);
       else if (!res.ok) RUN.timeF = clamp(RUN.timeF * 1.1, 0.5, 1.6);
     }
+    if (isExam()) return notes;
     const fb = s.feedback === 'each';
     const goodReason = !res.J || RS.reasonOk(res.J.status);
     if (!res.ok && fb && RUN.review.length < 6) RUN.review.push({ cat: c, kind: res.q.kindId, due: RUN.i + 3 + Math.floor(Math.random() * 4) });
@@ -3059,7 +3207,7 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
       <div><small>Score</small><b>${ok}/${n}</b></div>
       <div><small>Nauwkeurigheid</small><b>${pct(ok, n)}%</b></div>
       ${withR.length ? `<div><small>Redenering correct</small><b>${rOk}/${withR.length}</b></div>` : ''}
-      <div><small>Huidig niveau</small><b>${RUN.plan ? '—' : curLevel() + '/5'}</b></div>
+      ${isExam() ? '' : `<div><small>Huidig niveau</small><b>${RUN.plan ? '—' : curLevel() + '/5'}</b></div>`}
       <div><small>Sterkste categorie</small><b class="txt">${st ? CATS[st].name : '—'}</b></div>
       <div><small>Extra aandacht</small><b class="txt">${wk ? CATS[wk].name : '—'}</b></div>
     </div>`;
@@ -3108,8 +3256,8 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
       if (!res.ok) bad = res.timedOut ? '<h3>Waar ging het mis?</h3><p class="miss">De tijd was op voordat je een antwoord koos. Kom je er niet uit, gok dan en ga door: een lege vraag levert nooit punten op.</p>'
         : `<h3>Waar ging het mis?</h3><p class="miss">Je koos ${LETTERS[res.chosen]}. ${wrongWhy}</p><p class="muted small">Dit is waarom dat antwoord niet klopt. Hoe je tot ${LETTERS[res.chosen]} kwam weet ik niet; zet redenering aan (Leren & Uitleggen of Zelf Instellen) voor feedback op je denkwijze.</p>`;
     }
-    view(`${J ? '' : `<div class="qbar"><div class="left"><span class="chip">${CATS[q.cat].icon} ${CATS[q.cat].name}</span><span class="chip olive">Niveau ${res.d}/5</span><span class="counter">${esc(q.kind)}</span></div></div>`}
-      ${J ? `<div class="qbar"><div class="left"><span class="chip">${CATS[q.cat].icon} ${CATS[q.cat].name}</span><span class="chip olive">Niveau ${res.d}/5</span><span class="counter">Vraag ${count} · ${esc(q.kind)}</span></div></div>` : head}
+    view(`${J ? '' : `<div class="qbar"><div class="left"><span class="chip">${CATS[q.cat].icon} ${CATS[q.cat].name}</span>${isExam() ? '' : `<span class="chip olive">Niveau ${res.d}/5</span>`}<span class="counter">${esc(q.kind)}</span></div></div>`}
+      ${J ? `<div class="qbar"><div class="left"><span class="chip">${CATS[q.cat].icon} ${CATS[q.cat].name}</span>${isExam() ? '' : `<span class="chip olive">Niveau ${res.d}/5</span>`}<span class="counter">Vraag ${count} · ${esc(q.kind)}</span></div></div>` : head}
       <div class="card">${J ? head : ''}${stemHTML(q, { chosen: res.chosen })}
         <div class="fb">
           ${good}${bad}
@@ -3135,7 +3283,7 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
   function showScore() {
     const n = RUN.results.length, ok = RUN.results.filter((r) => r.ok).length;
     const S = catStats(RUN.results.map((r) => ({ c: r.q.cat, ok: r.ok, t: r.ms, to: r.timedOut })));
-    openPanel(`<h2>Score</h2><p><b class="num">${ok}/${n}</b> goed · <b class="num">${pct(ok, n)}%</b> nauwkeurig · niveau <b class="num">${curLevel()}/5</b></p>${catTable(S)}`);
+    openPanel(`<h2>Score</h2><p><b class="num">${ok}/${n}</b> goed · <b class="num">${pct(ok, n)}%</b> nauwkeurig${isExam() ? '' : ` · niveau <b class="num">${curLevel()}/5</b>`}</p>${catTable(S)}`);
   }
   function showWeak() {
     const H = SESSION.history, S = catStats(H);
@@ -3245,13 +3393,13 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
     let rec, recStart;
     const endLv = curLevel();
     if (weak.length) { rec = `🎯 Zwakke Punten Training, 10 vragen, met focus op ${weak.slice(0, 2).map((c) => CATS[c].name).join(' en ')}.`; recStart = () => { W = { mode: 5, label: '🎯 Zwakke Punten Training', s: { ...MODES[5].fixed, duration: 10, level: endLv }, steps: [], i: 0, weakCats: weak.slice(0, 2) }; renderSummary(); }; }
-    else if (pct(ok, n) >= 85 && endLv >= 4) { rec = '⚓ Mariniers Training Mode (30 gemengde vragen) of een ⏱️ Assessment Simulatie met hoge tijdsdruk.'; recStart = () => { W = { mode: 3, label: '⚓ Mariniers Training Mode', s: { ...MODES[3].fixed, level: endLv }, steps: [], i: 0 }; renderSummary(); }; }
+    else if (pct(ok, n) >= 85 && endLv >= 4) { rec = '⚓ Mariniers Training Mode (55 vragen) of een ⏱️ Assessment Simulatie met hoge tijdsdruk.'; recStart = () => { W = { mode: 3, label: '⚓ Mariniers Training Mode', s: { ...MODES[3].fixed, level: endLv }, steps: [], i: 0 }; renderSummary(); }; }
     else { rec = `🧠 Adaptieve Training, 20 vragen, startniveau ${endLv}.`; recStart = () => { W = { mode: 2, label: '🧠 Adaptieve Training', s: { ...MODES[2].def, ...MODES[2].fixed, level: endLv }, steps: [], i: 0 }; renderSummary(); }; }
     const meaningful = SESSION.pending.length >= 5;
     view(`<div class="report">
       <div class="eyebrow">${esc(RUN.label)}${stopped && RUN.total !== Infinity && R.length < RUN.total ? ' · voortijdig gestopt' : ''}</div>
       <h2>📊 Trainingsrapport</h2>
-      <div class="kpis"><div><small>Totaalscore</small><b>${ok}/${n}</b></div><div><small>Nauwkeurigheid</small><b>${pct(ok, n)}%</b></div><div><small>Niveau aan het begin</small><b>${RUN.startLv}</b></div><div><small>Niveau aan het einde</small><b>${endLv}</b></div><div><small>Gem. tijd per vraag</small><b>${avg} s</b></div></div>
+      <div class="kpis"><div><small>Totaalscore</small><b>${ok}/${n}</b></div><div><small>Nauwkeurigheid</small><b>${pct(ok, n)}%</b></div>${isExam() ? '' : `<div><small>Niveau aan het begin</small><b>${RUN.startLv}</b></div><div><small>Niveau aan het einde</small><b>${endLv}</b></div>`}<div><small>Gem. tijd per vraag</small><b>${avg} s</b></div></div>
       ${meaningful ? `<div class="offer"><p><b>Wil je je Assessmentprofiel bijwerken met de resultaten van deze training?</b></p><div class="row"><button class="btn" id="upd">Ja, profiel bijwerken</button><button class="btn quiet" id="noupd">Nee</button></div></div>` : ''}
       <h3>Per onderdeel</h3>${catTable(S)}
       ${withR.length ? `<h3>Antwoord en denkwijze</h3><div class="quadgrid">${['A', 'B', 'C', 'D'].map((k) => `<div class="q${k}"><b>${quad[k]}×</b><span>${esc(RS.QUAD[k])}</span></div>`).join('')}</div>` : ''}
@@ -3264,7 +3412,7 @@ ol.search li.no{color:var(--muted)} ol.search li.yes{color:var(--good)} ol.searc
       <div class="row"><button class="btn" id="rec">Start aanbevolen training</button><button class="btn ghost" id="menu">Terug naar menu</button></div>
       <p class="muted small" style="margin-top:12px">Dit rapport gaat alleen over deze oefentraining. Het voorspelt niet of je het echte assessment haalt.</p>
       <h3>Alle vragen nakijken</h3>
-      ${R.map((r, i) => `<details class="rev"><summary><span class="mark ${r.ok ? 'ok' : 'no'}">${r.ok ? '✓' : '✗'}</span><span>${i + 1}. ${CATS[r.q.cat].name} · ${esc(r.q.kind)}${r.qd ? ` · ${r.qd}` : ''}</span><span class="muted small" style="margin-left:auto">niveau ${r.d} · ${(r.ms / 1000).toFixed(0)} s${r.timedOut ? ' · tijd op' : ''}</span></summary>
+      ${R.map((r, i) => `<details class="rev"><summary><span class="mark ${r.ok ? 'ok' : 'no'}">${r.ok ? '✓' : '✗'}</span><span>${i + 1}. ${CATS[r.q.cat].name} · ${esc(r.q.kind)}${r.qd ? ` · ${r.qd}` : ''}</span><span class="muted small" style="margin-left:auto">${isExam() ? '' : `niveau ${r.d} · `}${(r.ms / 1000).toFixed(0)} s${r.timedOut ? ' · tijd op' : ''}</span></summary>
         <div class="body">${stemHTML(r.q, { chosen: r.chosen })}<div class="fb"><h3>Uitleg</h3><ol>${r.q.steps.map((s) => `<li>${s}</li>`).join('')}</ol>${!r.ok && r.chosen != null ? `<p class="miss" style="margin-top:10px">Jouw antwoord ${LETTERS[r.chosen]}: ${esc(r.q.opts[r.chosen].why || '')}</p>` : ''}${r.J ? `<p class="small" style="margin-top:8px">Jouw redenering: ${esc(r.J.chosen.join('; '))}</p>` : ''}<p class="lesson" style="margin-top:10px">${esc(r.q.lesson)}</p></div></div></details>`).join('')}
     </div>`, (e) => { if (e.key === 'Escape') renderMenu(); });
     $('#rec').onclick = () => { RUN = null; recStart(); };

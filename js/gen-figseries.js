@@ -3,6 +3,8 @@
   'use strict';
   const MT = G.MT;
   const { rand, pick, chance, shuffle, optCount, buildOptions, attempt } = MT.util;
+  let EXAM_N = null;
+  const nOpt = (d) => EXAM_N || optCount(d);
   const F = MT.fig;
   const { norm, SHAPE_NL, FILL_NL, DIR_NL } = F;
   const cw = (d) => (d > 0 ? 'met de klok mee' : 'tegen de klok in');
@@ -79,7 +81,7 @@
     }
     // Bij meerdere regels: zet een optie met precies één fout vooraan (meest verleidelijk)
     const P = [...first, ...shuffle(extra)].map((p) => ({ key: F.key(p.f), html: F.draw(p.f), text: F.describe(p.f), why: p.why, tag: changing.length > 1 && p.tag === 'Regel gemist' ? 'Tweede regel gemist' : p.tag }));
-    const built = buildOptions({ key: F.key(ans), html: F.draw(ans), text: F.describe(ans) }, P, optCount(d));
+    const built = buildOptions({ key: F.key(ans), html: F.draw(ans), text: F.describe(ans) }, P, nOpt(d));
     if (!built) return null;
     const stem = `<div class="figs">${frames.map((f, k) => (k === gi ? '<div class="fig q">?</div>' : `<div class="fig">${F.draw(f)}</div>`)).join('')}</div>`;
     const ruleTxt = changing.map((a) => rules[a].txt);
@@ -125,7 +127,7 @@
     if (nm === 2) pool.unshift({ f: [{ pos: ans[0].pos, m: 2 }, { pos: ans[1].pos, m: 1 }], why: 'De plekken kloppen, maar het gekleurde vak en de stip zijn verwisseld.', tag: 'Tweede regel gemist' });
     const clean = pool.filter((p) => p.f.length < 2 || p.f[0].pos !== p.f[1].pos);
     const P = shuffle(clean).map((p) => ({ key: kf(p.f), html: F.drawGrid(n, p.f), text: 'raster', why: p.why, tag: p.tag }));
-    const built = buildOptions({ key: kf(ans), html: F.drawGrid(n, ans), text: 'raster' }, P, optCount(d));
+    const built = buildOptions({ key: kf(ans), html: F.drawGrid(n, ans), text: 'raster' }, P, nOpt(d));
     if (!built) return null;
     const txt = ms.map((mk) => `${name(mk.m)} loopt langs de rand, steeds ${mk.st} ${mk.st === 1 ? 'vak' : 'vakken'} ${cw(mk.dir)}.`);
     return {
@@ -141,6 +143,7 @@
   }
 
   function generate(d, opt = {}) {
+    EXAM_N = opt.exam ? 4 : null; // Mariniers Training Mode: vier antwoordopties
     return attempt(() => {
       const wantGrid = opt.kind ? opt.kind.startsWith('grid') : chance(0.35);
       const q = wantGrid ? gridQ(d) : attrQ(d);

@@ -173,7 +173,72 @@
     };
   }
 
+  /* ---- Woordanalogieën met twee open plekken (Mariniers Training Mode) ----
+   * "…… : b = c : ……": links kies je een woord dat bij b past, rechts een woord dat bij c past, zodat
+   * beide paren dezelfde relatie hebben. Elk antwoord is een combinatie (links + rechts).
+   * [x, b, c, y, [foute x], [foute y], relatie, uitleg, niveau] */
+  const WORDS2 = [
+    ['honing', 'bij', 'melk', 'koe', ['raat', 'imker'], ['kalf', 'kaas'], 'afkomstig van', 'Honing komt van een bij, melk komt van een koe.', 1],
+    ['vol', 'leeg', 'aan', 'uit', ['half', 'glas'], ['lamp', 'stekker'], 'tegenstelling', 'Vol is het tegenovergestelde van leeg, aan van uit.', 1],
+    ['oog', 'zien', 'neus', 'ruiken', ['bril', 'hoofd'], ['geur', 'parfum'], 'zintuig en wat je ermee doet', 'Met je oog zie je, met je neus ruik je.', 1],
+    ['steen', 'muur', 'woord', 'zin', ['cement', 'huis'], ['taal', 'letter'], 'bouwsteen en geheel', 'Stenen vormen samen een muur, woorden vormen samen een zin.', 1],
+    ['dokter', 'ziekenhuis', 'leraar', 'school', ['patiënt', 'stethoscoop'], ['les', 'schoolbord'], 'beroep en werkplek', 'Een dokter werkt in een ziekenhuis, een leraar in een school.', 1],
+    ['veulen', 'paard', 'lam', 'schaap', ['ruiter', 'hooi'], ['wol', 'wei'], 'jong en ouder', 'Een veulen is het jong van een paard, een lam het jong van een schaap.', 1],
+    ['wiel', 'auto', 'vleugel', 'vliegtuig', ['weg', 'chauffeur'], ['piloot', 'lucht'], 'onderdeel en geheel', 'Een wiel is een onderdeel van een auto, een vleugel van een vliegtuig.', 1],
+    ['koe', 'gras', 'leeuw', 'vlees', ['melk', 'stal'], ['kooi', 'bos'], 'dier en zijn voedsel', 'Een koe eet gras, een leeuw eet vlees.', 1],
+    ['schilder', 'penseel', 'chirurg', 'scalpel', ['verf', 'atelier'], ['operatie', 'ziekenhuis'], 'beroep en zijn gereedschap', 'Een schilder werkt met een penseel, een chirurg met een scalpel.', 1],
+    ['ontbijt', 'ochtend', 'diner', 'avond', ['brood', 'tafel'], ['restaurant', 'honger'], 'maaltijd en moment van de dag', 'Je ontbijt in de ochtend, je dineert in de avond.', 1],
+    ['weg', 'auto', 'spoor', 'trein', ['stad', 'asfalt'], ['station', 'wissel'], 'route en voertuig dat erop rijdt', 'Een auto rijdt over een weg, een trein over een spoor.', 1],
+    ['laken', 'bed', 'tafelkleed', 'tafel', ['slaapkamer', 'kussen'], ['servies', 'eten'], 'wat iets bedekt', 'Een laken ligt over een bed, een tafelkleed over een tafel.', 1],
+    ['bezem', 'vloer', 'ruitenwisser', 'voorruit', ['stof', 'emmer'], ['regen', 'auto'], 'gereedschap en wat het schoonmaakt', 'Met een bezem maak je een vloer schoon, met een ruitenwisser een voorruit.', 2],
+    ['timmerman', 'hout', 'metselaar', 'steen', ['hamer', 'werkplaats'], ['muur', 'kelder'], 'ambachtsman en zijn materiaal', 'Een timmerman werkt met hout, een metselaar met steen.', 2],
+    ['afstand', 'liniaal', 'gewicht', 'weegschaal', ['snelheid', 'hout'], ['kilo', 'boodschappen'], 'wat je meet en het meetinstrument', 'Afstand meet je met een liniaal, gewicht met een weegschaal.', 2],
+    ['bries', 'storm', 'motregen', 'stortbui', ['zeil', 'weerbericht'], ['regenjas', 'plas'], 'zwakke en zeer sterke vorm', 'Een storm is een veel sterkere vorm van een bries, een stortbui van motregen.', 2],
+    ['regisseur', 'film', 'componist', 'lied', ['camera', 'acteur'], ['piano', 'orkest'], 'maker en zijn werk', 'Een regisseur maakt een film, een componist maakt een lied.', 2],
+    ['zwemmer', 'zwembad', 'schaatser', 'ijsbaan', ['medaille', 'water'], ['schaatsen', 'winter'], 'sporter en zijn sportlocatie', 'Een zwemmer zwemt in een zwembad, een schaatser schaatst op een ijsbaan.', 2],
+    ['plant', 'water', 'auto', 'benzine', ['pot', 'tuin'], ['garage', 'wiel'], 'wat iets nodig heeft om te werken', 'Een plant heeft water nodig om te groeien, een auto benzine om te rijden.', 2],
+    ['bril', 'zien', 'hoortoestel', 'horen', ['oog', 'glas'], ['oor', 'geluid'], 'hulpmiddel en wat het mogelijk maakt', 'Een bril helpt je zien, een hoortoestel helpt je horen.', 2],
+    ['brandweer', 'blussen', 'politie', 'arresteren', ['slang', 'brand'], ['uniform', 'misdaad'], 'beroep en zijn taak', 'De brandweer blust branden, de politie arresteert verdachten.', 2],
+    ['suiker', 'zoet', 'citroen', 'zuur', ['koffie', 'lepel'], ['geel', 'vrucht'], 'voedsel en zijn smaak', 'Suiker smaakt zoet, een citroen smaakt zuur.', 2],
+    ['hoofdpijn', 'paracetamol', 'dorst', 'water', ['dokter', 'pijn'], ['fles', 'zomer'], 'probleem en middel ertegen', 'Paracetamol helpt tegen hoofdpijn, water helpt tegen dorst.', 2],
+    ['vlieg', 'spin', 'muis', 'kat', ['web', 'insect'], ['kaas', 'hol'], 'prooi en jager', 'Een vlieg wordt gevangen door een spin, een muis door een kat.', 2],
+    ['klas', 'school', 'hoofdstuk', 'boek', ['leraar', 'bank'], ['bladzijde', 'bibliotheek'], 'onderdeel en geheel', 'Een klas is een onderdeel van een school, een hoofdstuk van een boek.', 2],
+    ['olie', 'smeren', 'lijm', 'plakken', ['motor', 'fles'], ['papier', 'stift'], 'middel en wat je ermee doet', 'Met olie smeer je, met lijm plak je.', 2],
+    ['architect', 'plattegrond', 'componist', 'partituur', ['bouwvakker', 'huis'], ['concert', 'orkest'], 'ontwerper en zijn ontwerp op papier', 'Een architect tekent een plattegrond, een componist schrijft een partituur.', 3],
+    ['zaaien', 'oogst', 'studeren', 'diploma', ['tuin', 'boer'], ['school', 'boek'], 'inspanning en het resultaat daarvan', 'Door te zaaien krijg je een oogst, door te studeren een diploma.', 3],
+    ['gids', 'toerist', 'loods', 'schip', ['museum', 'tour'], ['haven', 'kust'], 'wie begeleidt wie of wat', 'Een gids begeleidt een toerist, een loods begeleidt een schip.', 3],
+    ['chirurg', 'operatie', 'rechter', 'vonnis', ['mes', 'ziekenhuis'], ['wetboek', 'toga'], 'beroep en wat die persoon uitvoert of uitspreekt', 'Een chirurg voert een operatie uit, een rechter spreekt een vonnis uit.', 3],
+    ['oorlog', 'vrede', 'chaos', 'orde', ['soldaat', 'wapen'], ['rommel', 'verwarring'], 'tegenstelling', 'Oorlog is het tegenovergestelde van vrede, chaos van orde.', 3],
+  ];
+
+  function word2Q(d, n = 4) {
+    return attempt(() => {
+      const [x, b, c, y, wx, wy, rel, why] = pick(WORDS2);
+      const mk = (l, r, text) => ({ key: `${l}|${r}`, html: `<b>${esc(l)}</b>&ensp;·&ensp;<b>${esc(r)}</b>`, text: `${l} en ${r}`, why: text, tag: 'Relatie niet gelijk' });
+      const leftBad = (w) => `Links past “${w}” niet bij “${b}” volgens de relatie (${rel}).`;
+      const rightBad = (w) => `Rechts past “${w}” niet bij “${c}” volgens de relatie (${rel}).`;
+      const half = shuffle([
+        ...wx.map((w) => mk(w, y, `${leftBad(w)} Rechts heb je het goed.`)),
+        ...wy.map((w) => mk(x, w, `${rightBad(w)} Links heb je het goed.`)),
+      ]);
+      const both = shuffle(wx.flatMap((l) => wy.map((r) => mk(l, r, `Beide woorden kloppen niet: ${leftBad(l)} ${rightBad(r)}`))));
+      const built = buildOptions({ key: `${x}|${y}`, html: `<b>${esc(x)}</b>&ensp;·&ensp;<b>${esc(y)}</b>`, text: `${x} en ${y}` }, [...half.slice(0, 2), ...both, ...half.slice(2)], n);
+      if (!built) return null;
+      return {
+        cat: 'ana', diff: d, kindId: 'word', kind: 'Woordanalogie (twee woorden)', meta: { sub: 'word', rel },
+        prompt: 'Kies het woord links en het woord rechts dat op de open plekken hoort.',
+        stem: `<div class="analogy"><span class="gap">?</span><span class="op">:</span><b>${esc(b)}</b><span class="op">=</span><b>${esc(c)}</b><span class="op">:</span><span class="gap">?</span></div>`,
+        opts: built.opts, ans: built.ans, layout: 'text',
+        steps: [`Zoek de relatie bij het linkerpaar: “${x}” en “${b}” → ${rel}.`, `Pas dezelfde relatie toe op het rechterpaar: “${c}” en “${y}”. ${why}`, 'Controleer beide kanten: pas als links én rechts kloppen, is de combinatie goed.'],
+        hint: `Bedenk eerst welk woord links bij “${b}” past, en welk woord rechts bij “${c}”. De relatie moet in beide paren hetzelfde zijn.`,
+        quick: 'Begin bij het paar waar je de relatie het snelst ziet, en test dan of de andere kant dezelfde relatie heeft. Een combinatie waarvan één kant klopt is dus nog fout.',
+        lesson: 'Beide kanten moeten kloppen. Opties met één goed woord zijn bewuste valkuilen.',
+      };
+    });
+  }
+
   function generate(d, opt = {}) {
+    if (opt.exam) return word2Q(d);
     const pW = [0, 0.9, 0.65, 0.45, 0.3, 0.25][d];
     let kind = opt.kind;
     if (!kind) kind = chance(pW) ? 'word' : d >= 2 && chance(0.5) ? 'num' : d >= 2 ? 'let' : 'word';
@@ -181,5 +246,5 @@
     return attempt(() => (kind === 'num' ? numQ(d) : letQ(d)));
   }
 
-  MT.gens.ana = { generate, _words: WORDS };
+  MT.gens.ana = { generate, _words: WORDS.concat(WORDS2.map((w) => [w[0], w[1], w[2], w[3], [], w[6], w[7], w[8]])) };
 })(typeof window !== 'undefined' ? window : globalThis);

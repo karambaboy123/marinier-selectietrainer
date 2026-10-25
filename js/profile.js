@@ -16,7 +16,7 @@
     CAT_IDS.forEach((c) => (cats[c] = { n: 0, ok: 0, est: null, kOk: {}, kBad: {}, kFast: {}, errs: {} }));
     return { fmt: 'MST2', version: 0, date: today(), diag: 0, intake: {}, cats, errs: {}, quad: { A: 0, B: 0, C: 0, D: 0 }, rs: {}, fast: { n: 0, wrong: 0 }, total: { n: 0, ok: 0 }, numOk: [0, 0, 0, 0, 0, 0, 0], numBad: [0, 0, 0, 0, 0, 0, 0], notes: [], imported: null };
   }
-  const FOUND = { arith: 0, prime: 1, sqdiff: 1, incdiff: 2, pow: 2, diffmul: 2, geo: 3, incmul: 3, plusmin: 4, altop: 4, altinc: 4, alt2: 5, fib: 6, trib: 6, mulminus: 6 };
+  const FOUND = { arith: 0, prime: 1, sqdiff: 1, incdiff: 2, pow: 2, diffmul: 2, geo: 3, incmul: 3, plusmin: 4, altop: 4, altinc: 4, alt2: 5, altdiff: 5, alt2inc: 5, zigzag: 6, fib: 6, trib: 6, mulminus: 6 };
 
   /** Voegt nieuwe antwoorden toe aan (een kopie van) een profiel. opts.diag = aantal diagnostische vragen. */
   function update(prev, answers, opts = {}) {

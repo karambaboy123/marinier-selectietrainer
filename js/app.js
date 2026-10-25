@@ -39,12 +39,14 @@
     { v: '5', k: '5', label: '5/5 – Extreem', desc: 'Complexe combinaties, weinig tijd en hoge nauwkeurigheid vereist.' },
     { v: 'auto', k: 'A', label: 'AUTO – Adaptief', desc: 'Begint passend bij je niveau en past de moeilijkheid automatisch aan.' },
   ];
-  const CAT_DESC = { num: 'Welk getal komt hierna?', ana: 'Woord-, getal- en letterverbanden.', dia: 'Bewerkingen op een rij letters.', fig: 'Welke figuur komt hierna?', log: 'Volgordes, conclusies, codes en redeneersommen.', abs: 'Afwijkers, figuuranalogieën en matrices.' };
+  const CAT_DESC = { num: 'Welk getal van twee cijfers komt hierna?', ana: 'Woord-, getal- en letterverbanden.', dia: 'Bewerkingen op een rij letters.', fig: 'Welke figuur komt hierna?', log: 'Volgordes, conclusies, codes en redeneersommen.', abs: 'Afwijkers, figuuranalogieën en matrices.' };
   const CATEGORY_OPTS = [
     ...CAT_IDS.map((id) => ({ v: id, k: CATS[id].letter, label: `${CATS[id].icon} ${CATS[id].name}`, desc: CAT_DESC[id] })),
     { v: 'mix', k: 'G', label: '🔀 Gemengd', desc: 'Alle onderdelen door elkaar.' },
     { v: 'weak', k: 'H', label: '🎯 Mijn zwakke punten', desc: 'Onderdelen waar je profiel en deze sessie de meeste fouten laten zien.' },
   ];
+  // Opbouw van de Mariniers Training Mode: 13 cijferreeksen, 13 analogieën, 13 figuurreeksen en 16 Venn-diagrammen
+  const EXAM_PLAN = [...Array(13).fill('num'), ...Array(13).fill('ana'), ...Array(13).fill('fig'), ...Array(16).fill('dia')];
   const DURATIONS = [
     { v: 5, k: '1', label: '5 vragen', desc: 'Kort' }, { v: 10, k: '2', label: '10 vragen', desc: 'Normaal' }, { v: 20, k: '3', label: '20 vragen', desc: 'Lang' },
     { v: 30, k: '4', label: '30 vragen', desc: 'Intensief' }, { v: 40, k: '5', label: '40 vragen', desc: 'Mariniers Training: gemengd' },
@@ -76,8 +78,8 @@
       steps: ['level', 'difficulty', 'category', 'duration'], fixed: { pressure: 'none', feedback: 'each', hints: true, reasoning: true }, def: { difficulty: 'auto', category: 'mix', duration: 10 } },
     2: { icon: '🧠', name: 'Adaptieve Training', bullets: ['Moeilijkheid past zich aan je prestaties en profiel aan', 'Herhaalt zwakke onderwerpen met nieuwe vragen'],
       steps: ['level', 'category', 'duration', 'pressure'], fixed: { difficulty: 'auto', feedback: 'each', hints: true, reasoning: false }, def: { category: 'weak', duration: 20, pressure: 'adaptive' } },
-    3: { icon: '⚓', name: 'Mariniers Training Mode', bullets: ['Intensief en gemengd', 'Nadruk op snelheid, nauwkeurigheid en logisch denken', 'Geen hints tenzij ingesteld', 'Zelfgemaakt; geen officiële Defensiesimulatie'],
-      steps: ['level'], fixed: { category: 'mix', difficulty: 'auto', duration: 30, feedback: 'each', hints: false, pressure: 'adaptive', reasoning: false }, def: {} },
+    3: { icon: '⚓', name: 'Mariniers Training Mode', bullets: ['Vaste opbouw: 13 cijferreeksen, 13 analogieën, 13 figuurreeksen en 16 Venn-diagrammen, willekeurig door elkaar', 'Cijferreeksen met getallen van twee cijfers (10–99)', 'Analogieën: kies het woord links én rechts', 'Geen niveaus en geen hints', 'Zelfgemaakt; geen officiële Defensiesimulatie'],
+      steps: [], fixed: { category: 'exam', difficulty: 'exam', level: 3, duration: 55, feedback: 'each', hints: false, pressure: 'adaptive', reasoning: false }, def: {} },
     4: { icon: '⏱️', name: 'Assessment Simulatie', bullets: ['Geen feedback tussendoor', 'Geen hints', 'Assessmentachtige tijdsdruk', 'Analyse na afloop'],
       steps: ['level', 'category', 'duration', 'pressure'], fixed: { difficulty: 'auto', feedback: 'end', hints: false, reasoning: false }, def: { category: 'mix', duration: 20, pressure: 'normal' }, pressureOpts: ['normal', 'high', 'extreme'] },
     5: { icon: '🎯', name: 'Zwakke Punten Training', bullets: ['Gebruikt je Assessmentprofiel en deze sessie', 'Traint gericht je zwakke onderdelen', 'Antwoord + redenering'],
@@ -137,6 +139,7 @@
   const levelName = (v) => PF.LEVEL_NAMES[v] || '';
   const settingLabel = (key, v) => {
     if (key === 'level') return v === 'profile' ? 'Uit mijn Assessmentprofiel' : `${v} – ${levelName(v)}`;
+    if (key === 'category' && v === 'exam') return 'Cijferreeksen, analogieën, figuurreeksen (13 van elk) en Venn-diagrammen (16)';
     const list = { difficulty: DIFFS, category: CATEGORY_OPTS, duration: DURATIONS, pressure: PRESSURES, feedback: FEEDBACKS, hints: HINTS, reasoning: REASONS }[key];
     const o = list && list.find((x) => x.v === v);
     return o ? o.label : String(v);
@@ -167,7 +170,10 @@
     const saved = PROFILE ? `<p class="note">In deze browser staat al een profiel: <b>v${PROFILE.version}</b> van ${esc(PROFILE.date)} (niveau ${PF.overall(PROFILE) || '?'}/5). Kies optie 2 of 3 om het te gebruiken.</p>` : '';
     view(`<h2>⚓ Assessmenttrainer</h2>
       <p>Welkom. Voordat we beginnen wil ik weten of je al eerder met deze trainer hebt geoefend.</p>
-      <h3 style="margin-top:14px">👤 Kies je profieloptie</h3>
+      <div class="choices-list">
+        <button class="pick" id="exam-start"><span class="k">M</span><b>⚓ Mariniers toets starten</b><span class="d">Direct beginnen, geen profiel nodig: 55 vragen (cijferreeksen, analogieën, figuurreeksen en Venn-diagrammen).</span></button>
+      </div>
+      <h3 style="margin-top:14px">👤 Of kies je profieloptie</h3>
       <div class="choices-list">
         <button class="pick" data-o="1"><span class="k">1</span><b>🆕 Nieuwe gebruiker</b><span class="d">Start intake + volledige nulmeting.</span></button>
         <button class="pick" data-o="2"><span class="k">2</span><b>📂 Bestaand Assessmentprofiel</b><span class="d">Plak je vorige profiel en ga direct verder.</span></button>
@@ -176,9 +182,10 @@
       ${saved}
       <p><b>Welke optie kies je: 1, 2 of 3?</b></p>
       <p class="muted small">Je kunt ook <button class="linkbtn" id="skip">zonder profiel direct naar het trainingsmenu</button>.</p>`,
-      (e) => { if (['1', '2', '3'].includes(e.key)) go(e.key); });
+      (e) => { if (['1', '2', '3'].includes(e.key)) go(e.key); if (e.key.toLowerCase() === 'm') chooseMode(3); });
     const go = (o) => (o === '1' ? startIntake() : renderPaste(o === '3' ? 'recal' : 'load'));
     $$('[data-o]').forEach((b) => (b.onclick = () => go(b.dataset.o)));
+    $('#exam-start').onclick = () => chooseMode(3);
     $('#skip').onclick = renderMenu;
   }
 
@@ -414,7 +421,7 @@
   }
   function renderSummary() {
     const s = W.s;
-    const rows = [['Niveau', settingLabel('level', s.level)], ['Moeilijkheid', settingLabel('difficulty', s.difficulty)], ['Categorie', s.category === 'weak' ? `🎯 ${(W.weakCats || weakPoints(2)).map((c) => CATS[c].name).join(' en ') || 'zwakke punten'}` : settingLabel('category', s.category)], ['Aantal vragen', settingLabel('duration', s.duration)], ['Tijdsdruk', settingLabel('pressure', s.pressure)], ['Feedback', settingLabel('feedback', s.feedback)], ['Hints', s.hints ? 'Aan' : 'Uit'], ['Redenering', s.reasoning ? 'Antwoord + redenering' : 'Alleen antwoord']];
+    const rows = [...(s.difficulty === 'exam' ? [] : [['Niveau', settingLabel('level', s.level)], ['Moeilijkheid', settingLabel('difficulty', s.difficulty)]]), ['Categorie', s.category === 'weak' ? `🎯 ${(W.weakCats || weakPoints(2)).map((c) => CATS[c].name).join(' en ') || 'zwakke punten'}` : settingLabel('category', s.category)], ['Aantal vragen', settingLabel('duration', s.duration)], ['Tijdsdruk', settingLabel('pressure', s.pressure)], ['Feedback', settingLabel('feedback', s.feedback)], ['Hints', s.hints ? 'Aan' : 'Uit'], ['Redenering', s.reasoning ? 'Antwoord + redenering' : 'Alleen antwoord']];
     view(`<div class="eyebrow">${esc(W.label)}</div><h2>Klaar om te starten</h2>
       ${W.mode === 3 ? '<p class="muted">Een zelfgemaakte, intensieve trainingsmodus ter voorbereiding. Geen officiële simulatie van Defensie of het Korps Mariniers.</p>' : ''}
       <dl class="summary">${rows.map(([a, b]) => `<dt>${a}</dt><dd>${esc(b)}</dd>`).join('')}</dl>
@@ -448,6 +455,7 @@
     nextQuestion();
   }
   const isAuto = () => RUN.s.difficulty === 'auto';
+  const isExam = () => !!RUN && RUN.s.difficulty === 'exam';
   const reasoningOn = () => !!RUN.s.reasoning;
   const curLevel = () => {
     if (CATS[RUN.s.category]) return RUN.lv[RUN.s.category];
@@ -459,6 +467,7 @@
     const c = RUN.s.category;
     if (CATS[c]) return c;
     if (c === 'mix') { if (!RUN.bag.length) RUN.bag = shuffle(CAT_IDS); return RUN.bag.pop(); }
+    if (c === 'exam') { if (!RUN.bag.length) RUN.bag = shuffle(EXAM_PLAN); return RUN.bag.pop(); }
     const pool = RUN.weakCats && RUN.weakCats.length ? RUN.weakCats : CAT_IDS;
     const S = catStats([...SESSION.history.slice(-60), ...RUN.results.map((r) => ({ c: r.q.cat, ok: r.ok }))]);
     const w = pool.map((k) => (S[k].n - S[k].ok + 1) / (S[k].n + 2) + 0.1);
@@ -485,9 +494,10 @@
     else if (RUN.retest) { cat = RUN.retest.cat; kind = RUN.retest.kind; d = RUN.retest.at; flag = 'retest'; }
     else if (due >= 0 && RUN.s.feedback === 'each') { const r = RUN.review.splice(due, 1)[0]; cat = r.cat; kind = r.kind; d = RUN.lv[cat]; flag = 'review'; }
     else { cat = chooseCat(); d = RUN.lv[cat]; }
+    const gopt = { ...(kind ? { kind } : {}), ...(isExam() ? { exam: true } : {}) };
     let q;
     for (let k = 0; k < 8; k++) {
-      q = MT.gens[cat].generate(d, kind ? { kind } : {});
+      q = MT.gens[cat].generate(d, gopt);
       const sig = q.prompt + q.stem + q.opts.map((o) => o.key).join();
       if (!RUN.seen.has(sig)) { RUN.seen.add(sig); break; }
     }
@@ -502,7 +512,7 @@
     return `<div class="cmds">
       ${phase === 'q' ? cmdBtn('hint', 'HINT', !s.hints || RUN.cur.hint) : cmdBtn('uitleg', 'UITLEG')}
       ${phase === 'fb' ? cmdBtn('next', 'VOLGENDE') : ''}
-      ${cmdBtn('harder', 'MOEILIJKER')}${cmdBtn('easier', 'MAKKELIJKER')}${cmdBtn('score', 'SCORE')}
+      ${isExam() ? '' : cmdBtn('harder', 'MOEILIJKER') + cmdBtn('easier', 'MAKKELIJKER')}${cmdBtn('score', 'SCORE')}
       ${cmdBtn('weak', 'ZWAKKE PUNTEN')}${cmdBtn('profiel', 'PROFIEL', !PROFILE)}
       ${cmdBtn('stop', 'STOP', false, 'stop')}${cmdBtn('menu', 'MENU')}
     </div>`;
@@ -555,7 +565,7 @@
     const cat = CATS[C.cat];
     const count = RUN.total === Infinity ? `Vraag ${RUN.i + 1} · vrij trainen` : `Vraag ${RUN.i + 1}/${RUN.total}`;
     const flag = { diag: '<span class="chip warn">Eenvoudiger oefenvraag</span>', retest: '<span class="chip olive">Hertest</span>', review: '<span class="chip olive">Herhaling in andere vorm</span>' }[C.flag] || '';
-    return `<div class="qbar"><div class="left"><span class="chip">${cat.icon} ${cat.name}</span><span class="chip olive">Niveau ${C.d}/5</span>${flag}<span class="counter">${count}</span></div>${C.target ? `<div class="timer" id="timer">${C.target}s</div>` : ''}</div>`;
+    return `<div class="qbar"><div class="left"><span class="chip">${cat.icon} ${cat.name}</span>${isExam() ? '' : `<span class="chip olive">Niveau ${C.d}/5</span>`}${flag}<span class="counter">${count}</span></div>${C.target ? `<div class="timer" id="timer">${C.target}s</div>` : ''}</div>`;
   }
 
   function renderQuestion() {
@@ -668,6 +678,7 @@
       if (res.ok && res.ms < res.target * 600) RUN.timeF = clamp(RUN.timeF * 0.92, 0.5, 1.6);
       else if (!res.ok) RUN.timeF = clamp(RUN.timeF * 1.1, 0.5, 1.6);
     }
+    if (isExam()) return notes;
     const fb = s.feedback === 'each';
     const goodReason = !res.J || RS.reasonOk(res.J.status);
     if (!res.ok && fb && RUN.review.length < 6) RUN.review.push({ cat: c, kind: res.q.kindId, due: RUN.i + 3 + Math.floor(Math.random() * 4) });
@@ -709,7 +720,7 @@
       <div><small>Score</small><b>${ok}/${n}</b></div>
       <div><small>Nauwkeurigheid</small><b>${pct(ok, n)}%</b></div>
       ${withR.length ? `<div><small>Redenering correct</small><b>${rOk}/${withR.length}</b></div>` : ''}
-      <div><small>Huidig niveau</small><b>${RUN.plan ? '—' : curLevel() + '/5'}</b></div>
+      ${isExam() ? '' : `<div><small>Huidig niveau</small><b>${RUN.plan ? '—' : curLevel() + '/5'}</b></div>`}
       <div><small>Sterkste categorie</small><b class="txt">${st ? CATS[st].name : '—'}</b></div>
       <div><small>Extra aandacht</small><b class="txt">${wk ? CATS[wk].name : '—'}</b></div>
     </div>`;
@@ -758,8 +769,8 @@
       if (!res.ok) bad = res.timedOut ? '<h3>Waar ging het mis?</h3><p class="miss">De tijd was op voordat je een antwoord koos. Kom je er niet uit, gok dan en ga door: een lege vraag levert nooit punten op.</p>'
         : `<h3>Waar ging het mis?</h3><p class="miss">Je koos ${LETTERS[res.chosen]}. ${wrongWhy}</p><p class="muted small">Dit is waarom dat antwoord niet klopt. Hoe je tot ${LETTERS[res.chosen]} kwam weet ik niet; zet redenering aan (Leren & Uitleggen of Zelf Instellen) voor feedback op je denkwijze.</p>`;
     }
-    view(`${J ? '' : `<div class="qbar"><div class="left"><span class="chip">${CATS[q.cat].icon} ${CATS[q.cat].name}</span><span class="chip olive">Niveau ${res.d}/5</span><span class="counter">${esc(q.kind)}</span></div></div>`}
-      ${J ? `<div class="qbar"><div class="left"><span class="chip">${CATS[q.cat].icon} ${CATS[q.cat].name}</span><span class="chip olive">Niveau ${res.d}/5</span><span class="counter">Vraag ${count} · ${esc(q.kind)}</span></div></div>` : head}
+    view(`${J ? '' : `<div class="qbar"><div class="left"><span class="chip">${CATS[q.cat].icon} ${CATS[q.cat].name}</span>${isExam() ? '' : `<span class="chip olive">Niveau ${res.d}/5</span>`}<span class="counter">${esc(q.kind)}</span></div></div>`}
+      ${J ? `<div class="qbar"><div class="left"><span class="chip">${CATS[q.cat].icon} ${CATS[q.cat].name}</span>${isExam() ? '' : `<span class="chip olive">Niveau ${res.d}/5</span>`}<span class="counter">Vraag ${count} · ${esc(q.kind)}</span></div></div>` : head}
       <div class="card">${J ? head : ''}${stemHTML(q, { chosen: res.chosen })}
         <div class="fb">
           ${good}${bad}
@@ -785,7 +796,7 @@
   function showScore() {
     const n = RUN.results.length, ok = RUN.results.filter((r) => r.ok).length;
     const S = catStats(RUN.results.map((r) => ({ c: r.q.cat, ok: r.ok, t: r.ms, to: r.timedOut })));
-    openPanel(`<h2>Score</h2><p><b class="num">${ok}/${n}</b> goed · <b class="num">${pct(ok, n)}%</b> nauwkeurig · niveau <b class="num">${curLevel()}/5</b></p>${catTable(S)}`);
+    openPanel(`<h2>Score</h2><p><b class="num">${ok}/${n}</b> goed · <b class="num">${pct(ok, n)}%</b> nauwkeurig${isExam() ? '' : ` · niveau <b class="num">${curLevel()}/5</b>`}</p>${catTable(S)}`);
   }
   function showWeak() {
     const H = SESSION.history, S = catStats(H);
@@ -895,13 +906,13 @@
     let rec, recStart;
     const endLv = curLevel();
     if (weak.length) { rec = `🎯 Zwakke Punten Training, 10 vragen, met focus op ${weak.slice(0, 2).map((c) => CATS[c].name).join(' en ')}.`; recStart = () => { W = { mode: 5, label: '🎯 Zwakke Punten Training', s: { ...MODES[5].fixed, duration: 10, level: endLv }, steps: [], i: 0, weakCats: weak.slice(0, 2) }; renderSummary(); }; }
-    else if (pct(ok, n) >= 85 && endLv >= 4) { rec = '⚓ Mariniers Training Mode (30 gemengde vragen) of een ⏱️ Assessment Simulatie met hoge tijdsdruk.'; recStart = () => { W = { mode: 3, label: '⚓ Mariniers Training Mode', s: { ...MODES[3].fixed, level: endLv }, steps: [], i: 0 }; renderSummary(); }; }
+    else if (pct(ok, n) >= 85 && endLv >= 4) { rec = '⚓ Mariniers Training Mode (55 vragen) of een ⏱️ Assessment Simulatie met hoge tijdsdruk.'; recStart = () => { W = { mode: 3, label: '⚓ Mariniers Training Mode', s: { ...MODES[3].fixed, level: endLv }, steps: [], i: 0 }; renderSummary(); }; }
     else { rec = `🧠 Adaptieve Training, 20 vragen, startniveau ${endLv}.`; recStart = () => { W = { mode: 2, label: '🧠 Adaptieve Training', s: { ...MODES[2].def, ...MODES[2].fixed, level: endLv }, steps: [], i: 0 }; renderSummary(); }; }
     const meaningful = SESSION.pending.length >= 5;
     view(`<div class="report">
       <div class="eyebrow">${esc(RUN.label)}${stopped && RUN.total !== Infinity && R.length < RUN.total ? ' · voortijdig gestopt' : ''}</div>
       <h2>📊 Trainingsrapport</h2>
-      <div class="kpis"><div><small>Totaalscore</small><b>${ok}/${n}</b></div><div><small>Nauwkeurigheid</small><b>${pct(ok, n)}%</b></div><div><small>Niveau aan het begin</small><b>${RUN.startLv}</b></div><div><small>Niveau aan het einde</small><b>${endLv}</b></div><div><small>Gem. tijd per vraag</small><b>${avg} s</b></div></div>
+      <div class="kpis"><div><small>Totaalscore</small><b>${ok}/${n}</b></div><div><small>Nauwkeurigheid</small><b>${pct(ok, n)}%</b></div>${isExam() ? '' : `<div><small>Niveau aan het begin</small><b>${RUN.startLv}</b></div><div><small>Niveau aan het einde</small><b>${endLv}</b></div>`}<div><small>Gem. tijd per vraag</small><b>${avg} s</b></div></div>
       ${meaningful ? `<div class="offer"><p><b>Wil je je Assessmentprofiel bijwerken met de resultaten van deze training?</b></p><div class="row"><button class="btn" id="upd">Ja, profiel bijwerken</button><button class="btn quiet" id="noupd">Nee</button></div></div>` : ''}
       <h3>Per onderdeel</h3>${catTable(S)}
       ${withR.length ? `<h3>Antwoord en denkwijze</h3><div class="quadgrid">${['A', 'B', 'C', 'D'].map((k) => `<div class="q${k}"><b>${quad[k]}×</b><span>${esc(RS.QUAD[k])}</span></div>`).join('')}</div>` : ''}
@@ -914,7 +925,7 @@
       <div class="row"><button class="btn" id="rec">Start aanbevolen training</button><button class="btn ghost" id="menu">Terug naar menu</button></div>
       <p class="muted small" style="margin-top:12px">Dit rapport gaat alleen over deze oefentraining. Het voorspelt niet of je het echte assessment haalt.</p>
       <h3>Alle vragen nakijken</h3>
-      ${R.map((r, i) => `<details class="rev"><summary><span class="mark ${r.ok ? 'ok' : 'no'}">${r.ok ? '✓' : '✗'}</span><span>${i + 1}. ${CATS[r.q.cat].name} · ${esc(r.q.kind)}${r.qd ? ` · ${r.qd}` : ''}</span><span class="muted small" style="margin-left:auto">niveau ${r.d} · ${(r.ms / 1000).toFixed(0)} s${r.timedOut ? ' · tijd op' : ''}</span></summary>
+      ${R.map((r, i) => `<details class="rev"><summary><span class="mark ${r.ok ? 'ok' : 'no'}">${r.ok ? '✓' : '✗'}</span><span>${i + 1}. ${CATS[r.q.cat].name} · ${esc(r.q.kind)}${r.qd ? ` · ${r.qd}` : ''}</span><span class="muted small" style="margin-left:auto">${isExam() ? '' : `niveau ${r.d} · `}${(r.ms / 1000).toFixed(0)} s${r.timedOut ? ' · tijd op' : ''}</span></summary>
         <div class="body">${stemHTML(r.q, { chosen: r.chosen })}<div class="fb"><h3>Uitleg</h3><ol>${r.q.steps.map((s) => `<li>${s}</li>`).join('')}</ol>${!r.ok && r.chosen != null ? `<p class="miss" style="margin-top:10px">Jouw antwoord ${LETTERS[r.chosen]}: ${esc(r.q.opts[r.chosen].why || '')}</p>` : ''}${r.J ? `<p class="small" style="margin-top:8px">Jouw redenering: ${esc(r.J.chosen.join('; '))}</p>` : ''}<p class="lesson" style="margin-top:10px">${esc(r.q.lesson)}</p></div></div></details>`).join('')}
     </div>`, (e) => { if (e.key === 'Escape') renderMenu(); });
     $('#rec').onclick = () => { RUN = null; recStart(); };

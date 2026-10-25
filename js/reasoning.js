@@ -26,13 +26,16 @@
 
   /* ---------- Cijferreeksen: systematische zoekvolgorde ---------- */
   const SEARCH = ['Optellen of aftrekken (vaste stap)', 'Verschillen bekijken', 'Verschillen van verschillen', 'Vermenigvuldigen of delen', 'Afwisselende bewerkingen', 'Oneven en even posities apart', 'Combinaties van meerdere regels'];
-  const FOUND_AT = { arith: 0, prime: 1, sqdiff: 1, incdiff: 2, pow: 2, diffmul: 2, geo: 3, incmul: 3, plusmin: 4, altop: 4, altinc: 4, alt2: 5, fib: 6, trib: 6, mulminus: 6 };
+  const FOUND_AT = { arith: 0, prime: 1, sqdiff: 1, incdiff: 2, pow: 2, diffmul: 2, geo: 3, incmul: 3, plusmin: 4, altop: 4, altinc: 4, alt2: 5, altdiff: 5, alt2inc: 5, zigzag: 6, fib: 6, trib: 6, mulminus: 6 };
   const NUM_DESC = {
     arith: 'Vaste stap: steeds hetzelfde getal erbij of eraf',
     geo: 'Steeds keer (of gedeeld door) hetzelfde getal',
     plusmin: 'Afwisselend een vaste stap erbij en een vaste stap eraf',
     incdiff: 'De verschillen worden steeds een vast getal groter',
     alt2: 'Twee reeksen door elkaar (om en om lezen)',
+    altdiff: 'De verschillen vormen zelf twee reeksen om en om',
+    alt2inc: 'Twee reeksen door elkaar, waarvan de stappen steeds veranderen',
+    zigzag: 'Grote verschillen die groeien en van teken wisselen, met +1 en −1 ertussen',
     altop: 'Twee verschillende bewerkingen wisselen elkaar af (bijv. +3 en ×2)',
     fib: 'Elk getal is de som van de twee getallen ervoor',
     pow: 'Kwadraten of machten (1, 4, 9, 16 … of 1, 8, 27 …)',
@@ -83,7 +86,13 @@
   function diaReason(q) {
     const mode = (q.meta || {}).mode;
     let opts;
-    if (mode === 'op') opts = [
+    if (mode === 'venn') opts = [
+      { id: 'pairs', text: 'Elk paar begrippen apart bekeken: binnen elkaar, overlappend of los van elkaar', status: 'correct' },
+      { id: 'big', text: 'Eerst het grootste begrip gezocht en daarna gekeken hoe de andere twee zich verhouden', status: 'correct' },
+      { id: 'look', text: 'Het diagram gekozen dat het meest voor de hand lag', status: 'wrong', err: ERR.early, note: 'Zonder elk paar te controleren is dit gokken. Bijna alle diagrammen lijken op elkaar.' },
+      { id: 'topic', text: 'Gekeken of de begrippen iets met elkaar te maken hebben', status: 'wrong', err: ERR.assume, note: 'Dat zegt niets over de verhouding. Het gaat erom of het ene binnen het andere valt, of ze overlappen of elkaar uitsluiten.' },
+    ];
+    else     if (mode === 'op') opts = [
       { id: 'fb', text: 'Vooruit gerekend tot het vraagteken en terug vanaf de uitkomst', status: 'correct' },
       { id: 'try', text: 'Elke bewerking uit de legenda op die plek uitgeprobeerd', status: 'inefficient', note: 'Dat werkt, maar kost bij veel bewerkingen veel tijd.' },
       { id: 'freq', text: 'Gekozen welke bewerking het meest voor de hand lag', status: 'wrong', err: ERR.early, note: 'Zonder narekenen weet je niet of de bewerking de juiste uitkomst geeft.' },
@@ -201,6 +210,7 @@
     'ana-word': 'Bij een analogie gaat het om de relatie, niet om het onderwerp. Door van het eerste paar een zin te maken, leg je die relatie vast. Het juiste woord past precies in dezelfde zin.',
     'ana-num': 'Eén voorbeeld past bij heel veel regels (3 → 6 kan +3 zijn, maar ook ×2). Met twee voorbeelden blijft er meestal één regel over. Daarom test je elke regel op alle voorbeelden.',
     'ana-let': 'Door letter voor letter te vergelijken zie je of de letters verschuiven (andere letters) of van plek wisselen (zelfde letters). Die ene vaststelling bepaalt al welk soort regel het is.',
+    venn: 'Een Venn-diagram laat de verhouding tussen begrippen zien: helemaal binnen een ander, gedeeltelijk overlappend of los. Door elk paar apart te beoordelen weet je precies welke cirkels in elkaar, door elkaar of naast elkaar horen te staan.',
     dia: 'Elke bewerking werkt op de uitkomst van de vorige. De volgorde bepaalt dus het resultaat: wie een stap verwisselt of overslaat, krijgt een andere uitkomst. Stap voor stap werken sluit dat uit.',
     'dia-in': 'Elke bewerking heeft een tegenbewerking (omkeren ↔ omkeren, eerste naar achteren ↔ laatste naar voren). Door achteraan te beginnen, maak je stap voor stap ongedaan wat er gebeurd is.',
     fig: 'In een figuurreeks kunnen meerdere eigenschappen tegelijk veranderen, elk met een eigen regel. Door ze apart te bekijken raak je er geen kwijt, en voorkom je dat één opvallende verandering een andere verbergt.',
@@ -215,6 +225,7 @@
   function whyWorks(q) {
     if (q.cat === 'num') return WHY.num;
     if (q.cat === 'ana') return WHY['ana-' + ((q.meta && q.meta.sub) || 'word')];
+    if (q.cat === 'dia' && q.kindId === 'venn') return WHY.venn;
     if (q.cat === 'dia') return q.meta && q.meta.mode === 'in' ? WHY['dia-in'] : WHY.dia;
     if (q.cat === 'fig') return WHY.fig;
     if (q.cat === 'abs') return WHY['abs-' + q.kindId] || WHY['abs-odd'];
