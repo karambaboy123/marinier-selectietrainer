@@ -37,7 +37,7 @@ Alle vragen worden **ter plekke gegenereerd**. Elke training heeft dus andere ge
 
 | | Categorie | Soorten vragen |
 |---|---|---|
-| A | 🔢 Cijferreeksen | Alle getallen hebben twee cijfers (10–99); één getal is gevraagd. 13 patronen: vaste stap, afwisselende stappen, veranderende verschillen, twee reeksen door elkaar (ook met veranderende stap), verschillen in twee reeksen, groeiende zigzag, kwadraten, som van vorige twee/drie, priemverschillen … |
+| A | 🔢 Cijferreeksen | De laatste twee getallen van de reeks zijn gevraagd (één antwoord met beide getallen). Elke reeks volgt een duidelijke regel. 16 patronen: vaste stap, afwisselende stappen, veranderende verschillen, twee reeksen door elkaar (ook met veranderende stap), verschillen in twee reeksen, groeiende zigzag, kwadraten, som van vorige twee/drie, priemverschillen … |
 | B | 🔤 Analogieën | Woordanalogieën, getalanalogieën en letteranalogieën. In de Mariniers Training Mode kies je bij elke woordanalogie het woord links én rechts (31 eigen woordparen met bewust verleidelijke combinaties) |
 | C | ◯ Diagrammen | Uitkomst bepalen, ontbrekende bewerking vinden, terugrekenen; symbolen wisselen per vraag. In de Mariniers Training Mode: Venn-diagrammen met drie begrippen en negen soorten verhoudingen |
 | D | 🔷 Figuurreeksen | Draaiing, vulling, vorm, stippen, 1–3 regels tegelijk, rasters met één of twee bewegingen |
@@ -46,7 +46,7 @@ Alle vragen worden **ter plekke gegenereerd**. Elke training heeft dus andere ge
 
 **Mariniers Training Mode**
 
-Deze modus heeft geen niveaukeuze en past zijn moeilijkheid niet aan. De vragen zijn opgebouwd naar het formaat van de oefenopgaven die gebruikers kennen: cijferreeksen met een lange reeks getallen van twee cijfers en vier antwoordopties, analogieën met twee open plekken, figuurreeksen met vier opties en Venn-diagrammen (kies het diagram dat de verhouding tussen drie begrippen toont). De vragen zijn zelf gemaakt en komen niet uit het echte assessment.
+Deze modus heeft geen niveaukeuze en past zijn moeilijkheid niet aan. De vragen zijn opgebouwd naar het formaat van de oefenopgaven die gebruikers kennen: cijferreeksen met een lange reeks waarvan je de laatste twee getallen geeft (vier antwoordopties), analogieën met twee open plekken, figuurreeksen met vier opties en Venn-diagrammen (kies het diagram dat de verhouding tussen drie begrippen toont). De vragen zijn zelf gemaakt en komen niet uit het echte assessment.
 
 **Adaptief systeem** (de andere modi)
 

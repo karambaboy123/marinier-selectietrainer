@@ -39,7 +39,7 @@
     { v: '5', k: '5', label: '5/5 – Extreem', desc: 'Complexe combinaties, weinig tijd en hoge nauwkeurigheid vereist.' },
     { v: 'auto', k: 'A', label: 'AUTO – Adaptief', desc: 'Begint passend bij je niveau en past de moeilijkheid automatisch aan.' },
   ];
-  const CAT_DESC = { num: 'Welk getal van twee cijfers komt hierna?', ana: 'Woord-, getal- en letterverbanden.', dia: 'Bewerkingen op een rij letters.', fig: 'Welke figuur komt hierna?', log: 'Volgordes, conclusies, codes en redeneersommen.', abs: 'Afwijkers, figuuranalogieën en matrices.' };
+  const CAT_DESC = { num: 'Welke twee getallen komen hierna?', ana: 'Woord-, getal- en letterverbanden.', dia: 'Bewerkingen op een rij letters.', fig: 'Welke figuur komt hierna?', log: 'Volgordes, conclusies, codes en redeneersommen.', abs: 'Afwijkers, figuuranalogieën en matrices.' };
   const CATEGORY_OPTS = [
     ...CAT_IDS.map((id) => ({ v: id, k: CATS[id].letter, label: `${CATS[id].icon} ${CATS[id].name}`, desc: CAT_DESC[id] })),
     { v: 'mix', k: 'G', label: '🔀 Gemengd', desc: 'Alle onderdelen door elkaar.' },
@@ -78,7 +78,7 @@
       steps: ['level', 'difficulty', 'category', 'duration'], fixed: { pressure: 'none', feedback: 'each', hints: true, reasoning: true }, def: { difficulty: 'auto', category: 'mix', duration: 10 } },
     2: { icon: '🧠', name: 'Adaptieve Training', bullets: ['Moeilijkheid past zich aan je prestaties en profiel aan', 'Herhaalt zwakke onderwerpen met nieuwe vragen'],
       steps: ['level', 'category', 'duration', 'pressure'], fixed: { difficulty: 'auto', feedback: 'each', hints: true, reasoning: false }, def: { category: 'weak', duration: 20, pressure: 'adaptive' } },
-    3: { icon: '⚓', name: 'Mariniers Training Mode', bullets: ['Vaste opbouw: 13 cijferreeksen, 13 analogieën, 13 figuurreeksen en 16 Venn-diagrammen, willekeurig door elkaar', 'Cijferreeksen met getallen van twee cijfers (10–99)', 'Analogieën: kies het woord links én rechts', 'Geen niveaus en geen hints', 'Zelfgemaakt; geen officiële Defensiesimulatie'],
+    3: { icon: '⚓', name: 'Mariniers Training Mode', bullets: ['Vaste opbouw: 13 cijferreeksen, 13 analogieën, 13 figuurreeksen en 16 Venn-diagrammen, willekeurig door elkaar', 'Cijferreeksen: je geeft de laatste twee getallen van de reeks', 'Analogieën: kies het woord links én rechts', 'Geen niveaus en geen hints', 'Zelfgemaakt; geen officiële Defensiesimulatie'],
       steps: [], fixed: { category: 'exam', difficulty: 'exam', level: 3, duration: 55, feedback: 'each', hints: false, pressure: 'adaptive', reasoning: false }, def: {} },
     4: { icon: '⏱️', name: 'Assessment Simulatie', bullets: ['Geen feedback tussendoor', 'Geen hints', 'Assessmentachtige tijdsdruk', 'Analyse na afloop'],
       steps: ['level', 'category', 'duration', 'pressure'], fixed: { difficulty: 'auto', feedback: 'end', hints: false, reasoning: false }, def: { category: 'mix', duration: 20, pressure: 'normal' }, pressureOpts: ['normal', 'high', 'extreme'] },
