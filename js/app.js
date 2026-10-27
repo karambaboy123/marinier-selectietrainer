@@ -63,7 +63,24 @@
   const FEEDBACKS = [{ v: 'each', k: '1', label: 'Na iedere vraag', desc: 'Direct beoordeling en uitleg.' }, { v: 'end', k: '2', label: 'Alleen aan het eind', desc: 'Zoals bij een assessment.' }];
   const HINTS = [{ v: true, k: '1', label: 'Hints aan', desc: 'Per vraag één kleine hint.' }, { v: false, k: '2', label: 'Hints uit', desc: '' }];
   const REASONS = [{ v: true, k: '1', label: 'Redenering vragen', desc: 'Na elk antwoord geef je aan hoe je het aanpakte. Antwoord en denkwijze worden apart beoordeeld.' }, { v: false, k: '2', label: 'Alleen antwoord', desc: 'Sneller, maar minder inzicht in je denkwijze.' }];
+  const PARTS = [
+    { v: 'all', k: '1', label: '🔀 Alles gemengd', desc: '55 vragen door elkaar: 13 cijferreeksen, 13 analogieën, 13 figuurreeksen en 16 Venn-diagrammen.' },
+    { v: 'num', k: '2', label: '🔢 Cijferreeksen', desc: '13 vragen: geef de laatste twee getallen van de reeks.' },
+    { v: 'ana', k: '3', label: '🔤 Analogieën', desc: '13 vragen: kies het woord links én rechts.' },
+    { v: 'fig', k: '4', label: '🔷 Figuurreeksen', desc: '13 vragen: welke figuur komt hierna?' },
+    { v: 'dia', k: '5', label: '◯ Venn-diagrammen', desc: '16 vragen: welk diagram past bij de drie begrippen?' },
+  ];
+  const PART_LEN = { all: 55, num: 13, ana: 13, fig: 13, dia: 16 };
   const STEP_DEFS = {
+    part: { title: 'Onderdeel', q: 'Wat wil je oefenen?', opts: PARTS },
+    examcount: {
+      title: 'Aantal vragen', q: 'Hoeveel vragen wil je?',
+      opts: () => {
+        const n = PART_LEN[W.s.part || 'all'];
+        const list = [{ v: n, label: `Toets: ${n} vragen`, desc: 'Zoals de opbouw van de echte toets.' }, ...[20, 30, 40, 50].filter((x) => x !== n).map((x) => ({ v: x, label: `${x} vragen`, desc: '' })), { v: Infinity, label: 'Oneindig', desc: 'Doorgaan tot je op STOP drukt.' }];
+        return list.map((o, i) => ({ ...o, k: String(i + 1) }));
+      },
+    },
     level: { title: 'Niveau', q: 'Wat is je huidige niveau?', opts: LEVELS },
     difficulty: { title: 'Moeilijkheid', q: 'Hoe moeilijk wil je beginnen?', opts: DIFFS, note: 'Deze niveaus zijn trainingsniveaus van deze oefenomgeving. Ze zeggen niets over het officiële niveau van Defensie.' },
     category: { title: 'Categorie', q: 'Wat wil je oefenen?', opts: CATEGORY_OPTS },
@@ -78,8 +95,8 @@
       steps: ['level', 'difficulty', 'category', 'duration'], fixed: { pressure: 'none', feedback: 'each', hints: true, reasoning: true }, def: { difficulty: 'auto', category: 'mix', duration: 10 } },
     2: { icon: '🧠', name: 'Adaptieve Training', bullets: ['Moeilijkheid past zich aan je prestaties en profiel aan', 'Herhaalt zwakke onderwerpen met nieuwe vragen'],
       steps: ['level', 'category', 'duration', 'pressure'], fixed: { difficulty: 'auto', feedback: 'each', hints: true, reasoning: false }, def: { category: 'weak', duration: 20, pressure: 'adaptive' } },
-    3: { icon: '⚓', name: 'Mariniers Training Mode', bullets: ['Vaste opbouw: 13 cijferreeksen, 13 analogieën, 13 figuurreeksen en 16 Venn-diagrammen, willekeurig door elkaar', 'Cijferreeksen: je geeft de laatste twee getallen van de reeks', 'Analogieën: kies het woord links én rechts', 'Geen niveaus en geen hints', 'Zelfgemaakt; geen officiële Defensiesimulatie'],
-      steps: [], fixed: { category: 'exam', difficulty: 'exam', level: 3, duration: 55, feedback: 'each', hints: false, pressure: 'adaptive', reasoning: false }, def: {} },
+    3: { icon: '⚓', name: 'Mariniers Training Mode', bullets: ['Alles gemengd (13 cijferreeksen, 13 analogieën, 13 figuurreeksen en 16 Venn-diagrammen) of elk onderdeel apart oefenen', 'Cijferreeksen: je geeft de laatste twee getallen van de reeks', 'Analogieën: kies het woord links én rechts', 'Geen niveaus en geen hints', 'Zelfgemaakt; geen officiële Defensiesimulatie'],
+      steps: ['part', 'examcount'], fixed: { difficulty: 'exam', level: 3, feedback: 'each', hints: false, pressure: 'adaptive', reasoning: false }, def: { part: 'all', category: 'exam', duration: 55, examcount: 55 } },
     4: { icon: '⏱️', name: 'Assessment Simulatie', bullets: ['Geen feedback tussendoor', 'Geen hints', 'Assessmentachtige tijdsdruk', 'Analyse na afloop'],
       steps: ['level', 'category', 'duration', 'pressure'], fixed: { difficulty: 'auto', feedback: 'end', hints: false, reasoning: false }, def: { category: 'mix', duration: 20, pressure: 'normal' }, pressureOpts: ['normal', 'high', 'extreme'] },
     5: { icon: '🎯', name: 'Zwakke Punten Training', bullets: ['Gebruikt je Assessmentprofiel en deze sessie', 'Traint gericht je zwakke onderdelen', 'Antwoord + redenering'],
@@ -142,7 +159,7 @@
     if (key === 'category' && v === 'exam') return 'Cijferreeksen, analogieën, figuurreeksen (13 van elk) en Venn-diagrammen (16)';
     const list = { difficulty: DIFFS, category: CATEGORY_OPTS, duration: DURATIONS, pressure: PRESSURES, feedback: FEEDBACKS, hints: HINTS, reasoning: REASONS }[key];
     const o = list && list.find((x) => x.v === v);
-    return o ? o.label : String(v);
+    return o ? o.label : key === 'duration' ? `${v} vragen` : String(v);
   };
   const pct = (a, b) => (b ? Math.round((a / b) * 100) : 0);
 
@@ -171,7 +188,7 @@
     view(`<h2>⚓ Assessmenttrainer</h2>
       <p>Welkom. Voordat we beginnen wil ik weten of je al eerder met deze trainer hebt geoefend.</p>
       <div class="choices-list">
-        <button class="pick" id="exam-start"><span class="k">M</span><b>⚓ Mariniers toets starten</b><span class="d">Direct beginnen, geen profiel nodig: 55 vragen (cijferreeksen, analogieën, figuurreeksen en Venn-diagrammen).</span></button>
+        <button class="pick" id="exam-start"><span class="k">M</span><b>⚓ Mariniers toets starten</b><span class="d">Direct beginnen, geen profiel nodig. Alles gemengd (55 vragen) of elk onderdeel apart: cijferreeksen, analogieën, figuurreeksen of Venn-diagrammen.</span></button>
       </div>
       <h3 style="margin-top:14px">👤 Of kies je profieloptie</h3>
       <div class="choices-list">
@@ -398,7 +415,7 @@
   function renderStep() {
     if (W.i >= W.steps.length) return renderSummary();
     const key = W.steps[W.i], D = STEP_DEFS[key];
-    let opts = D.opts;
+    let opts = typeof D.opts === 'function' ? D.opts() : D.opts;
     if (key === 'pressure' && MODES[W.mode].pressureOpts) opts = opts.filter((o) => MODES[W.mode].pressureOpts.includes(o.v));
     const cur = W.s[key];
     const disabled = (o) => (o.v === 'profile' && !PROFILE) || (o.v === 'weak' && !weakPoints(1).length);
@@ -412,6 +429,8 @@
     const choose = (i) => {
       const o = opts[i];
       W.s[key] = o.v;
+      if (key === 'part') { W.s.category = o.v === 'all' ? 'exam' : o.v; W.s.duration = PART_LEN[o.v]; W.s.examcount = W.s.duration; }
+      if (key === 'examcount') W.s.duration = o.v;
       if (key === 'duration' && o.v === 40) { W.s.category = 'mix'; const ci = W.steps.indexOf('category'); if (ci > W.i) W.steps.splice(ci, 1); }
       W.i++; renderStep();
     };
@@ -906,7 +925,7 @@
     let rec, recStart;
     const endLv = curLevel();
     if (weak.length) { rec = `🎯 Zwakke Punten Training, 10 vragen, met focus op ${weak.slice(0, 2).map((c) => CATS[c].name).join(' en ')}.`; recStart = () => { W = { mode: 5, label: '🎯 Zwakke Punten Training', s: { ...MODES[5].fixed, duration: 10, level: endLv }, steps: [], i: 0, weakCats: weak.slice(0, 2) }; renderSummary(); }; }
-    else if (pct(ok, n) >= 85 && endLv >= 4) { rec = '⚓ Mariniers Training Mode (55 vragen) of een ⏱️ Assessment Simulatie met hoge tijdsdruk.'; recStart = () => { W = { mode: 3, label: '⚓ Mariniers Training Mode', s: { ...MODES[3].fixed, level: endLv }, steps: [], i: 0 }; renderSummary(); }; }
+    else if (pct(ok, n) >= 85 && endLv >= 4) { rec = '⚓ Mariniers Training Mode (55 vragen) of een ⏱️ Assessment Simulatie met hoge tijdsdruk.'; recStart = () => { W = { mode: 3, label: '⚓ Mariniers Training Mode', s: { ...MODES[3].def, ...MODES[3].fixed, level: endLv }, steps: [], i: 0 }; renderSummary(); }; }
     else { rec = `🧠 Adaptieve Training, 20 vragen, startniveau ${endLv}.`; recStart = () => { W = { mode: 2, label: '🧠 Adaptieve Training', s: { ...MODES[2].def, ...MODES[2].fixed, level: endLv }, steps: [], i: 0 }; renderSummary(); }; }
     const meaningful = SESSION.pending.length >= 5;
     view(`<div class="report">

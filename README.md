@@ -28,7 +28,7 @@ Alle vragen worden **ter plekke gegenereerd**. Elke training heeft dus andere ge
 
 1. 📚 Leren & Uitleggen: één vraag per keer, direct uitleg, geen tijdsdruk
 2. 🧠 Adaptieve Training: moeilijkheid en tijd passen zich aan je prestaties aan
-3. ⚓ Mariniers Training Mode: vaste opbouw van 55 vragen (13 cijferreeksen, 13 analogieën, 13 figuurreeksen en 16 Venn-diagrammen), zonder niveaus en hints, met uitgebreide analyse
+3. ⚓ Mariniers Training Mode: kies alles gemengd (55 vragen: 13 cijferreeksen, 13 analogieën, 13 figuurreeksen en 16 Venn-diagrammen) of oefen elk onderdeel apart. Je kiest zelf de lengte: de toetslengte, 20, 30, 40 of 50 vragen, of oneindig tot je op STOP drukt. Zonder niveaus en hints, met uitgebreide analyse
 4. ⏱️ Assessment Simulatie: geen feedback tussendoor, tijdsdruk, eindrapport
 5. 🎯 Zwakke Punten Training: kiest automatisch je zwakste onderdelen uit de sessie
 6. 🛠️ Zelf Instellen: niveau, moeilijkheid, categorie, duur, tijdsdruk, feedback en hints
